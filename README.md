@@ -1,126 +1,135 @@
-# Key Rescata
+# OpenShelter
 
-Sitio web de código abierto para organizaciones de rescate animal y adopción de mascotas. Construido con **Next.js 16**, **Tailwind CSS v4** y **shadcn/ui**.
+OpenShelter is an open-source website for animal rescue organizations and pet adoption. It provides a pet catalog, individual adoption profiles with application forms, donation pages, contact pages, and the legal pages every shelter needs — ready to deploy in minutes.
 
-## Licencia y uso
+Built with **Next.js 16**, **Tailwind CSS v4**, and **shadcn/ui**.
 
-Este proyecto es **código abierto** y de **uso libre para organizaciones** (refugios, albergues, asociaciones y grupos de rescate animal).
+## License
 
-- ✅ Puedes descargarlo, usarlo, modificarlo y desplegarlo libremente.
-- ❌ **Está prohibida su venta**, ya sea del proyecto tal cual o con modificaciones.
-- ❌ **No está permitido su uso con fines comerciales o de lucro** por particulares.
-- 📌 El uso está orientado a **organizaciones sin fines de lucro** dedicadas al bienestar animal.
+OpenShelter is **open-source software**. It is free to download, use, modify, and deploy for any **non-profit animal welfare organization** — shelters, rescues, sanctuaries, and foster groups.
 
-Cualquier redistribución debe conservar el aviso de licencia original.
+- ✅ Free to use, modify, and redistribute for non-profit organizations
+- ❌ **Sale is prohibited** — you may not sell this project, modified or not
+- ❌ **Commercial or for-profit use is not permitted**
+- 📌 Usage is intended for **non-profit organizations** dedicated to animal welfare
 
-## Características
+Any redistribution must retain the original license notice.
 
-- 🐾 **Catálogo de mascotas**: tarjetas en la portada enlazadas a perfiles individuales.
-- 📋 **Perfiles de adopción**: galería de fotos, datos (edad, tamaño, sexo, ubicación), historia, requisitos de adopción y formulario de solicitud.
-- 💚 **Donaciones**: donación única por tarjeta, transferencia (SPEI) o PayPal.
-- ✉️ **Contacto**: datos de la organización y formulario de mensaje.
-- 📄 Páginas legales: **Aviso de privacidad** y **Términos y condiciones**.
+## Features
 
-## Tecnologías
+- 🐾 **Pet catalog** — cards on the landing page linking to individual profiles
+- 📋 **Adoption profiles** — photo gallery, details (age, size, sex, location), story, adoption requirements, and application form
+- 💚 **Donations** — one-time donations via card, bank transfer (SPEI), or PayPal
+- ✉️ **Contact** — organization contact details and a message form
+- 📄 Legal pages — **Privacy policy** and **Terms & conditions**
+
+## Tech Stack
 
 - [Next.js](https://nextjs.org) 16 (App Router)
 - [React](https://react.dev) 19
 - [Tailwind CSS](https://tailwindcss.com) v4
 - [shadcn/ui](https://ui.shadcn.com)
-- [lucide-react](https://lucide.dev) (iconos)
+- [lucide-react](https://lucide.dev) (icons)
 
-## Requisitos
+## Prerequisites
 
-- Node.js 20 o superior
-- npm o pnpm
+- Node.js 20 or later
+- npm or pnpm
 
-## Instalación
+## Installation
 
 ```bash
-# Clonar el repositorio
-git clone <url-del-repositorio>
-cd adopt-me
+# Clone the repository
+git clone https://github.com/Chikavi1/OpenShelter.git
+cd OpenShelter
 
-# Instalar dependencias (con pnpm)
+# Install dependencies (with pnpm)
 pnpm install
-# o con npm
+# or with npm
 npm install
 ```
 
-## Configuración
+## Configuration
 
-Copia `.env.example` a `.env` y ajusta los valores:
+Copy `.env.example` to `.env` and adjust the values to match your organization:
 
 ```bash
 cp .env.example .env
 ```
 
-| Variable | Descripción |
+| Variable | Description |
 | --- | --- |
-| `NEXT_PUBLIC_APP_NAME` | Nombre de la organización |
-| `NEXT_PUBLIC_LOGO_URL` | URL del logo |
-| `NEXT_PUBLIC_CONTACT_EMAIL` | Correo de contacto |
-| `NEXT_PUBLIC_CONTACT_PHONE` | Teléfono de contacto |
-| `NEXT_PUBLIC_CONTACT_ADDRESS` | Dirección |
-| `NEXT_PUBLIC_CONTACT_HOURS` | Horario de atención |
+| `NEXT_PUBLIC_APP_NAME` | Organization name |
+| `NEXT_PUBLIC_LOGO_URL` | Logo URL |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | Contact email |
+| `NEXT_PUBLIC_CONTACT_PHONE` | Contact phone |
+| `NEXT_PUBLIC_CONTACT_ADDRESS` | Organization address |
+| `NEXT_PUBLIC_CONTACT_HOURS` | Business hours |
 
-> El archivo `.env` no debe subirse al repositorio (está en `.gitignore`). Solo `.env.example` se versiona.
+> The `.env` file must never be committed to the repository (it is in `.gitignore`). Only `.env.example` is versioned.
 
-## Poner en marcha
+## Development
 
 ```bash
-# Entorno de desarrollo
+# Start the development server
 pnpm dev
-# o
+# or
 npm run dev
+```
 
-# Build de producción
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Production
+
+```bash
+# Create a production build
 pnpm build
+# or
 npm run build
 
-# Servir el build de producción
+# Serve the production build
 pnpm start
+# or
 npm run start
 
-# Lint
+# Lint the codebase
 pnpm lint
+# or
 npm run lint
 ```
 
-Abre [http://localhost:3000](http://localhost:3000) para ver el sitio.
-
-## Estructura del proyecto
+## Project Structure
 
 ```
 app/
-├── page.tsx                 # Portada: hero, catálogo de mascotas, donativos, contacto
-├── layout.tsx               # Layout raíz con tema y fuentes
-├── globals.css              # Estilos globales y tema (Tailwind v4)
+├── page.tsx                 # Landing: hero, pet catalog, donations, contact
+├── layout.tsx               # Root layout with theme and fonts
+├── globals.css              # Global styles and theme (Tailwind v4)
 ├── adopta/
-│   ├── milo/page.tsx        # Perfil de Milo
-│   ├── luna/page.tsx        # Perfil de Luna
-│   ├── bruno/page.tsx       # Perfil de Bruno
-│   └── nube/page.tsx        # Perfil de Nube
-├── donar/page.tsx           # Página de donaciones
-├── contacto/page.tsx        # Página de contacto
-├── privacidad/page.tsx      # Aviso de privacidad
-└── terminos/page.tsx        # Términos y condiciones
+│   ├── milo/page.tsx        # Milo's profile
+│   ├── luna/page.tsx        # Luna's profile
+│   ├── bruno/page.tsx       # Bruno's profile
+│   └── nube/page.tsx        # Nube's profile
+├── donar/page.tsx           # Donation page
+├── contacto/page.tsx        # Contact page
+├── privacidad/page.tsx      # Privacy policy
+└── terminos/page.tsx        # Terms and conditions
 ```
 
-## Cómo agregar una mascota
+## Adding a Pet
 
-1. Crea un perfil en `app/adopta/<slug>/page.tsx` siguiendo la estructura de un perfil existente (p. ej. `milo`).
-2. Agrega la mascota al array `pets` en `app/page.tsx` con su `slug` para que aparezca en el catálogo.
-3. Coloca las fotos en `public/` y refiérelas desde la galería del perfil.
+1. Create a profile at `app/adopta/<slug>/page.tsx`, following the structure of an existing profile (e.g. `milo`).
+2. Add the pet to the `pets` array in `app/page.tsx` with its `slug` so it appears in the catalog.
+3. Place the photos in `public/` and reference them from the profile gallery.
 
-## Despliegue
+## Deployment
 
-El sitio es estático y funciona sin servidor. Puedes desplegarlo en [Vercel](https://vercel.com), Netlify, Cloudflare Pages o cualquier host que soporte Next.js.
+The site is fully static and requires no server. Deploy it on [Vercel](https://vercel.com), Netlify, Cloudflare Pages, or any host that supports Next.js.
 
-## Contribuciones
+## Contributing
 
-¿Eres una organización de rescate? Las contribuciones, correcciones de bugs y mejoras de accesibilidad son bienvenidas. Abre un *issue* o envía un *pull request*.
+Contributions are welcome. Please open an issue or submit a pull request for bug fixes, improvements, or accessibility enhancements.
 
-## Contacto del proyecto
+## Support
 
-Para dudas sobre el uso de este proyecto, abre un *issue* en el repositorio.
+For questions about using OpenShelter, open an issue on GitHub.
