@@ -38,12 +38,12 @@ export default function Page() {
         <header className="flex items-center justify-between border-b border-foreground/10 py-5">
           <a href="#inicio" className="flex items-center gap-2 font-semibold tracking-tight">{logoUrl ? <img src={logoUrl} alt={appName} className="size-8 rounded-full object-cover" /> : <span className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground"><PawPrint className="size-4" /></span>} {appName.toLowerCase()}</a>
           <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-            <a href="#adopta" className="transition-colors hover:text-foreground">Adopta</a><a href="#nosotros" className="transition-colors hover:text-foreground">Nosotros</a><a href="#impacto" className="transition-colors hover:text-foreground">Impacto</a><a href="#donativos" className="transition-colors hover:text-foreground">Donativos</a>
+            <a href="#adopta" className="transition-colors hover:text-foreground">Adopta</a><a href="#nosotros" className="transition-colors hover:text-foreground">Nosotros</a><a href="#impacto" className="transition-colors hover:text-foreground">Impacto</a><a href="#agradecimientos" className="transition-colors hover:text-foreground">Gracias</a><a href="#donativos" className="transition-colors hover:text-foreground">Donativos</a><a href="/dashboard" className="font-semibold text-primary transition-colors hover:underline">Panel Refugio</a>
           </nav>
           <a href="#formulario" className="hidden rounded-full border border-foreground/20 px-5 py-2 text-sm font-medium transition hover:bg-primary hover:text-primary-foreground sm:block">Quiero adoptar <ArrowRight className="ml-2 inline size-4" /></a>
           <button aria-label="Abrir menú" className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
         </header>
-        {menuOpen && <nav className="flex flex-col gap-4 border-b border-foreground/10 py-5 text-sm md:hidden"><a href="#adopta" onClick={() => setMenuOpen(false)}>Adopta</a><a href="#nosotros" onClick={() => setMenuOpen(false)}>Nosotros</a><a href="#impacto" onClick={() => setMenuOpen(false)}>Impacto</a><a href="#formulario" onClick={() => setMenuOpen(false)}>Quiero adoptar</a></nav>}
+        {menuOpen && <nav className="flex flex-col gap-4 border-b border-foreground/10 py-5 text-sm md:hidden"><a href="#adopta" onClick={() => setMenuOpen(false)}>Adopta</a><a href="#nosotros" onClick={() => setMenuOpen(false)}>Nosotros</a><a href="#impacto" onClick={() => setMenuOpen(false)}>Impacto</a><a href="#agradecimientos" onClick={() => setMenuOpen(false)}>Gracias</a><a href="/dashboard" onClick={() => setMenuOpen(false)} className="font-semibold text-primary">Panel Refugio</a><a href="#formulario" onClick={() => setMenuOpen(false)}>Quiero adoptar</a></nav>}
 
         <section id="inicio" className="grid gap-10 py-14 md:py-20 lg:grid-cols-[1fr_0.9fr] lg:items-end lg:gap-20">
           <div className="max-w-3xl"><p className="mb-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"><span className="size-2 rounded-full bg-accent" /> Rescate y adopción responsable</p><h1 className="text-balance text-5xl font-semibold leading-[0.95] tracking-[-0.065em] sm:text-7xl lg:text-[6.7rem]">Una segunda oportunidad <span className="text-muted-foreground">cambia dos vidas.</span></h1><p className="mt-8 max-w-xl text-lg leading-7 text-muted-foreground">Rescatamos, rehabilitamos y conectamos mascotas increíbles con personas listas para quererlas para siempre.</p><div className="mt-9 flex flex-wrap gap-3"><a href="#adopta" className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition hover:scale-[1.02]">Conoce a los rescatados <ArrowRight className="ml-2 inline size-4" /></a><a href="#nosotros" className="rounded-full border border-foreground/15 px-6 py-3 text-sm font-medium transition hover:bg-muted">Conoce nuestra historia</a></div></div>
@@ -57,6 +57,39 @@ export default function Page() {
         <section id="nosotros" className="scroll-mt-10 grid gap-10 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:items-center"><div className="overflow-hidden rounded-[2rem] bg-secondary"><img src={RESCUE_IMAGE} alt="Voluntaria cuidando perros rescatados" className="h-[460px] w-full object-cover" /></div><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Quiénes somos</p><h2 className="max-w-xl text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">No salvamos mascotas. <span className="text-muted-foreground">Salvamos futuros.</span></h2><p className="mt-6 max-w-lg text-lg leading-8 text-muted-foreground">{capitalizedAppName} nació de un grupo de personas que decidió hacer algo frente al abandono. Cada rescate recibe atención médica, alimento, cariño y una familia que lo espera.</p><div className="mt-8 grid max-w-lg gap-4 sm:grid-cols-2">{['Rescate con respeto', 'Adopción responsable', 'Transparencia total', 'Comunidad que acompaña'].map((item) => <p key={item} className="flex items-center gap-3 text-sm font-medium"><span className="grid size-7 place-items-center rounded-full bg-accent"><Check className="size-4" /></span>{item}</p>)}</div></div></section>
 
         <section id="impacto" className="scroll-mt-10 rounded-[2rem] bg-accent p-7 sm:p-12"><div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-accent-foreground/60">Nuestro impacto</p><h2 className="max-w-xl text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">Cada gesto se convierte en una historia feliz.</h2></div><p className="max-w-xs text-sm leading-6 text-accent-foreground/70">Con tu ayuda podemos seguir atendiendo rescates urgentes y encontrar hogares para más animales.</p></div><div className="mt-14 grid gap-8 border-t border-accent-foreground/20 pt-8 sm:grid-cols-3"><div><p className="text-5xl font-semibold tracking-[-0.06em]">16</p><p className="mt-2 text-sm text-accent-foreground/65">adopciones felices</p></div><div><p className="text-5xl font-semibold tracking-[-0.06em]">10</p><p className="mt-2 text-sm text-accent-foreground/65">rescates atendidos</p></div><div><p className="text-5xl font-semibold tracking-[-0.06em]">92%</p><p className="mt-2 text-sm text-accent-foreground/65">de donativos directo al rescate</p></div></div></section>
+
+        {/* PUBLIC THANKS WALL SECTION */}
+        <section id="agradecimientos" className="scroll-mt-10 py-24">
+          <div className="mb-12 text-center max-w-2xl mx-auto">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Muro de Reconocimiento</p>
+            <h2 className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">Gracias por hacer esto posible</h2>
+            <p className="mt-4 text-muted-foreground leading-relaxed">Nuestra labor existe gracias a la generosidad de donantes, padrinos, empresas aliadas y voluntarios dedicados.</p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { name: 'Veterinaria San Antonio', role: 'Empresa Aliada', contribution: 'Campañas de esterilización gratuita', msg: 'Gracias por brindar atención médica profesional y de corazón a nuestros rescatados.', img: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=300&q=80' },
+              { name: 'Gonzalo & Sofía', role: 'Donantes', contribution: '$5,000 MXN en alimento ProPlan', msg: 'Su aportación permitió alimentar a la camada de 6 cachorros durante dos meses completos.', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80' },
+              { name: 'Lucía Fernández', role: 'Voluntaria Fotógrafa', contribution: 'Fotografía profesional de catálogo', msg: 'Gracias a sus fotos, 4 perritos consiguieron familia en tiempo récord.', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80' }
+            ].map((t, idx) => (
+              <div key={idx} className="rounded-3xl border border-foreground/10 bg-card p-6 flex flex-col justify-between space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <img src={t.img} alt={t.name} className="size-12 rounded-full object-cover border border-foreground/10" />
+                    <div>
+                      <h3 className="font-semibold text-base">{t.name}</h3>
+                      <span className="text-xs text-primary font-medium">{t.role}</span>
+                    </div>
+                  </div>
+                  <div className="rounded-xl bg-secondary p-3 text-xs">
+                    <span className="text-muted-foreground uppercase font-bold text-[10px] block">Aportación:</span>
+                    <p className="font-medium text-foreground">{t.contribution}</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground italic leading-relaxed">"{t.msg}"</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <section id="donativos" className="scroll-mt-10 flex flex-col justify-between gap-8 py-24 lg:flex-row lg:items-center"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Donativos</p><h2 className="max-w-2xl text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">Tu ayuda puede llenar un plato, cubrir una cirugía o cambiar un destino.</h2></div><div className="max-w-sm rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm leading-6 text-muted-foreground">Aporta desde $100 MXN y acompáñanos a construir más finales felices.</p><a href="/donar" className="mt-6 flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">Quiero donar <ArrowRight className="ml-2 inline size-4" /></a></div></section>
 
