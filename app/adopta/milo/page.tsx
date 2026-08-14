@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, Heart, PawPrint, ShieldCheck } from 'lucide-react'
+import { VaccinationHistory } from '@/components/vaccination-history'
 
 const photos = [
   'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=1200&q=90',
@@ -32,6 +33,20 @@ export default function MiloProfilePage() {
           </div>
           <div className="lg:pt-3"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Conoce a tu nuevo mejor amigo</p><h1 className="mt-4 text-6xl font-semibold tracking-[-0.07em] sm:text-8xl">Milo<span className="text-muted-foreground"></span></h1><p className="mt-5 max-w-lg text-lg leading-8 text-muted-foreground">Un mestizo noble y cariñoso que está listo para llenar tu casa de juegos, paseos y mucho amor.</p><div className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/10 sm:grid-cols-4"><Stat label="Edad" value="2 años" /><Stat label="Tamaño" value="Mediano" /><Stat label="Sexo" value="Macho" /><Stat label="Ubicación" value="CDMX" /></div><div className="mt-9 flex flex-wrap gap-2">{['Leal', 'Curioso', 'Juguetón', 'Convive con perros'].map((tag) => <span key={tag} className="rounded-full border border-foreground/15 px-4 py-2 text-sm">{tag}</span>)}</div><div className="mt-10 border-t border-foreground/10 pt-8"><h2 className="text-2xl font-semibold">Su historia</h2><p className="mt-3 leading-7 text-muted-foreground">Milo llegó con nosotros después de ser encontrado en una carretera. Hoy está sano, vacunado y aprendió que las personas también pueden ser sinónimo de seguridad. Sus paseos favoritos terminan con una siesta al sol.</p></div><div className="mt-8 flex items-center gap-3 text-sm text-muted-foreground"><ShieldCheck className="size-5 text-accent-foreground" /> Esterilizado, vacunado y con seguimiento veterinario</div></div>
         </section>
+
+        <VaccinationHistory
+          petName="Milo"
+          species="Perro"
+          highlights={['Esterilizado', 'Desparasitado']}
+          nextAppointment="5 de septiembre, 2026"
+          records={[
+            { vaccine: 'Múltiple (Distemper, Parvovirus, Adenovirus)', date: 'Junio 2024', clinic: 'Refugio Huellas Central' },
+            { vaccine: 'Rabia', date: 'Julio 2024', clinic: 'Refugio Huellas Central' },
+            { vaccine: 'Refuerzo Múltiple', date: 'Junio 2025', clinic: 'Veterinaria San Antonio' },
+            { vaccine: 'Refuerzo de Rabia', date: 'Julio 2025', clinic: 'Veterinaria San Antonio' },
+            { vaccine: 'Refuerzo Múltiple', date: 'Junio 2026', clinic: 'Veterinaria San Antonio' },
+          ]}
+        />
 
         <section className="rounded-[2rem] border border-foreground/10 bg-card p-6 sm:p-10">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Requisitos de adopción</p>

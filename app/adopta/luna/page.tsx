@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, Heart, PawPrint, ShieldCheck } from 'lucide-react'
+import { VaccinationHistory } from '@/components/vaccination-history'
 
 const photos = [
   'https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=1200&q=90',
@@ -32,6 +33,19 @@ export default function LunaProfilePage() {
           </div>
           <div className="lg:pt-3"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Conoce a tu nuevo mejor amigo</p><h1 className="mt-4 text-6xl font-semibold tracking-[-0.07em] sm:text-8xl">Luna<span className="text-muted-foreground"></span></h1><p className="mt-5 max-w-lg text-lg leading-8 text-muted-foreground">Una gata carey dulce y tranquila que elige a su persona para ronronear y dormir la siesta.</p><div className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/10 sm:grid-cols-4"><Stat label="Edad" value="1 año" /><Stat label="Tamaño" value="Pequeño" /><Stat label="Sexo" value="Hembra" /><Stat label="Ubicación" value="CDMX" /></div><div className="mt-9 flex flex-wrap gap-2">{['Mimosota', 'Curiosa', 'Tranquila', 'Convive con gatos'].map((tag) => <span key={tag} className="rounded-full border border-foreground/15 px-4 py-2 text-sm">{tag}</span>)}</div><div className="mt-10 border-t border-foreground/10 pt-8"><h2 className="text-2xl font-semibold">Su historia</h2><p className="mt-3 leading-7 text-muted-foreground">Luna fue rescatada de una colonia en situación vulnerable. Hoy está sana, esterilizada y descubrió que dormir en un sillón calientito es lo mejor que le ha pasado. Es calladita, pero su ronroneo lo dice todo.</p></div><div className="mt-8 flex items-center gap-3 text-sm text-muted-foreground"><ShieldCheck className="size-5 text-accent-foreground" /> Esterilizada, vacunada y con seguimiento veterinario</div></div>
         </section>
+
+        <VaccinationHistory
+          petName="Luna"
+          species="Gato"
+          highlights={['Esterilizada', 'Desparasitada', 'Prueba de Leucemia Felina (FeLV) negativa']}
+          nextAppointment="10 de septiembre, 2026"
+          records={[
+            { vaccine: 'Trivalente Felina (Herpesvirus, Calicivirus, Panleucopenia)', date: 'Enero 2025', clinic: 'Clínica Felina El Ronroneo' },
+            { vaccine: 'Rabia', date: 'Febrero 2025', clinic: 'Clínica Felina El Ronroneo' },
+            { vaccine: 'Refuerzo Trivalente Felina', date: 'Enero 2026', clinic: 'Clínica Felina El Ronroneo' },
+            { vaccine: 'Refuerzo de Rabia', date: 'Febrero 2026', clinic: 'Clínica Felina El Ronroneo' },
+          ]}
+        />
 
         <section className="rounded-[2rem] border border-foreground/10 bg-card p-6 sm:p-10">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Requisitos de adopción</p>

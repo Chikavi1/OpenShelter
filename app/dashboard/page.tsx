@@ -25,10 +25,8 @@ import {
   Edit,
   Trash2,
   Check,
-  AlertCircle,
   Bell,
   UserCheck,
-  ShieldCheck,
   LogOut,
   ChevronDown,
   Settings,
@@ -57,7 +55,8 @@ import {
   ToggleLeft,
   CalendarDays,
   Hash,
-  ListFilter
+  ListFilter,
+  Lock
 } from 'lucide-react'
 
 // Types
@@ -380,9 +379,18 @@ const INITIAL_SETTINGS: ShelterSettings = {
   }
 }
 
+const ADMIN_EMAIL = 'admin@root.com'
+const ADMIN_PASSWORD = '12345678A'
+const SESSION_COOKIE = 'huellas_admin_session'
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const handleLogout = () => {
+    document.cookie = `${SESSION_COOKIE}=; path=/; max-age=0; SameSite=Lax`
+    window.location.href = '/dashboard/login'
+  }
 
   // Main Data States
   const [pets, setPets] = useState<Pet[]>(INITIAL_PETS)
@@ -987,6 +995,13 @@ export default function DashboardPage() {
             <LogOut className="size-3.5" />
             Volver a la web pública
           </Link>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-xs font-medium text-red-600 hover:text-red-700 px-2 py-1 transition"
+          >
+            <Lock className="size-3.5" />
+            Cerrar sesión
+          </button>
         </div>
       </aside>
 
@@ -1732,7 +1747,7 @@ export default function DashboardPage() {
                       <div className="grid gap-3 sm:grid-cols-2">
                         {settings.adoptionFormFields.map((field) => {
                           const val = app.customResponses?.[field.id] ?? (field.type === 'boolean' ? 'Sí' : 'No especificado')
-                          return (
+  return (
                             <div key={field.id} className="flex flex-col">
                               <span className="text-muted-foreground font-medium">{field.label}:</span>
                               <span className="font-semibold text-foreground">
