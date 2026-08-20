@@ -2,25 +2,38 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { AlertCircle, Eye, EyeOff, Lock, Mail, PawPrint, ShieldCheck } from 'lucide-react'
 
-const ADMIN_EMAIL = 'admin@root.com'
-const ADMIN_PASSWORD = '12345678A'
-const SESSION_COOKIE = 'huellas_admin_session'
-
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleLogin = (event: React.FormEvent) => {
+  const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      document.cookie = `${SESSION_COOKIE}=active; path=/; max-age=28800; SameSite=Lax`
-      window.location.href = '/dashboard'
-    } else {
-      setError('Correo o contraseña incorrectos.')
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
+      if (!response.ok) {
+        setError('Correo o contraseña incorrectos.')
+        return
+      }
+
+      router.replace('/dashboard')
+      router.refresh()
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -31,7 +44,7 @@ export default function LoginPage() {
           <span className="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground">
             <PawPrint className="size-5" />
           </span>
-          huellas
+          Panel
         </Link>
         <div className="w-full rounded-[2rem] border border-foreground/10 bg-card p-6 sm:p-8">
           <div className="mb-6 text-center">
@@ -81,7 +94,7 @@ export default function LoginPage() {
               </span>
             </label>
             {error && <p className="flex items-center gap-2 rounded-xl bg-red-50 p-3 text-xs font-medium text-red-700"><AlertCircle className="size-4 shrink-0" /> {error}</p>}
-            <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:scale-[1.01]">
+            <button type="submit" disabled={isSubmitting} className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60">
               <ShieldCheck className="size-4" /> Entrar al panel
             </button>
           </form>

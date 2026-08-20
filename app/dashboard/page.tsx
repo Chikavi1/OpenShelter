@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   PawPrint,
   Heart,
   FileText,
-  PlusCircle,
   Users,
   Search,
   Filter,
@@ -56,11 +56,22 @@ import {
   CalendarDays,
   Hash,
   ListFilter,
+  HandCoins,
   Lock
 } from 'lucide-react'
+import { slugify } from '@/lib/slug'
+import { applySitePalette } from '@/lib/theme'
 
 // Types
 type TabType = 'overview' | 'pets' | 'register-pet' | 'applications' | 'foster-homes' | 'thanks' | 'settings'
+
+function BrandMark({ src, alt, className = '' }: { src: string; alt: string; className?: string }) {
+  return (
+    <span className={`grid overflow-hidden place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm ${className}`}>
+      <img src={src} alt={alt} className="h-full w-full object-cover" />
+    </span>
+  )
+}
 
 export type CustomFieldType = 'text' | 'email' | 'tel' | 'date' | 'number' | 'select' | 'boolean' | 'textarea'
 
@@ -151,11 +162,27 @@ interface ShelterSettings {
   zipCode: string
   primaryColor: string
   accentColor: string
+  palette: {
+    primary: string
+    secondary: string
+    background: string
+    cta: string
+    text: string
+    surface: string
+  }
   logoUrl: string
   heroBannerUrl: string
   adoptionContractTerms: string
   shelterRules: string
   visitingHours: string
+  supportTitle: string
+  supportDescription: string
+  transferBankName: string
+  transferClabe: string
+  transferOwner: string
+  transferReference: string
+  paypalUrl: string
+  supportNotes: string
   // Form Configurations
   adoptionFormFields: CustomFormField[]
   fosterFormFields: CustomFormField[]
@@ -167,229 +194,101 @@ interface ShelterSettings {
   }
 }
 
-// Initial Mock Data
-const INITIAL_PETS: Pet[] = [
-  {
-    id: 'pet-1',
-    name: 'Milo',
-    species: 'Perro',
-    breed: 'Mestizo',
-    age: '2 años',
-    gender: 'Macho',
-    size: 'Mediano',
-    status: 'Disponible',
-    location: 'CDMX (Refugio Central)',
-    image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85',
-    health: ['Vacunas al día', 'Esterilizado', 'Desparasitado'],
-    personality: ['Juguetón', 'Cariñoso', 'Sociable'],
-    story: 'Fue rescatado en una zona concurrida y ha demostrado ser un compañero leal y vital.',
-    views: 342,
-    applicationsCount: 4
-  },
-  {
-    id: 'pet-2',
-    name: 'Luna',
-    species: 'Gato',
-    breed: 'Carey',
-    age: '1 año',
-    gender: 'Hembra',
-    size: 'Pequeño',
-    status: 'En Proceso',
-    location: 'CDMX (Hogar Temporal)',
-    image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=900&q=85',
-    health: ['Vacunas al día', 'Esterilizada'],
-    personality: ['Tranquila', 'Observadora', 'Mimada'],
-    story: 'Encontrada cuando era muy pequeña. Le encanta dormir en sofás suaves.',
-    views: 218,
-    applicationsCount: 2
-  },
-  {
-    id: 'pet-3',
-    name: 'Bruno',
-    species: 'Perro',
-    breed: 'Labrador Mestizo',
-    age: '4 años',
-    gender: 'Macho',
-    size: 'Grande',
-    status: 'Disponible',
-    location: 'Toluca',
-    image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=900&q=85',
-    health: ['Vacunas al día', 'Esterilizado', 'Microchip'],
-    personality: ['Noble', 'Protector', 'Activo'],
-    story: 'Le encanta correr al aire libre y jugar a atrapar la pelota.',
-    views: 405,
-    applicationsCount: 5
-  },
-  {
-    id: 'pet-4',
-    name: 'Nube',
-    species: 'Gato',
-    breed: 'Blanco',
-    age: '8 meses',
-    gender: 'Hembra',
-    size: 'Pequeño',
-    status: 'Adoptado',
-    location: 'Puebla',
-    image: 'https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=900&q=85',
-    health: ['Vacunas al día', 'Esterilizada'],
-    personality: ['Curiosa', 'Tierna'],
-    story: 'Ya encontró su hogar definitivo y vive felizmente con su nueva familia.',
-    views: 520,
-    applicationsCount: 6
-  }
-]
-
-const INITIAL_APPLICATIONS: AdoptionApplication[] = [
-  {
-    id: 'sol-101',
-    applicantName: 'Carolina Mendoza',
-    applicantEmail: 'carolina.m@example.com',
-    applicantPhone: '+52 55 1234 5678',
-    petName: 'Milo',
-    petId: 'pet-1',
-    petImage: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85',
-    homeType: 'Casa',
-    hasOtherPets: true,
-    yard: true,
-    status: 'Pendiente',
-    dateSubmitted: '14 de Agosto, 2026',
-    experience: 'He tenido perros mestizos antes durante 10 años. Busco un compañero activo.',
-    customResponses: {
-      'birth_date': '1994-06-15',
-      'has_had_dogs': true,
-      'hours_alone': '4 horas'
-    }
-  },
-  {
-    id: 'sol-102',
-    applicantName: 'Rodrigo Torres',
-    applicantEmail: 'rodrigo.t@example.com',
-    applicantPhone: '+52 55 9876 5432',
-    petName: 'Luna',
-    petId: 'pet-2',
-    petImage: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=900&q=85',
-    homeType: 'Departamento',
-    hasOtherPets: false,
-    yard: false,
-    status: 'En revisión',
-    dateSubmitted: '13 de Agosto, 2026',
-    experience: 'Vivo solo, trabajo desde casa y cuento con espacio tranquilo para un gatito.',
-    customResponses: {
-      'birth_date': '1998-11-20',
-      'has_had_dogs': false,
-      'hours_alone': '2 horas'
-    }
-  }
-]
-
-const INITIAL_FOSTER_HOMES: FosterHome[] = [
-  {
-    id: 'fh-1',
-    name: 'Dra. Andrea Salgado',
-    email: 'andrea.salgado@example.com',
-    phone: '+52 55 4433 2211',
-    address: 'Calle Duraznos 45, Col. Coyoacán',
-    city: 'CDMX',
-    homeType: 'Casa',
-    yard: true,
-    preferredSpecies: 'Gatos',
-    maxCapacity: 3,
-    currentPetsCount: 1,
-    status: 'Activa',
-    notes: 'Cuenta con habitación aislada especial para gatitos recién nacidos o post-operatorio.',
-    registeredDate: '15 de Mayo, 2026',
-    currentFosteredPet: 'Luna (Gato)'
-  },
-  {
-    id: 'fh-2',
-    name: 'Familia Ramírez Varela',
-    email: 'contacto.ramirez@example.com',
-    phone: '+52 55 8899 7766',
-    address: 'Av. Paseo de las Palmas 210',
-    city: 'Toluca',
-    homeType: 'Finca',
-    yard: true,
-    preferredSpecies: 'Perros',
-    maxCapacity: 2,
-    currentPetsCount: 0,
-    status: 'Disponible',
-    notes: 'Jardín de más de 200m2 totalmente bardado. Excelente para perros de tamaño grande.',
-    registeredDate: '02 de Junio, 2026'
-  }
-]
-
-const INITIAL_THANKS: SponsorThank[] = [
-  {
-    id: 'th-1',
-    name: 'Veterinaria San Antonio',
-    role: 'Empresa Aliada',
-    amountOrContribution: 'Campañas gratuitas de esterilización y vacunación',
-    message: 'Gracias por brindar atención médica profesional y de corazón a más de 30 rescatados este año.',
-    avatarUrl: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=300&q=80',
-    date: '12 de Agosto, 2026',
-    isPublic: true
-  },
-  {
-    id: 'th-2',
-    name: 'Gonzalo & Sofía',
-    role: 'Donante',
-    amountOrContribution: '$5,000 MXN en alimento ProPlan',
-    message: 'Su aportación permitió alimentar a la camada de 6 cachorros rescatados durante dos meses completos.',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-    date: '05 de Agosto, 2026',
-    isPublic: true
-  }
-]
-
+// Initial empty state
+const INITIAL_PETS: Pet[] = []
+const INITIAL_APPLICATIONS: AdoptionApplication[] = []
+const INITIAL_FOSTER_HOMES: FosterHome[] = []
+const INITIAL_THANKS: SponsorThank[] = []
 const INITIAL_SETTINGS: ShelterSettings = {
-  name: 'Refugio Huellas',
-  tagline: 'Rescate y Adopción Responsable',
-  description: 'Somos una organización sin fines de lucro dedicada al rescate, rehabilitación médica y búsqueda de hogares definitivos para animales en situación de calle o abandono.',
-  phone: '+52 55 8765 4321',
-  email: 'contacto@huellasrefugio.org',
-  address: 'Av. Insurgentes Sur 1230, Col. Del Valle',
-  city: 'Ciudad de México',
-  state: 'CDMX',
-  country: 'México',
-  zipCode: '03100',
-  primaryColor: '#1d3f33',
-  accentColor: '#dceebf',
-  logoUrl: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=300&q=80',
-  heroBannerUrl: 'https://images.unsplash.com/photo-1660535254205-b9f03a7b84dc?q=80&w=857&auto=format&fit=crop',
-  adoptionContractTerms: `CONTRATO DE ADOPCIÓN RESPONSABLE...`,
-  shelterRules: `REGLAMENTO Y POLITICAS DEL REFUGIO...`,
-  visitingHours: 'Lunes a Sábado: 10:00 - 17:00 | Domingos: Solo con cita previa',
-  adoptionFormFields: [
-    { id: 'f-1', label: 'Fecha de Nacimiento', type: 'date', required: true },
-    { id: 'f-2', label: '¿Has tenido perros o gatos previamente?', type: 'boolean', required: true },
-    { id: 'f-3', label: '¿Cuántas horas al día pasará la mascota sola?', type: 'select', options: ['Menos de 3 horas', 'De 3 a 6 horas', 'Más de 6 horas'], required: true },
-    { id: 'f-4', label: 'Teléfono alternativo de emergencia', type: 'tel', required: false }
-  ],
-  fosterFormFields: [
-    { id: 'ff-1', label: 'Fecha disponible para iniciar hospedaje', type: 'date', required: true },
-    { id: 'ff-2', label: '¿Tienes área aislada para cuarentena o post-operatorio?', type: 'boolean', required: true },
-    { id: 'ff-3', label: 'Experiencia administrando medicamentos veterinarios', type: 'select', options: ['Sin experiencia', 'Básica (Pastillas/Gotas)', 'Avanzada (Inyecciones/Curaciones)'], required: true },
-    { id: 'ff-4', label: 'Número de adultos y niños en casa', type: 'number', required: true }
-  ],
-  fosterRequirements: 'Patios bien bardados, compromiso mínimo de 2 semanas, disponibilidad para llevar a la mascota a revisiones o ferias de adopción y amor infinito.',
+  name: '',
+  tagline: '',
+  description: '',
+  phone: '',
+  email: '',
+  address: '',
+  city: '',
+  state: '',
+  country: '',
+  zipCode: '',
+  primaryColor: '',
+  accentColor: '',
+  palette: {
+    primary: '#163b2d',
+    secondary: '#e8e1d5',
+    background: '#f5f1e9',
+    cta: '#c5e86c',
+    text: '#24352d',
+    surface: '#fcfaf6',
+  },
+  logoUrl: '',
+  heroBannerUrl: '',
+  adoptionContractTerms: '',
+  shelterRules: '',
+  visitingHours: '',
+  supportTitle: '',
+  supportDescription: '',
+  transferBankName: '',
+  transferClabe: '',
+  transferOwner: '',
+  transferReference: '',
+  paypalUrl: '',
+  supportNotes: '',
+  adoptionFormFields: [],
+  fosterFormFields: [],
+  fosterRequirements: '',
   socialLinks: {
-    instagram: 'https://instagram.com/huellasrefugio',
-    facebook: 'https://facebook.com/huellasrefugio',
-    website: 'https://huellasrefugio.org'
-  }
+    instagram: '',
+    facebook: '',
+    website: '',
+  },
 }
 
-const ADMIN_EMAIL = 'admin@root.com'
-const ADMIN_PASSWORD = '12345678A'
-const SESSION_COOKIE = 'huellas_admin_session'
+const createEmptyPetForm = () => ({
+  name: '',
+  species: 'Perro' as 'Perro' | 'Gato' | 'Otro',
+  breed: '',
+  age: '',
+  gender: 'Macho' as 'Macho' | 'Hembra',
+  size: 'Mediano' as 'Pequeño' | 'Mediano' | 'Grande',
+  location: 'CDMX (Refugio Central)',
+  image: '',
+  story: '',
+  healthInput: 'Vacunas al día, Esterilizado',
+  personalityInput: 'Amigable, Cariñoso',
+})
+
+const createEmptyFosterForm = () => ({
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  city: 'CDMX',
+  homeType: 'Casa' as 'Casa' | 'Departamento' | 'Finca',
+  yard: true,
+  preferredSpecies: 'Cualquiera' as 'Perros' | 'Gatos' | 'Cualquiera',
+  maxCapacity: 1,
+  notes: '',
+  customResponses: {} as Record<string, string | boolean>,
+})
+
+const createEmptyThankForm = () => ({
+  name: '',
+  role: 'Donante' as 'Donante' | 'Voluntario' | 'Empresa Aliada' | 'Padrino',
+  amountOrContribution: '',
+  message: '',
+  avatarUrl: '',
+  isPublic: true,
+})
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const handleLogout = () => {
-    document.cookie = `${SESSION_COOKIE}=; path=/; max-age=0; SameSite=Lax`
-    window.location.href = '/dashboard/login'
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' })
+    router.replace('/dashboard/login')
+    router.refresh()
   }
 
   // Main Data States
@@ -398,6 +297,89 @@ export default function DashboardPage() {
   const [fosterHomes, setFosterHomes] = useState<FosterHome[]>(INITIAL_FOSTER_HOMES)
   const [thanksList, setThanksList] = useState<SponsorThank[]>(INITIAL_THANKS)
   const [settings, setSettings] = useState<ShelterSettings>(INITIAL_SETTINGS)
+  const [hydrated, setHydrated] = useState(false)
+  const saveTimer = useRef<number | null>(null)
+  const [uploadingImage, setUploadingImage] = useState<'logo' | 'hero' | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadDashboardState = async () => {
+      try {
+        const response = await fetch('/api/admin/state', { cache: 'no-store' })
+
+        if (response.status === 401) {
+          router.replace('/dashboard/login')
+          return
+        }
+
+        if (!response.ok) return
+
+        const state = await response.json() as {
+          pets?: Pet[]
+          applications?: AdoptionApplication[]
+          fosterHomes?: FosterHome[]
+          thanksList?: SponsorThank[]
+          settings?: ShelterSettings
+        }
+
+        if (cancelled) return
+
+        if (state.pets) setPets(state.pets)
+        if (state.applications) setApplications(state.applications)
+        if (state.fosterHomes) setFosterHomes(state.fosterHomes)
+        if (state.thanksList) setThanksList(state.thanksList)
+        if (state.settings) setSettings(state.settings)
+      } catch {
+        // Keep the seeded defaults if the API is unavailable.
+      } finally {
+        if (!cancelled) setHydrated(true)
+      }
+    }
+
+    void loadDashboardState()
+
+    return () => {
+      cancelled = true
+    }
+  }, [router])
+
+  useEffect(() => {
+    applySitePalette(settings)
+  }, [settings])
+
+  const persistDashboardState = useCallback(async (state: { pets: Pet[]; applications: AdoptionApplication[]; fosterHomes: FosterHome[]; thanksList: SponsorThank[]; settings: ShelterSettings }) => {
+    const response = await fetch('/api/admin/state', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state),
+    })
+
+    if (response.status === 401) {
+      router.replace('/dashboard/login')
+      return false
+    }
+
+    return response.ok
+  }, [router])
+
+  useEffect(() => {
+    if (!hydrated) return
+
+    if (saveTimer.current) {
+      window.clearTimeout(saveTimer.current)
+    }
+
+    saveTimer.current = window.setTimeout(() => {
+      void persistDashboardState({ pets, applications, fosterHomes, thanksList, settings })
+    }, 350)
+
+    return () => {
+      if (saveTimer.current) {
+        window.clearTimeout(saveTimer.current)
+      }
+    }
+  }, [hydrated, pets, applications, fosterHomes, thanksList, settings, persistDashboardState])
 
   // Filters
   const [searchTerm, setSearchTerm] = useState('')
@@ -409,51 +391,20 @@ export default function DashboardPage() {
   // Registration & Editing state for Pet
   const [editingPet, setEditingPet] = useState<Pet | null>(null)
   const [petFormActionSuccess, setPetFormActionSuccess] = useState<string | null>(null)
-  const [newPet, setNewPet] = useState({
-    name: '',
-    species: 'Perro' as 'Perro' | 'Gato' | 'Otro',
-    breed: '',
-    age: '',
-    gender: 'Macho' as 'Macho' | 'Hembra',
-    size: 'Mediano' as 'Pequeño' | 'Mediano' | 'Grande',
-    location: 'CDMX (Refugio Central)',
-    image: '',
-    story: '',
-    healthInput: 'Vacunas al día, Esterilizado',
-    personalityInput: 'Amigable, Cariñoso'
-  })
+  const [newPet, setNewPet] = useState(createEmptyPetForm())
   const [registerSuccess, setRegisterSuccess] = useState(false)
   const [settingsSuccess, setSettingsSuccess] = useState(false)
 
   // New Foster Home Modal State
   const [showAddFosterModal, setShowAddFosterModal] = useState(false)
-  const [newFoster, setNewFoster] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: 'CDMX',
-    homeType: 'Casa' as 'Casa' | 'Departamento' | 'Finca',
-    yard: true,
-    preferredSpecies: 'Cualquiera' as 'Perros' | 'Gatos' | 'Cualquiera',
-    maxCapacity: 1,
-    notes: '',
-    customResponses: {} as Record<string, string | boolean>
-  })
+  const [newFoster, setNewFoster] = useState(createEmptyFosterForm())
 
   // New Thank Modal State
   const [showAddThankModal, setShowAddThankModal] = useState(false)
-  const [newThank, setNewThank] = useState({
-    name: '',
-    role: 'Donante' as 'Donante' | 'Voluntario' | 'Empresa Aliada' | 'Padrino',
-    amountOrContribution: '',
-    message: '',
-    avatarUrl: '',
-    isPublic: true
-  })
+  const [newThank, setNewThank] = useState(createEmptyThankForm())
 
   // Settings Sub-tab state
-  const [settingsSection, setSettingsSection] = useState<'general' | 'forms' | 'appearance' | 'location' | 'legal'>('general')
+  const [settingsSection, setSettingsSection] = useState<'general' | 'forms' | 'appearance' | 'support' | 'location' | 'legal'>('general')
 
   // Form Field Builder States (Dynamic Web Inputs)
   const [newFieldTarget, setNewFieldTarget] = useState<'adoption' | 'foster'>('adoption')
@@ -504,20 +455,15 @@ export default function DashboardPage() {
   // Cancel Editing
   const handleCancelEdit = () => {
     setEditingPet(null)
-    setNewPet({
-      name: '',
-      species: 'Perro',
-      breed: '',
-      age: '',
-      gender: 'Macho',
-      size: 'Mediano',
-      location: 'CDMX (Refugio Central)',
-      image: '',
-      story: '',
-      healthInput: 'Vacunas al día, Esterilizado',
-      personalityInput: 'Amigable, Cariñoso'
-    })
+    setNewPet(createEmptyPetForm())
     setActiveTab('pets')
+  }
+
+  const handleStartCreatePet = () => {
+    setEditingPet(null)
+    setRegisterSuccess(false)
+    setNewPet(createEmptyPetForm())
+    setActiveTab('register-pet')
   }
 
   // Add Custom Web Input Field Handler
@@ -592,19 +538,7 @@ export default function DashboardPage() {
     }
     setFosterHomes(prev => [fosterToAdd, ...prev])
     setShowAddFosterModal(false)
-    setNewFoster({
-      name: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: 'CDMX',
-      homeType: 'Casa',
-      yard: true,
-      preferredSpecies: 'Cualquiera',
-      maxCapacity: 1,
-      notes: '',
-      customResponses: {}
-    })
+    setNewFoster(createEmptyFosterForm())
   }
 
   const handleUpdateFosterStatus = (id: string, status: FosterHome['status']) => {
@@ -632,14 +566,7 @@ export default function DashboardPage() {
     }
     setThanksList(prev => [thankToAdd, ...prev])
     setShowAddThankModal(false)
-    setNewThank({
-      name: '',
-      role: 'Donante',
-      amountOrContribution: '',
-      message: '',
-      avatarUrl: '',
-      isPublic: true
-    })
+    setNewThank(createEmptyThankForm())
   }
 
   const handleToggleThankPublic = (id: string) => {
@@ -653,12 +580,52 @@ export default function DashboardPage() {
   }
 
   // Save Shelter Settings
-  const handleSaveSettings = (e: React.FormEvent) => {
+  const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const ok = await persistDashboardState({ pets, applications, fosterHomes, thanksList, settings })
+    if (!ok) return
+
     setSettingsSuccess(true)
     setTimeout(() => {
       setSettingsSuccess(false)
     }, 2500)
+  }
+
+  const handleCloseFosterModal = () => {
+    setShowAddFosterModal(false)
+    setNewFoster(createEmptyFosterForm())
+  }
+
+  const handleCloseThankModal = () => {
+    setShowAddThankModal(false)
+    setNewThank(createEmptyThankForm())
+  }
+
+  const handleImageUpload = async (target: 'logo' | 'hero', file?: File) => {
+    if (!file) return
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    setUploadingImage(target)
+    try {
+      const response = await fetch('/api/admin/uploads', { method: 'POST', body: formData })
+
+      if (!response.ok) {
+        throw new Error('Upload failed')
+      }
+
+      const asset = await response.json() as { url: string }
+
+      setSettings(prev => target === 'logo'
+        ? { ...prev, logoUrl: asset.url }
+        : { ...prev, heroBannerUrl: asset.url })
+    } catch (error) {
+      console.error('Error al subir imagen:', error)
+    } finally {
+      setUploadingImage(null)
+    }
   }
 
   // Add / Edit Pet submission
@@ -713,7 +680,7 @@ export default function DashboardPage() {
       setRegisterSuccess(true)
       setTimeout(() => {
         setRegisterSuccess(false)
-        handleCancelEdit()
+        setNewPet(createEmptyPetForm())
       }, 1500)
     }
   }
@@ -769,29 +736,20 @@ export default function DashboardPage() {
       {/* Mobile Top Header */}
       <header className="md:hidden sticky top-0 z-40 w-full border-b border-foreground/10 bg-card/90 backdrop-blur-md px-4 py-3 flex items-center justify-between shadow-xs">
         <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-base">
-          <span className="grid size-8 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-            <PawPrint className="size-4" />
-          </span>
+          <BrandMark src={settings.logoUrl} alt={settings.name} className="size-8" />
           <div className="flex flex-col">
             <span className="leading-tight font-bold truncate max-w-[150px]">{settings.name}</span>
             <span className="text-[9px] text-muted-foreground uppercase tracking-widest font-semibold">Panel Admin</span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-2">
-          {pendingApps > 0 && (
-            <span className="bg-accent text-accent-foreground font-bold text-xs px-2 py-0.5 rounded-full">
-              {pendingApps} sol.
-            </span>
-          )}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Abrir menú"
-            className="p-2 rounded-xl border border-foreground/15 bg-background text-foreground hover:bg-secondary transition active:scale-95"
-          >
-            {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-          </button>
-        </div>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Abrir menú"
+          className="p-2 rounded-xl border border-foreground/15 bg-background text-foreground hover:bg-secondary transition active:scale-95"
+        >
+          {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+        </button>
       </header>
 
       {/* Backdrop for Mobile Overlay */}
@@ -816,9 +774,7 @@ export default function DashboardPage() {
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-2.5 font-semibold tracking-tight text-lg"
             >
-              <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-                <PawPrint className="size-5" />
-              </span>
+              <BrandMark src={settings.logoUrl} alt={settings.name} className="size-9" />
               <div className="flex flex-col">
                 <span className="leading-tight font-bold truncate max-w-[140px]">{settings.name}</span>
                 <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Panel Admin</span>
@@ -854,48 +810,14 @@ export default function DashboardPage() {
                 setActiveTab('pets')
                 setMobileMenuOpen(false)
               }}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 activeTab === 'pets'
                   ? 'bg-primary text-primary-foreground shadow-sm font-semibold'
                   : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <List className="size-4" />
-                Listado de Mascotas
-              </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === 'pets' ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
-                {totalPets}
-              </span>
-            </button>
-
-            <button
-              onClick={() => {
-                setEditingPet(null)
-                setNewPet({
-                  name: '',
-                  species: 'Perro',
-                  breed: '',
-                  age: '',
-                  gender: 'Macho',
-                  size: 'Mediano',
-                  location: 'CDMX (Refugio Central)',
-                  image: '',
-                  story: '',
-                  healthInput: 'Vacunas al día, Esterilizado',
-                  personalityInput: 'Amigable, Cariñoso'
-                })
-                setActiveTab('register-pet')
-                setMobileMenuOpen(false)
-              }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                activeTab === 'register-pet' && !editingPet
-                  ? 'bg-primary text-primary-foreground shadow-sm font-semibold'
-                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-              }`}
-            >
-              <PlusCircle className="size-4" />
-              Registrar Mascota
+              <List className="size-4" />
+              Listado de Mascotas
             </button>
 
             <button
@@ -903,21 +825,14 @@ export default function DashboardPage() {
                 setActiveTab('applications')
                 setMobileMenuOpen(false)
               }}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 activeTab === 'applications'
                   ? 'bg-primary text-primary-foreground shadow-sm font-semibold'
                   : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <FileText className="size-4" />
-                Solicitudes
-              </div>
-              {pendingApps > 0 && (
-                <span className="bg-accent text-accent-foreground font-bold text-xs px-2 py-0.5 rounded-full">
-                  {pendingApps}
-                </span>
-              )}
+              <FileText className="size-4" />
+              Solicitudes
             </button>
 
             {/* NAV: Casas Puente */}
@@ -926,19 +841,14 @@ export default function DashboardPage() {
                 setActiveTab('foster-homes')
                 setMobileMenuOpen(false)
               }}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 activeTab === 'foster-homes'
                   ? 'bg-primary text-primary-foreground shadow-sm font-semibold'
                   : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Home className="size-4" />
-                Casas Puente
-              </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === 'foster-homes' ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
-                {activeFosters}
-              </span>
+              <Home className="size-4" />
+              Casas Puente
             </button>
 
             {/* NAV: Agradecimientos */}
@@ -977,11 +887,7 @@ export default function DashboardPage() {
         {/* User Info / Footer in sidebar */}
         <div className="pt-5 border-t border-foreground/10 mt-6">
           <div className="flex items-center gap-3 px-2 py-1">
-            <img
-              src={settings.logoUrl}
-              alt="Refugio"
-              className="size-9 rounded-full object-cover border border-foreground/10 shrink-0"
-            />
+            <BrandMark src={settings.logoUrl} alt={settings.name} className="size-9" />
             <div className="flex flex-col truncate">
               <span className="text-sm font-semibold truncate">{settings.name}</span>
               <span className="text-xs text-muted-foreground truncate">{settings.email}</span>
@@ -1013,7 +919,7 @@ export default function DashboardPage() {
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               {activeTab === 'overview' && 'Panel de Control del Refugio'}
               {activeTab === 'pets' && 'Listado de Mascotas'}
-              {activeTab === 'register-pet' && (editingPet ? `Editar Perfil: ${editingPet.name}` : 'Registrar Nueva Mascota')}
+              {activeTab === 'register-pet' && (editingPet ? `Editar Perfil: ${editingPet.name}` : 'Ficha de Mascota')}
               {activeTab === 'applications' && 'Solicitudes de Adopción'}
               {activeTab === 'foster-homes' && 'Red de Casas Puente (Hogares Temporales)'}
               {activeTab === 'thanks' && 'Módulo de Agradecimientos & Donantes'}
@@ -1022,7 +928,7 @@ export default function DashboardPage() {
             <p className="text-sm text-muted-foreground mt-1">
               {activeTab === 'overview' && 'Administra perfiles de rescatados, aprueba solicitudes y monitorea el estado del refugio.'}
               {activeTab === 'pets' && 'Listado completo de animales. Puedes editar perfiles, cambiar su estado o eliminarlos.'}
-              {activeTab === 'register-pet' && (editingPet ? 'Actualiza los datos, fotos e historial médico del rescatado.' : 'Llena la ficha para publicar un nuevo rescatado en la plataforma.')}
+              {activeTab === 'register-pet' && (editingPet ? 'Actualiza los datos, fotos e historial médico del rescatado.' : 'Consulta y ajusta la información de la mascota.')}
               {activeTab === 'applications' && 'Revisa los expedientes completos y respuestas de los posibles adoptantes.'}
               {activeTab === 'foster-homes' && 'Directorio de voluntarios registrados para dar alojamiento temporal a rescatados.'}
               {activeTab === 'thanks' && 'Reconoce públicamente a donantes, empresas y voluntarios que sostienen al refugio.'}
@@ -1050,31 +956,6 @@ export default function DashboardPage() {
             </button>
           )}
 
-          {activeTab !== 'register-pet' && activeTab !== 'foster-homes' && activeTab !== 'thanks' && (
-            <button
-              onClick={() => {
-                setEditingPet(null)
-                setNewPet({
-                  name: '',
-                  species: 'Perro',
-                  breed: '',
-                  age: '',
-                  gender: 'Macho',
-                  size: 'Mediano',
-                  location: 'CDMX (Refugio Central)',
-                  image: '',
-                  story: '',
-                  healthInput: 'Vacunas al día, Esterilizado',
-                  personalityInput: 'Amigable, Cariñoso'
-                })
-                setActiveTab('register-pet')
-              }}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <PlusCircle className="size-4" />
-              Nueva Mascota
-            </button>
-          )}
         </div>
 
         {/* Action alert / Notification */}
@@ -1322,6 +1203,15 @@ export default function DashboardPage() {
                     <option value="Adoptado">Adoptado</option>
                   </select>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={handleStartCreatePet}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition hover:scale-[1.01]"
+                >
+                  <Plus className="size-4" />
+                  Crear mascota
+                </button>
               </div>
             </div>
 
@@ -1357,7 +1247,7 @@ export default function DashboardPage() {
                       {/* Floating Quick Action Buttons on Top Right */}
                       <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/40 backdrop-blur-md p-1 rounded-xl">
                         <Link
-                          href={`/adopta/${pet.name.toLowerCase()}`}
+                          href={`/adopta/${slugify(pet.name)}`}
                           title="Ver en web pública"
                           target="_blank"
                           className="p-1.5 rounded-lg bg-white/20 hover:bg-white/40 text-white transition"
@@ -2053,6 +1943,17 @@ export default function DashboardPage() {
               </button>
 
               <button
+                onClick={() => setSettingsSection('support')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+                  settingsSection === 'support'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-card text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <HandCoins className="size-3.5" /> Apoyo & Transferencias
+              </button>
+
+              <button
                 onClick={() => setSettingsSection('location')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
                   settingsSection === 'location'
@@ -2326,15 +2227,53 @@ export default function DashboardPage() {
                     <Palette className="size-5 text-primary" /> Personalización Visual & Imágenes
                   </h2>
 
+                  <div className="space-y-4 rounded-xl border border-foreground/10 bg-background p-4 sm:p-5">
+                    <div>
+                      <h3 className="font-semibold">Paleta de colores</h3>
+                      <p className="mt-1 text-xs text-muted-foreground">Los cambios se aplican en la plataforma al guardar la configuración.</p>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {([
+                        ['primary', 'Color primario', 'Botones, enlaces y secciones principales'],
+                        ['secondary', 'Color secundario', 'Fondos suaves y elementos de apoyo'],
+                        ['background', 'Fondo', 'Fondo general de la plataforma'],
+                        ['cta', 'CTA / Acento', 'Llamadas a la acción y destacados'],
+                        ['text', 'Texto', 'Texto principal y títulos'],
+                        ['surface', 'Superficie', 'Tarjetas, formularios y paneles'],
+                      ] as const).map(([key, label, description]) => (
+                        <label key={key} className="group grid gap-2 rounded-xl border border-foreground/10 bg-card p-3 text-sm">
+                          <span className="flex items-center justify-between gap-2 font-medium">
+                            {label}
+                            <span className="size-6 rounded-full border border-foreground/15 shadow-inner" style={{ backgroundColor: settings.palette[key] }} />
+                          </span>
+                          <span className="text-[11px] leading-4 text-muted-foreground">{description}</span>
+                          <div className="flex items-center gap-2">
+                            <input type="color" value={settings.palette[key]} onChange={(e) => setSettings((prev) => ({ ...prev, palette: { ...prev.palette, [key]: e.target.value } }))} className="h-9 w-11 cursor-pointer rounded-lg border-0 bg-transparent p-0" aria-label={label} />
+                            <input type="text" value={settings.palette[key]} onChange={(e) => setSettings((prev) => ({ ...prev, palette: { ...prev.palette, [key]: e.target.value } }))} pattern="^#[0-9A-Fa-f]{6}$" className="min-w-0 flex-1 rounded-lg border border-foreground/15 bg-background px-2 py-2 font-mono text-xs uppercase outline-none focus:border-primary" aria-label={`${label} en hexadecimal`} />
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      {Object.entries(settings.palette).map(([key, color]) => <span key={key} className="rounded-full border border-foreground/10 bg-card px-3 py-1"><i className="mr-1.5 inline-block size-2.5 rounded-full" style={{ backgroundColor: color }} />{key}: {color}</span>)}
+                    </div>
+                  </div>
+
                   <div className="grid gap-6 sm:grid-cols-2">
                     <div className="space-y-3 p-4 rounded-xl border border-foreground/10 bg-background">
                       <span className="text-xs font-semibold uppercase tracking-wider block">Logotipo del Refugio</span>
                       <div className="flex items-center gap-4">
-                        <img
-                          src={settings.logoUrl}
-                          alt="Logo Preview"
-                          className="size-16 rounded-2xl object-cover border border-foreground/15"
-                        />
+                        {settings.logoUrl ? (
+                          <img
+                            src={settings.logoUrl}
+                            alt="Logo Preview"
+                            className="size-16 rounded-2xl object-cover border border-foreground/15"
+                          />
+                        ) : (
+                          <div className="grid size-16 place-items-center rounded-2xl border border-dashed border-foreground/15 bg-muted text-[11px] text-muted-foreground">
+                            Sin logo
+                          </div>
+                        )}
                         <div className="flex-1 space-y-2">
                           <input
                             type="url"
@@ -2343,6 +2282,20 @@ export default function DashboardPage() {
                             onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
                             className="w-full text-xs rounded-lg border border-foreground/15 p-2 bg-card outline-none"
                           />
+                          <label className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-foreground/20 p-2 text-xs font-medium cursor-pointer transition hover:border-primary/40 hover:text-primary">
+                            <Upload className="size-3.5" />
+                            {uploadingImage === 'logo' ? 'Subiendo…' : 'Subir logo'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="sr-only"
+                              disabled={uploadingImage !== null}
+                              onChange={(e) => {
+                                void handleImageUpload('logo', e.target.files?.[0])
+                                e.target.value = ''
+                              }}
+                            />
+                          </label>
                         </div>
                       </div>
                     </div>
@@ -2362,8 +2315,120 @@ export default function DashboardPage() {
                           onChange={(e) => setSettings({ ...settings, heroBannerUrl: e.target.value })}
                           className="w-full text-xs rounded-lg border border-foreground/15 p-2 bg-card outline-none"
                         />
+                        <label className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-foreground/20 p-2 text-xs font-medium cursor-pointer transition hover:border-primary/40 hover:text-primary">
+                          <Upload className="size-3.5" />
+                          {uploadingImage === 'hero' ? 'Subiendo…' : 'Subir portada'}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="sr-only"
+                            disabled={uploadingImage !== null}
+                            onChange={(e) => {
+                              void handleImageUpload('hero', e.target.files?.[0])
+                              e.target.value = ''
+                            }}
+                          />
+                        </label>
                       </div>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Location & Schedule */}
+              {settingsSection === 'support' && (
+                <div className="bg-card border border-foreground/10 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                  <h2 className="text-lg font-bold border-b border-foreground/10 pb-3 flex items-center gap-2">
+                    <HandCoins className="size-5 text-primary" /> Apoyo, Transferencias y Donaciones
+                  </h2>
+
+                  <div className="grid gap-5">
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider">
+                      Título del bloque de apoyo
+                      <input
+                        type="text"
+                        value={settings.supportTitle}
+                        onChange={(e) => setSettings({ ...settings, supportTitle: e.target.value })}
+                        className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground"
+                      />
+                    </label>
+
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider">
+                      Descripción del apoyo
+                      <textarea
+                        rows={3}
+                        value={settings.supportDescription}
+                        onChange={(e) => setSettings({ ...settings, supportDescription: e.target.value })}
+                        className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground resize-none"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider">
+                      Banco
+                      <input
+                        type="text"
+                        value={settings.transferBankName}
+                        onChange={(e) => setSettings({ ...settings, transferBankName: e.target.value })}
+                        placeholder="BBVA"
+                        className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground"
+                      />
+                    </label>
+
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider">
+                      CLABE / Cuenta
+                      <input
+                        type="text"
+                        value={settings.transferClabe}
+                        onChange={(e) => setSettings({ ...settings, transferClabe: e.target.value })}
+                        placeholder="1234 5678 9012 3456 7890"
+                        className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground"
+                      />
+                    </label>
+
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider">
+                      Beneficiario
+                      <input
+                        type="text"
+                        value={settings.transferOwner}
+                        onChange={(e) => setSettings({ ...settings, transferOwner: e.target.value })}
+                        placeholder="Nombre de la cuenta"
+                        className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground"
+                      />
+                    </label>
+
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider">
+                      Concepto / Referencia
+                      <input
+                        type="text"
+                        value={settings.transferReference}
+                        onChange={(e) => setSettings({ ...settings, transferReference: e.target.value })}
+                        placeholder="Donativo Refugio"
+                        className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground"
+                      />
+                    </label>
+
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider sm:col-span-2">
+                      Link de PayPal
+                      <input
+                        type="url"
+                        value={settings.paypalUrl}
+                        onChange={(e) => setSettings({ ...settings, paypalUrl: e.target.value })}
+                        placeholder="https://paypal.me/..."
+                        className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground"
+                      />
+                    </label>
+
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider sm:col-span-2">
+                      Notas / instrucciones para apoyos
+                      <textarea
+                        rows={3}
+                        value={settings.supportNotes}
+                        onChange={(e) => setSettings({ ...settings, supportNotes: e.target.value })}
+                        className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground resize-none"
+                      />
+                    </label>
                   </div>
                 </div>
               )}
@@ -2428,7 +2493,7 @@ export default function DashboardPage() {
               <h3 className="font-bold text-lg flex items-center gap-2">
                 <Home className="size-5 text-primary" /> Registrar Nueva Casa Puente
               </h3>
-              <button onClick={() => setShowAddFosterModal(false)} className="text-muted-foreground hover:text-foreground">
+              <button onClick={handleCloseFosterModal} className="text-muted-foreground hover:text-foreground">
                 <X className="size-5" />
               </button>
             </div>
@@ -2552,7 +2617,7 @@ export default function DashboardPage() {
               <div className="pt-3 flex justify-end gap-2 border-t border-foreground/10">
                 <button
                   type="button"
-                  onClick={() => setShowAddFosterModal(false)}
+                  onClick={handleCloseFosterModal}
                   className="px-4 py-2 rounded-xl border border-foreground/15 text-muted-foreground hover:bg-secondary font-medium"
                 >
                   Cancelar
@@ -2577,7 +2642,7 @@ export default function DashboardPage() {
               <h3 className="font-bold text-lg flex items-center gap-2">
                 <Gift className="size-5 text-primary" /> Registrar Agradecimiento
               </h3>
-              <button onClick={() => setShowAddThankModal(false)} className="text-muted-foreground hover:text-foreground">
+              <button onClick={handleCloseThankModal} className="text-muted-foreground hover:text-foreground">
                 <X className="size-5" />
               </button>
             </div>
@@ -2638,7 +2703,7 @@ export default function DashboardPage() {
               <div className="pt-3 flex justify-end gap-2 border-t border-foreground/10">
                 <button
                   type="button"
-                  onClick={() => setShowAddThankModal(false)}
+                  onClick={handleCloseThankModal}
                   className="px-4 py-2 rounded-xl border border-foreground/15 text-muted-foreground hover:bg-secondary font-medium"
                 >
                   Cancelar
