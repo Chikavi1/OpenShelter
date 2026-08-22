@@ -10,6 +10,9 @@ export const fosterHomeTypeEnum = pgEnum('foster_home_type', ['Casa', 'Departame
 export const fosterSpeciesEnum = pgEnum('foster_species', ['Perros', 'Gatos', 'Cualquiera'])
 export const fosterStatusEnum = pgEnum('foster_status', ['Activa', 'En pausa', 'Disponible'])
 export const thankRoleEnum = pgEnum('thank_role', ['Donante', 'Voluntario', 'Empresa Aliada', 'Padrino'])
+export const adoptionFollowUpStageEnum = pgEnum('adoption_follow_up_stage', ['Pendiente', 'Contrato firmado', 'Entregado', 'Seguimiento 1', 'Seguimiento 2', 'Cerrado'])
+export const shelterEventStatusEnum = pgEnum('shelter_event_status', ['Programado', 'En preparación', 'En curso', 'Finalizado', 'Cancelado'])
+export const shelterEventCategoryEnum = pgEnum('shelter_event_category', ['Adopción', 'Recaudación', 'Voluntariado', 'Vacunación', 'Educativo'])
 export const customFieldTypeEnum = pgEnum('custom_field_type', ['text', 'email', 'tel', 'date', 'number', 'select', 'boolean', 'textarea'])
 
 export const pets = pgTable('pets', {
@@ -23,6 +26,8 @@ export const pets = pgTable('pets', {
   status: petStatusEnum('status').notNull(),
   location: text('location').notNull(),
   image: text('image').notNull(),
+  images: jsonb('images').$type<string[]>().notNull().default([]),
+  featured: boolean('featured').notNull().default(false),
   health: jsonb('health').$type<string[]>().notNull(),
   personality: jsonb('personality').$type<string[]>().notNull(),
   story: text('story').notNull(),
@@ -96,6 +101,48 @@ export const sponsorThanks = pgTable('sponsor_thanks', {
   publicIdx: index('sponsor_thanks_is_public_idx').on(table.isPublic),
 }))
 
+export const adoptionFollowUps = pgTable('adoption_followups', {
+  id: text('id').primaryKey(),
+  petId: text('pet_id').references(() => pets.id, { onDelete: 'set null' }),
+  petName: text('pet_name').notNull(),
+  adopterName: text('adopter_name').notNull(),
+  adopterEmail: text('adopter_email').notNull(),
+  adopterPhone: text('adopter_phone').notNull(),
+  adopterAddress: text('adopter_address').notNull(),
+  adopterCity: text('adopter_city').notNull(),
+  adoptionDate: text('adoption_date').notNull(),
+  nextFollowUpDate: text('next_follow_up_date').notNull(),
+  processStage: adoptionFollowUpStageEnum('process_stage').notNull(),
+  notes: text('notes').notNull(),
+  carePlan: text('care_plan').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  stageIdx: index('adoption_followups_process_stage_idx').on(table.processStage),
+  petIdx: index('adoption_followups_pet_id_idx').on(table.petId),
+}))
+
+export const shelterEvents = pgTable('shelter_events', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  category: shelterEventCategoryEnum('category').notNull(),
+  status: shelterEventStatusEnum('status').notNull(),
+  eventDate: text('event_date').notNull(),
+  eventTime: text('event_time').notNull(),
+  location: text('location').notNull(),
+  attendeesTarget: integer('attendees_target').notNull().default(0),
+  contactName: text('contact_name').notNull(),
+  contactPhone: text('contact_phone').notNull(),
+  registrationLink: text('registration_link').notNull(),
+  description: text('description').notNull(),
+  notes: text('notes').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  statusIdx: index('shelter_events_status_idx').on(table.status),
+  dateIdx: index('shelter_events_event_date_idx').on(table.eventDate),
+}))
+
 export const shelterSettings = pgTable('shelter_settings', {
   id: integer('id').primaryKey(),
   name: text('name').notNull(),
@@ -138,5 +185,7 @@ export const schema = {
   adoptionApplications,
   fosterHomes,
   sponsorThanks,
+  adoptionFollowUps,
+  shelterEvents,
   shelterSettings,
 }

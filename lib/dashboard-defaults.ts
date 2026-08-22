@@ -1,6 +1,9 @@
 export type DashboardPetStatus = 'Disponible' | 'En Proceso' | 'Adoptado'
 export type AdoptionApplicationStatus = 'Pendiente' | 'En revisión' | 'Aprobada' | 'Rechazada'
 export type FosterHomeStatus = 'Activa' | 'En pausa' | 'Disponible'
+export type AdoptionFollowUpStage = 'Pendiente' | 'Contrato firmado' | 'Entregado' | 'Seguimiento 1' | 'Seguimiento 2' | 'Cerrado'
+export type ShelterEventStatus = 'Programado' | 'En preparación' | 'En curso' | 'Finalizado' | 'Cancelado'
+export type ShelterEventCategory = 'Adopción' | 'Recaudación' | 'Voluntariado' | 'Vacunación' | 'Educativo'
 export type CustomFieldType = 'text' | 'email' | 'tel' | 'date' | 'number' | 'select' | 'boolean' | 'textarea'
 
 export interface CustomFormField {
@@ -23,6 +26,8 @@ export interface DashboardPet {
   status: DashboardPetStatus
   location: string
   image: string
+  images: string[]
+  featured: boolean
   health: string[]
   personality: string[]
   story: string
@@ -77,6 +82,38 @@ export interface SponsorThank {
   isPublic: boolean
 }
 
+export interface AdoptionFollowUp {
+  id: string
+  petId?: string
+  petName: string
+  adopterName: string
+  adopterEmail: string
+  adopterPhone: string
+  adopterAddress: string
+  adopterCity: string
+  adoptionDate: string
+  nextFollowUpDate: string
+  processStage: AdoptionFollowUpStage
+  notes: string
+  carePlan: string
+}
+
+export interface ShelterEvent {
+  id: string
+  title: string
+  category: ShelterEventCategory
+  status: ShelterEventStatus
+  eventDate: string
+  eventTime: string
+  location: string
+  attendeesTarget: number
+  contactName: string
+  contactPhone: string
+  registrationLink: string
+  description: string
+  notes: string
+}
+
 export interface ShelterSettings {
   name: string
   tagline: string
@@ -126,27 +163,184 @@ export interface DashboardState {
   applications: AdoptionApplication[]
   fosterHomes: FosterHome[]
   thanksList: SponsorThank[]
+  followUps: AdoptionFollowUp[]
+  events: ShelterEvent[]
   settings: ShelterSettings
 }
 
 export const DEFAULT_DASHBOARD_STATE: DashboardState = {
-  pets: [],
-  applications: [],
-  fosterHomes: [],
-  thanksList: [],
+  pets: [
+    {
+      id: 'pet-1',
+      name: 'Milo',
+      species: 'Perro',
+      breed: 'Mestizo',
+      age: '2 años',
+      gender: 'Macho',
+      size: 'Mediano',
+      status: 'Disponible',
+      location: 'CDMX (Refugio Central)',
+      image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85',
+      images: ['https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85'],
+      featured: true,
+      health: ['Vacunas al día', 'Esterilizado', 'Desparasitado'],
+      personality: ['Juguetón', 'Sociable', 'Cariñoso'],
+      story: 'Milo fue rescatado de la calle en muy malas condiciones, pero hoy recuperó toda su energía y está buscando una familia amorosa.',
+      views: 120,
+      applicationsCount: 2,
+    },
+    {
+      id: 'pet-2',
+      name: 'Luna',
+      species: 'Gato',
+      breed: 'Mestizo',
+      age: '1 año',
+      gender: 'Hembra',
+      size: 'Pequeño',
+      status: 'Disponible',
+      location: 'CDMX (Refugio Central)',
+      image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85',
+      images: ['https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85'],
+      featured: false,
+      health: ['Vacunas al día', 'Esterilizada'],
+      personality: ['Tranquila', 'Cariñosa', 'Hogareña'],
+      story: 'Luna es una gatita muy dulce que adora acurrucarse en lugares calientitos.',
+      views: 85,
+      applicationsCount: 1,
+    },
+    {
+      id: 'pet-3',
+      name: 'Bruno',
+      species: 'Perro',
+      breed: 'Labrador Mestizo',
+      age: '3 años',
+      gender: 'Macho',
+      size: 'Grande',
+      status: 'En Proceso',
+      location: 'CDMX (Refugio Central)',
+      image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85',
+      images: ['https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85'],
+      featured: false,
+      health: ['Vacunas al día', 'Esterilizado'],
+      personality: ['Protector', 'Leal', 'Inteligente'],
+      story: 'Bruno es un gran compañero de paseos, excelente para familias activas.',
+      views: 94,
+      applicationsCount: 3,
+    },
+    {
+      id: 'pet-4',
+      name: 'Nube',
+      species: 'Gato',
+      breed: 'Persa Mestizo',
+      age: '6 meses',
+      gender: 'Hembra',
+      size: 'Pequeño',
+      status: 'Disponible',
+      location: 'CDMX (Refugio Central)',
+      image: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85',
+      images: ['https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85'],
+      featured: false,
+      health: ['Desparasitada'],
+      personality: ['Curiosa', 'Juguetona'],
+      story: 'Nube es una cachorrita llena de vida y curiosidad por el mundo.',
+      views: 150,
+      applicationsCount: 4,
+    },
+  ],
+  applications: [
+    {
+      id: 'sol-1',
+      applicantName: 'Carlos Gómez',
+      applicantEmail: 'carlos@gmail.com',
+      applicantPhone: '5551234567',
+      petName: 'Milo',
+      petId: 'pet-1',
+      petImage: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85',
+      homeType: 'Casa',
+      hasOtherPets: true,
+      yard: true,
+      status: 'En revisión',
+      dateSubmitted: 'Ayer',
+      experience: 'He tenido perros durante más de 5 años.',
+    },
+  ],
+  fosterHomes: [
+    {
+      id: 'fh-1',
+      name: 'Familia Rodríguez',
+      email: 'contacto@rodriguez.org',
+      phone: '5559876543',
+      address: 'Av. Insurgentes Sur 1200',
+      city: 'CDMX',
+      homeType: 'Casa',
+      yard: true,
+      preferredSpecies: 'Cualquiera',
+      maxCapacity: 2,
+      currentPetsCount: 1,
+      status: 'Activa',
+      notes: 'Disponibles para recibir perritos o gatitos recuperándose.',
+      registeredDate: 'Hace 1 mes',
+    },
+  ],
+  thanksList: [
+    {
+      id: 'th-1',
+      name: 'Empresa Canina S.A.',
+      role: 'Empresa Aliada',
+      amountOrContribution: 'Donación de 200kg de alimento',
+      message: 'Felices de apoyar la causa de dar un hogar digno a los animales.',
+      avatarUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&q=80',
+      date: 'Hace 2 semanas',
+      isPublic: true,
+    },
+  ],
+  followUps: [
+    {
+      id: 'fu-1',
+      petId: 'pet-1',
+      petName: 'Milo',
+      adopterName: 'Carlos Gómez',
+      adopterEmail: 'carlos@gmail.com',
+      adopterPhone: '5551234567',
+      adopterAddress: 'Av. Siempre Viva 742',
+      adopterCity: 'CDMX',
+      adoptionDate: '12/08/2026',
+      nextFollowUpDate: '26/08/2026',
+      processStage: 'Seguimiento 1',
+      notes: 'Familia nueva muy comprometida. Se recomienda verificar adaptación en casa y rutina de paseos.',
+      carePlan: 'Revisar alimentación, sueño, paseos y contacto con veterinario en la siguiente visita.',
+    },
+  ],
+  events: [
+    {
+      id: 'evt-1',
+      title: 'Jornada de adopción y bazar solidario',
+      category: 'Adopción',
+      status: 'Programado',
+      eventDate: '30/08/2026',
+      eventTime: '10:00',
+      location: 'Parque Central, CDMX',
+      attendeesTarget: 80,
+      contactName: 'Laura Pérez',
+      contactPhone: '5554443322',
+      registrationLink: 'https://example.com/eventos/adopcion',
+      description: 'Evento para presentar mascotas en adopción, recibir donaciones y sumar voluntarios al refugio.',
+      notes: 'Confirmar carpa, mesas y permisos con administración del parque.',
+    },
+  ],
   settings: {
-    name: '',
-    tagline: '',
-    description: '',
-    phone: '',
-    email: '',
-    address: '',
-    city: '',
-    state: '',
-    country: '',
-    zipCode: '',
-    primaryColor: '',
-    accentColor: '',
+    name: 'Refugio Huellas',
+    tagline: 'Rescate y adopción responsable',
+    description: 'Rescatamos, rehabilitamos y conectamos mascotas increíbles con familias amorosas.',
+    phone: '+52 55 1234 5678',
+    email: 'contacto@refugiohuellas.org',
+    address: 'Calle del Amor 123',
+    city: 'Ciudad de México',
+    state: 'CDMX',
+    country: 'México',
+    zipCode: '01000',
+    primaryColor: '#163b2d',
+    accentColor: '#c5e86c',
     palette: {
       primary: '#163b2d',
       secondary: '#e8e1d5',
@@ -155,26 +349,26 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       text: '#24352d',
       surface: '#fcfaf6',
     },
-    logoUrl: '',
-    heroBannerUrl: '',
-    adoptionContractTerms: '',
-    shelterRules: '',
-    visitingHours: '',
-    supportTitle: '',
-    supportDescription: '',
-    transferBankName: '',
-    transferClabe: '',
-    transferOwner: '',
-    transferReference: '',
-    paypalUrl: '',
-    supportNotes: '',
+    logoUrl: 'https://i.ibb.co/tFjxBQK/default-image-icon-4595376-512.png',
+    heroBannerUrl: 'https://images.unsplash.com/photo-1660535254205-b9f03a7b84dc?q=80&w=857&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    adoptionContractTerms: 'El adoptante se compromete a brindar alimento, atención médica y un trato digno.',
+    shelterRules: 'Respetar los horarios de visita y agendar cita previa.',
+    visitingHours: 'Lunes a Sábado de 10:00 AM a 5:00 PM',
+    supportTitle: 'Apoya nuestro refugio',
+    supportDescription: 'Tu donación nos ayuda a seguir rescatando vidas.',
+    transferBankName: 'BBVA',
+    transferClabe: '012180000000000000',
+    transferOwner: 'Refugio Huellas A.C.',
+    transferReference: 'DONACION',
+    paypalUrl: 'https://paypal.me/refugiohuellas',
+    supportNotes: 'Las donaciones son deducibles de impuestos.',
     adoptionFormFields: [],
     fosterFormFields: [],
-    fosterRequirements: '',
+    fosterRequirements: 'Contar con un espacio seguro y tiempo para cuidar temporalmente a un rescatado.',
     socialLinks: {
-      instagram: '',
-      facebook: '',
-      website: '',
+      instagram: 'https://instagram.com/refugiohuellas',
+      facebook: 'https://facebook.com/refugiohuellas',
+      website: 'https://refugiohuellas.org',
     },
   },
 }

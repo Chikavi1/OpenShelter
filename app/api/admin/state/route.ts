@@ -20,7 +20,7 @@ export async function PUT(request: Request) {
   if (authError) return authError
 
   const payload = await request.json().catch(() => null) as Partial<DashboardState> | null
-  if (!payload?.pets || !payload?.applications || !payload?.fosterHomes || !payload?.thanksList || !payload?.settings) {
+  if (!payload?.pets || !payload?.applications || !payload?.fosterHomes || !payload?.thanksList || !payload?.followUps || !payload?.events || !payload?.settings) {
     return NextResponse.json({ error: 'Payload inválido' }, { status: 400 })
   }
 
