@@ -21,7 +21,7 @@ const sections = [
   },
   {
     title: 'Tus derechos',
-    body: 'Puedes solicitar el acceso, corrección o eliminación de tus datos personales en cualquier momento escribiéndonos a contacto@huellas.org. También puedes revocar tu consentimiento para el envío de comunicaciones.',
+    body: 'Puedes solicitar el acceso, corrección o eliminación de tus datos personales en cualquier momento a través de la sección de contacto. También puedes revocar tu consentimiento para el envío de comunicaciones.',
   },
   {
     title: 'Cookies',
@@ -30,8 +30,7 @@ const sections = [
 ]
 
 export default function PrivacidadPage() {
-  const appName = process.env.NEXT_PUBLIC_APP_NAME || 'Huellas'
-  const capitalizedAppName = appName.charAt(0).toUpperCase() + appName.slice(1)
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || ''
   const logoUrl = process.env.NEXT_PUBLIC_LOGO_URL
 
   return (
@@ -46,9 +45,9 @@ export default function PrivacidadPage() {
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Privacidad</p>
           <h1 className="text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">Política de privacidad</h1>
           <p className="mt-4 text-sm text-muted-foreground">Última actualización: {new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-          <p className="mt-8 max-w-2xl leading-8 text-muted-foreground">En {capitalizedAppName} nos tomamos la privacidad tan en serio como el bienestar de cada mascota. Esta política explica qué información recopilamos, cómo la usamos y los derechos que tienes sobre ella.</p>
+          <p className="mt-8 max-w-2xl leading-8 text-muted-foreground">Nos tomamos la privacidad tan en serio como el bienestar de cada mascota. Esta política explica qué información recopilamos, cómo la usamos y los derechos que tienes sobre ella.</p>
           <div className="mt-12 grid gap-8">{sections.map((section, index) => <section key={section.title}><h2 className="flex items-center gap-3 text-xl font-semibold"><span className="grid size-8 place-items-center rounded-full bg-accent text-sm text-accent-foreground">{index + 1}</span>{section.title}</h2><p className="mt-4 leading-7 text-muted-foreground">{section.body}</p></section>)}</div>
-          <div className="mt-14 rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm font-medium">¿Tienes preguntas sobre tu privacidad?</p><p className="mt-1 text-sm text-muted-foreground">Escríbenos a <a href="mailto:contacto@huellas.org" className="text-foreground underline decoration-accent decoration-2 underline-offset-2">contacto@huellas.org</a> y con gusto te ayudamos.</p></div>
+          <div className="mt-14 rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm font-medium">¿Tienes preguntas sobre tu privacidad?</p><p className="mt-1 text-sm text-muted-foreground">Usa la sección de contacto del sitio y con gusto te ayudamos.</p></div>
         </section>
 
         <footer className="flex flex-col justify-between gap-5 border-t border-foreground/10 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center"><p className="font-semibold text-foreground">{appName.toLowerCase()}.</p><p>Hecho con amor para quienes no tienen voz.</p><a href="/" className="hover:text-foreground">Volver al inicio</a></footer>

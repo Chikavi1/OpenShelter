@@ -2,16 +2,18 @@
 
 import { useState } from 'react'
 import { ArrowLeft, Check, Clock, Mail, MapPin, PawPrint, Phone, Send } from 'lucide-react'
+import { usePublicSite } from '@/lib/use-public-site'
 
 export default function ContactoPage() {
+  const site = usePublicSite()
   const [sent, setSent] = useState(false)
 
-  const appName = process.env.NEXT_PUBLIC_APP_NAME || 'Huellas'
-  const logoUrl = process.env.NEXT_PUBLIC_LOGO_URL
-  const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contacto@huellas.org'
-  const phone = process.env.NEXT_PUBLIC_CONTACT_PHONE || '+52 55 1234 5678'
-  const address = process.env.NEXT_PUBLIC_CONTACT_ADDRESS || 'Av. de las Flores 123, CDMX, México'
-  const hours = process.env.NEXT_PUBLIC_CONTACT_HOURS || 'Lun a Vie, 9:00 - 18:00'
+  const appName = site.settings.name || process.env.NEXT_PUBLIC_APP_NAME || ''
+  const logoUrl = site.settings.logoUrl || process.env.NEXT_PUBLIC_LOGO_URL
+  const email = site.settings.email || process.env.NEXT_PUBLIC_CONTACT_EMAIL || ''
+  const phone = site.settings.phone || process.env.NEXT_PUBLIC_CONTACT_PHONE || ''
+  const address = site.settings.address || process.env.NEXT_PUBLIC_CONTACT_ADDRESS || ''
+  const hours = site.settings.visitingHours || process.env.NEXT_PUBLIC_CONTACT_HOURS || ''
 
   const channels = [
     { label: 'Correo', value: email, href: `mailto:${email}`, icon: <Mail className="size-5" /> },

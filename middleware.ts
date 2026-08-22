@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { SESSION_COOKIE, verifySessionToken } from '@/lib/auth'
 
-const SESSION_COOKIE = 'huellas_admin_session'
-
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const token = request.cookies.get(SESSION_COOKIE)?.value
+  const hasSession = token ? await verifySessionToken(token) : false
 
   if (pathname.startsWith('/dashboard')) {
-    const hasSession = request.cookies.get(SESSION_COOKIE)?.value === 'active'
     if (!hasSession && pathname !== '/dashboard/login') {
       const loginUrl = new URL('/dashboard/login', request.url)
       return NextResponse.redirect(loginUrl)

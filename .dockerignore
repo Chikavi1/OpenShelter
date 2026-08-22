@@ -1,0 +1,10 @@
+.git
+.next
+.vercel
+.env
+.env.*
+node_modules
+tsconfig.tsbuildinfo
+*.log
+storage
+public/uploads

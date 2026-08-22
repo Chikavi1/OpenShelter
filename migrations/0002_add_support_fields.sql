@@ -1,0 +1,9 @@
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS support_title text NOT NULL DEFAULT '';
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS support_description text NOT NULL DEFAULT '';
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS transfer_bank_name text NOT NULL DEFAULT '';
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS transfer_clabe text NOT NULL DEFAULT '';
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS transfer_owner text NOT NULL DEFAULT '';
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS transfer_reference text NOT NULL DEFAULT '';
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS paypal_url text NOT NULL DEFAULT '';
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS support_notes text NOT NULL DEFAULT '';
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS palette jsonb NOT NULL DEFAULT '{"primary":"#163b2d","secondary":"#e8e1d5","background":"#f5f1e9","cta":"#c5e86c","text":"#24352d","surface":"#fcfaf6"}'::jsonb;

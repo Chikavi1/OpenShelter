@@ -1,135 +1,80 @@
 # OpenShelter
 
-OpenShelter is an open-source website for animal rescue organizations and pet adoption. It provides a pet catalog, individual adoption profiles with application forms, donation pages, contact pages, and the legal pages every shelter needs — ready to deploy in minutes.
-
-Built with **Next.js 16**, **Tailwind CSS v4**, and **shadcn/ui**.
-
-## License
-
-OpenShelter is **open-source software**. It is free to download, use, modify, and deploy for any **non-profit animal welfare organization** — shelters, rescues, sanctuaries, and foster groups.
-
-- ✅ Free to use, modify, and redistribute for non-profit organizations
-- ❌ **Sale is prohibited** — you may not sell this project, modified or not
-- ❌ **Commercial or for-profit use is not permitted**
-- 📌 Usage is intended for **non-profit organizations** dedicated to animal welfare
-
-Any redistribution must retain the original license notice.
-
-## Features
-
-- 🐾 **Pet catalog** — cards on the landing page linking to individual profiles
-- 📋 **Adoption profiles** — photo gallery, details (age, size, sex, location), story, adoption requirements, and application form
-- 💚 **Donations** — one-time donations via card, bank transfer (SPEI), or PayPal
-- ✉️ **Contact** — organization contact details and a message form
-- 📄 Legal pages — **Privacy policy** and **Terms & conditions**
+OpenShelter is a self-hostable, vendor-independent animal rescue platform built with Next.js, PostgreSQL, and Drizzle ORM.
 
 ## Tech Stack
 
-- [Next.js](https://nextjs.org) 16 (App Router)
-- [React](https://react.dev) 19
-- [Tailwind CSS](https://tailwindcss.com) v4
-- [shadcn/ui](https://ui.shadcn.com)
-- [lucide-react](https://lucide.dev) (icons)
+- Next.js 16 (App Router)
+- React 19
+- PostgreSQL
+- Drizzle ORM
+- Tailwind CSS v4
 
-## Prerequisites
+## Quick Deploy
 
-- Node.js 20 or later
-- npm or pnpm
+For cloud providers that run Node.js apps:
 
-## Installation
+1. Create a PostgreSQL database.
+2. Copy `.env.example` to `.env` and fill in the production values.
+3. Set `DATABASE_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`.
+4. Run `npm install`.
+5. Run `npm run build`.
+6. Start with `npm run start`.
 
-```bash
-# Clone the repository
-git clone https://github.com/Chikavi1/OpenShelter.git
-cd OpenShelter
+The app works on any Node-hosting platform that supports Next.js, including Vercel, Render, Railway, Fly, and similar providers.
 
-# Install dependencies (with pnpm)
-pnpm install
-# or with npm
-npm install
-```
-
-## Configuration
-
-Copy `.env.example` to `.env` and adjust the values to match your organization:
+## Self-hosted
 
 ```bash
+git clone <your-repo-url>
+cd adopt-me
 cp .env.example .env
+docker compose up -d --build
 ```
 
-| Variable | Description |
-| --- | --- |
-| `NEXT_PUBLIC_APP_NAME` | Organization name |
-| `NEXT_PUBLIC_LOGO_URL` | Logo URL |
-| `NEXT_PUBLIC_CONTACT_EMAIL` | Contact email |
-| `NEXT_PUBLIC_CONTACT_PHONE` | Contact phone |
-| `NEXT_PUBLIC_CONTACT_ADDRESS` | Organization address |
-| `NEXT_PUBLIC_CONTACT_HOURS` | Business hours |
+Open `http://localhost:3000` once the containers are healthy.
 
-> The `.env` file must never be committed to the repository (it is in `.gitignore`). Only `.env.example` is versioned.
+The stack includes:
 
-## Development
+- PostgreSQL with a persistent volume
+- Automatic migrations and seed data on startup
+- Local storage at `/app/public/uploads` for persisted files
+
+## Environment
+
+Required variables:
+
+- `DATABASE_URL`
+- `AUTH_SECRET`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+
+Optional variables:
+
+- `STORAGE_DRIVER`
+- `STORAGE_LOCAL_DIR`
+- `STORAGE_PUBLIC_BASE_URL`
+- `S3_ENDPOINT`
+- `S3_REGION`
+- `S3_BUCKET`
+- `S3_ACCESS_KEY_ID`
+- `S3_SECRET_ACCESS_KEY`
+- `S3_FORCE_PATH_STYLE`
+- `S3_PUBLIC_URL`
+
+## Scripts
 
 ```bash
-# Start the development server
-pnpm dev
-# or
 npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Production
-
-```bash
-# Create a production build
-pnpm build
-# or
 npm run build
-
-# Serve the production build
-pnpm start
-# or
 npm run start
-
-# Lint the codebase
-pnpm lint
-# or
 npm run lint
+npm run typecheck
+npm run db:setup
 ```
 
-## Project Structure
+## Notes
 
-```
-app/
-├── page.tsx                 # Landing: hero, pet catalog, donations, contact
-├── layout.tsx               # Root layout with theme and fonts
-├── globals.css              # Global styles and theme (Tailwind v4)
-├── adopta/
-│   ├── milo/page.tsx        # Milo's profile
-│   ├── luna/page.tsx        # Luna's profile
-│   ├── bruno/page.tsx       # Bruno's profile
-│   └── nube/page.tsx        # Nube's profile
-├── donar/page.tsx           # Donation page
-├── contacto/page.tsx        # Contact page
-├── privacidad/page.tsx      # Privacy policy
-└── terminos/page.tsx        # Terms and conditions
-```
-
-## Adding a Pet
-
-1. Create a profile at `app/adopta/<slug>/page.tsx`, following the structure of an existing profile (e.g. `milo`).
-2. Add the pet to the `pets` array in `app/page.tsx` with its `slug` so it appears in the catalog.
-3. Place the photos in `public/` and reference them from the profile gallery.
-
-## Deployment
-
-The site is fully static and requires no server. Deploy it on [Vercel](https://vercel.com), Netlify, Cloudflare Pages, or any host that supports Next.js.
-
-## Contributing
-
-Contributions are welcome. Please open an issue or submit a pull request for bug fixes, improvements, or accessibility enhancements.
-
-## Support
-
-For questions about using OpenShelter, open an issue on GitHub.
+- Dashboard data is stored in PostgreSQL.
+- Admin auth uses a signed HttpOnly cookie.
+- Local file uploads are stored under the configured storage directory instead of the ephemeral filesystem.

@@ -30,8 +30,7 @@ const sections = [
 ]
 
 export default function TerminosPage() {
-  const appName = process.env.NEXT_PUBLIC_APP_NAME || 'Huellas'
-  const capitalizedAppName = appName.charAt(0).toUpperCase() + appName.slice(1)
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || ''
   const logoUrl = process.env.NEXT_PUBLIC_LOGO_URL
 
   return (
@@ -46,9 +45,9 @@ export default function TerminosPage() {
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Términos</p>
           <h1 className="text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">Términos y condiciones</h1>
           <p className="mt-4 text-sm text-muted-foreground">Última actualización: {new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-          <p className="mt-8 max-w-2xl leading-8 text-muted-foreground">Estos términos regulan el uso del sitio de {capitalizedAppName} y los servicios de adopción y donación. Al navegar o participar, aceptas las condiciones descritas a continuación.</p>
+          <p className="mt-8 max-w-2xl leading-8 text-muted-foreground">Estos términos regulan el uso del sitio y los servicios de adopción y donación. Al navegar o participar, aceptas las condiciones descritas a continuación.</p>
           <div className="mt-12 grid gap-8">{sections.map((section, index) => <section key={section.title}><h2 className="flex items-center gap-3 text-xl font-semibold"><span className="grid size-8 place-items-center rounded-full bg-accent text-sm text-accent-foreground">{index + 1}</span>{section.title}</h2><p className="mt-4 leading-7 text-muted-foreground">{section.body}</p></section>)}</div>
-          <div className="mt-14 rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm font-medium">Dudas sobre estos términos</p><p className="mt-1 text-sm text-muted-foreground">Contáctanos en <a href="mailto:contacto@huellas.org" className="text-foreground underline decoration-accent decoration-2 underline-offset-2">contacto@huellas.org</a>.</p></div>
+          <div className="mt-14 rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm font-medium">Dudas sobre estos términos</p><p className="mt-1 text-sm text-muted-foreground">Usa la sección de contacto del sitio para escribirnos.</p></div>
         </section>
 
         <footer className="flex flex-col justify-between gap-5 border-t border-foreground/10 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center"><p className="font-semibold text-foreground">{appName.toLowerCase()}.</p><p>Hecho con amor para quienes no tienen voz.</p><a href="/" className="hover:text-foreground">Volver al inicio</a></footer>
