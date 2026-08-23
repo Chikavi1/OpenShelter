@@ -9,8 +9,8 @@ export const alt = 'Mascota en adopción'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-export default async function Image({ params }: { params: { slug: string } }) {
-  const { slug } = params
+export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://keyrescata.netlify.app').replace(/\/$/, '')
 
   let pet: { name: string; breed: string; species: string; image: string; story: string } | null = null
@@ -20,11 +20,16 @@ export default async function Image({ params }: { params: { slug: string } }) {
   try {
     const db = getDb()
     const [allPets, settingsRows] = await Promise.all([
-      db.select({ name: pets.name, breed: pets.breed, species: pets.species, image: pets.image, story: pets.story }).from(pets),
+      db.select({ name: pets.name, breed: pets.breed, species: pets.species, image: pets.image, images: pets.images, story: pets.story }).from(pets),
       db.select({ name: shelterSettings.name, logoUrl: shelterSettings.logoUrl }).from(shelterSettings).where(eq(shelterSettings.id, 1)).limit(1),
     ])
-    const found = allPets.find((p) => slugify(p.name) === slug)
-    if (found) pet = found as any
+    // slug puede venir encoded, comparar normalizado
+    const target = decodeURIComponent(slug).toLowerCase()
+    const found = allPets.find((p) => slugify(p.name) === target || slugify(p.name) === slug)
+    if (found) {
+      const img = (found as any).image || ((found as any).images?.[0] as string | undefined) || ''
+      pet = { ...(found as any), image: img } as any
+    }
     if (settingsRows[0]?.name) appName = settingsRows[0].name
     if (settingsRows[0]?.logoUrl) logoUrl = settingsRows[0].logoUrl
   } catch {}

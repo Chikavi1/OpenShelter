@@ -8,7 +8,8 @@ export const alt = 'Evento'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-export default async function Image({ params }: { params: { id: string } }) {
+export default async function Image({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://keyrescata.netlify.app').replace(/\/$/, '')
   let event: { title: string; description: string; image: string; location: string } | null = null
   let appName = process.env.NEXT_PUBLIC_APP_NAME || 'Key Rescata'
@@ -16,7 +17,7 @@ export default async function Image({ params }: { params: { id: string } }) {
   try {
     const db = getDb()
     const [rows, settingsRows] = await Promise.all([
-      db.select({ title: shelterEvents.title, description: shelterEvents.description, image: shelterEvents.image, location: shelterEvents.location }).from(shelterEvents).where(eq(shelterEvents.id, params.id)).limit(1),
+      db.select({ title: shelterEvents.title, description: shelterEvents.description, image: shelterEvents.image, location: shelterEvents.location }).from(shelterEvents).where(eq(shelterEvents.id, id)).limit(1),
       db.select({ name: shelterSettings.name, logoUrl: shelterSettings.logoUrl }).from(shelterSettings).where(eq(shelterSettings.id, 1)).limit(1),
     ])
     if (rows[0]) event = rows[0] as any
