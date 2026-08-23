@@ -563,7 +563,7 @@ export function DashboardSettingsTab() {
             </label>
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-wider">Ubicación exacta del refugio</p>
-              <EventLocationPicker latitude={settings.latitude} longitude={settings.longitude} onChange={(location) => setSettings({ ...settings, latitude: location.latitude, longitude: location.longitude })} />
+              <EventLocationPicker latitude={settings.latitude} longitude={settings.longitude} logoUrl={settings.logoUrl} onChange={(location) => setSettings({ ...settings, latitude: location.latitude, longitude: location.longitude })} />
             </div>
           </div>
         )}

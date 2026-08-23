@@ -253,14 +253,23 @@ const INITIAL_SETTINGS: ShelterSettings = {
   },
 }
 
-const createEmptyPetForm = () => ({
+const getDefaultPetLocation = (s: ShelterSettings) => {
+  // Prioridad: dirección completa del refugio. Si la dirección es solo ciudad/estado genérica, usa city+state
+  const hasDetailedAddress = s.address && (s.address.includes(',') || /\d/.test(s.address) || s.address.length > 20)
+  if (hasDetailedAddress) return s.address
+  if (s.address) return s.address
+  if (s.city && s.state && s.city !== s.state) return `${s.city}, ${s.state}`
+  if (s.city) return s.city
+  return s.name ? `${s.name}` : 'Ubicación del refugio'
+}
+const createEmptyPetForm = (settings?: ShelterSettings) => ({
   name: '',
   species: 'Perro' as 'Perro' | 'Gato' | 'Otro',
   breed: '',
   age: '',
   gender: 'Macho' as 'Macho' | 'Hembra',
   size: 'Mediano' as 'Pequeño' | 'Mediano' | 'Grande',
-  location: 'CDMX (Refugio Central)',
+  location: settings ? getDefaultPetLocation(settings) : 'Ubicación del refugio',
   image: '',
   images: [] as string[],
   story: '',
@@ -448,7 +457,14 @@ export default function DashboardPage() {
   // Registration & Editing state for Pet
   const [editingPet, setEditingPet] = useState<Pet | null>(null)
   const [deletePetTarget, setDeletePetTarget] = useState<{ id: string; name: string } | null>(null)
+  const [deleteFosterTarget, setDeleteFosterTarget] = useState<{ id: string; name: string } | null>(null)
+  const [deleteThankTarget, setDeleteThankTarget] = useState<{ id: string; name: string } | null>(null)
+  const [deleteFollowUpTarget, setDeleteFollowUpTarget] = useState<{ id: string; petName: string; adopterName: string } | null>(null)
+  const [deleteEventTarget, setDeleteEventTarget] = useState<{ id: string; title: string } | null>(null)
+  const [pendingAppStatusTarget, setPendingAppStatusTarget] = useState<{ id: string; status: AdoptionApplication['status']; applicantName: string; petName: string } | null>(null)
+  const [pendingApproveTarget, setPendingApproveTarget] = useState<AdoptionApplication | null>(null)
   const [petFormActionSuccess, setPetFormActionSuccess] = useState<string | null>(null)
+  const [appStatusSuccess, setAppStatusSuccess] = useState<string | null>(null)
   const [newPet, setNewPet] = useState(createEmptyPetForm())
   const [registerSuccess, setRegisterSuccess] = useState(false)
   const [settingsSuccess, setSettingsSuccess] = useState(false)
@@ -483,6 +499,62 @@ export default function DashboardPage() {
   // Handlers for App status changes
   const handleUpdateAppStatus = (appId: string, newStatus: AdoptionApplication['status']) => {
     setApplications(prev => prev.map(app => app.id === appId ? { ...app, status: newStatus } : app))
+  }
+
+  const handleRequestAppStatusChange = (appId: string, newStatus: AdoptionApplication['status'], applicantName: string, petName: string) => {
+    setPendingAppStatusTarget({ id: appId, status: newStatus, applicantName, petName })
+  }
+
+  const handleConfirmAppStatusChange = () => {
+    if (!pendingAppStatusTarget) return
+    const { id, status, applicantName, petName } = pendingAppStatusTarget
+    setApplications(prev => prev.map(app => app.id === id ? { ...app, status } : app))
+    setPendingAppStatusTarget(null)
+    const label = status === 'Rechazada' ? `Solicitud de ${applicantName} rechazada.` : status === 'En revisión' ? `Solicitud de ${applicantName} marcada en revisión.` : `Estado de ${applicantName} (${petName}) actualizado a ${status}.`
+    setAppStatusSuccess(label)
+    setTimeout(() => setAppStatusSuccess(null), 3000)
+  }
+
+  const handleRequestApproveApplication = (app: AdoptionApplication) => {
+    setPendingApproveTarget(app)
+  }
+
+  const handleConfirmApproveApplication = () => {
+    if (!pendingApproveTarget) return
+    const app = pendingApproveTarget
+    const checksComplete = Object.values(app.verification).every(Boolean)
+    const requiredDocuments = ['Identificación oficial', 'Comprobante de domicilio']
+    const documentsComplete = requiredDocuments.every((type) => app.documents.some((document) => document.type === type && document.url))
+    if (!checksComplete || !documentsComplete) {
+      setApplicationActionError(`No se puede aprobar ${app.applicantName}: completa todos los puntos de verificación y carga identificación y comprobante de domicilio.`)
+      setPendingApproveTarget(null)
+      return
+    }
+    setApplicationActionError(null)
+    setApplications(prev => prev.map(current => current.id === app.id
+      ? { ...current, status: 'Aprobada', reviewedAt: new Date().toISOString() }
+      : current))
+    setPets(prev => prev.map(pet => pet.id === app.petId ? { ...pet, status: 'En Proceso' } : pet))
+    setFollowUps(prev => {
+      if (prev.some(followUp => followUp.applicationId === app.id)) return prev
+      return [{
+        ...createEmptyFollowUpForm(),
+        id: `fu-${Date.now()}`,
+        applicationId: app.id,
+        petId: app.petId || undefined,
+        petName: app.petName,
+        adopterName: app.applicantName,
+        adopterEmail: app.applicantEmail,
+        adopterPhone: app.applicantPhone,
+        adopterAddress: app.applicantAddress,
+        adopterCity: app.applicantCity,
+        processStage: 'Pendiente',
+        nextFollowUpDate: '',
+      }, ...prev]
+    })
+    setPendingApproveTarget(null)
+    setAppStatusSuccess(`Solicitud de ${app.applicantName} aprobada. Se creó el seguimiento para ${app.petName}.`)
+    setTimeout(() => setAppStatusSuccess(null), 3000)
   }
 
   const handleUpdateAppVerification = (appId: string, key: keyof AdoptionApplication['verification'], value: boolean) => {
@@ -571,16 +643,25 @@ export default function DashboardPage() {
   // Cancel Editing
   const handleCancelEdit = () => {
     setEditingPet(null)
-    setNewPet(createEmptyPetForm())
+    setNewPet(createEmptyPetForm(settings))
     setActiveTab('pets')
   }
 
   const handleStartCreatePet = () => {
     setEditingPet(null)
     setRegisterSuccess(false)
-    setNewPet(createEmptyPetForm())
+    setNewPet(createEmptyPetForm(settings))
     setActiveTab('register-pet')
   }
+
+  // Sincroniza ubicación por defecto cuando se cargan los settings del refugio
+  useEffect(() => {
+    if (!hydrated || editingPet || activeTab !== 'register-pet') return
+    const expected = getDefaultPetLocation(settings)
+    if (newPet.location === 'Ubicación del refugio' || newPet.location === 'CDMX (Refugio Central)') {
+      setNewPet((prev) => ({ ...prev, location: expected }))
+    }
+  }, [settings, hydrated, editingPet, activeTab, newPet.location])
 
   // Add Custom Web Input Field Handler
   const handleAddCustomField = (targetForm: 'adoption' | 'foster') => {
@@ -662,9 +743,12 @@ export default function DashboardPage() {
   }
 
   const handleDeleteFoster = (id: string, name: string) => {
-    if (confirm(`¿Eliminar la casa puente de "${name}"?`)) {
-      setFosterHomes(prev => prev.filter(f => f.id !== id))
-    }
+    setDeleteFosterTarget({ id, name })
+  }
+  const handleConfirmDeleteFoster = () => {
+    if (!deleteFosterTarget) return
+    setFosterHomes(prev => prev.filter(f => f.id !== deleteFosterTarget.id))
+    setDeleteFosterTarget(null)
   }
 
   // Thanks Handlers
@@ -689,10 +773,14 @@ export default function DashboardPage() {
     setThanksList(prev => prev.map(t => t.id === id ? { ...t, isPublic: !t.isPublic } : t))
   }
 
-  const handleDeleteThank = (id: string) => {
-    if (confirm('¿Eliminar esta nota de agradecimiento?')) {
-      setThanksList(prev => prev.filter(t => t.id !== id))
-    }
+  const handleDeleteThank = (id: string, name?: string) => {
+    const targetName = name ?? thanksList.find(t => t.id === id)?.name ?? 'esta nota'
+    setDeleteThankTarget({ id, name: targetName })
+  }
+  const handleConfirmDeleteThank = () => {
+    if (!deleteThankTarget) return
+    setThanksList(prev => prev.filter(t => t.id !== deleteThankTarget.id))
+    setDeleteThankTarget(null)
   }
 
   const handleUpdateFollowUpStage = (followUpId: string, processStage: AdoptionFollowUp['processStage']) => {
@@ -723,9 +811,12 @@ export default function DashboardPage() {
   }
 
   const handleDeleteFollowUp = (followUpId: string, petName: string, adopterName: string) => {
-    if (confirm(`¿Eliminar el seguimiento de ${petName} asociado a ${adopterName}?`)) {
-      setFollowUps(prev => prev.filter(followUp => followUp.id !== followUpId))
-    }
+    setDeleteFollowUpTarget({ id: followUpId, petName, adopterName })
+  }
+  const handleConfirmDeleteFollowUp = () => {
+    if (!deleteFollowUpTarget) return
+    setFollowUps(prev => prev.filter(followUp => followUp.id !== deleteFollowUpTarget.id))
+    setDeleteFollowUpTarget(null)
   }
 
   const handleStartFollowUpFromApplication = () => setActiveTab('adoption-followups')
@@ -792,9 +883,12 @@ export default function DashboardPage() {
   }
 
   const handleDeleteEvent = (eventId: string, title: string) => {
-    if (confirm(`¿Eliminar el evento "${title}"?`)) {
-      setEvents(prev => prev.filter(event => event.id !== eventId))
-    }
+    setDeleteEventTarget({ id: eventId, title })
+  }
+  const handleConfirmDeleteEvent = () => {
+    if (!deleteEventTarget) return
+    setEvents(prev => prev.filter(event => event.id !== deleteEventTarget.id))
+    setDeleteEventTarget(null)
   }
 
   // Save Shelter Settings
@@ -953,7 +1047,7 @@ export default function DashboardPage() {
       setRegisterSuccess(true)
       setTimeout(() => {
         setRegisterSuccess(false)
-        setNewPet(createEmptyPetForm())
+        setNewPet(createEmptyPetForm(settings))
         setActiveTab('pets')
       }, 1500)
     }
@@ -1027,8 +1121,11 @@ export default function DashboardPage() {
     filteredAppsList,
     handleUpdateAppStatus,
     handleApproveApplication,
+    handleRequestAppStatusChange,
+    handleRequestApproveApplication,
     handleUpdateAppVerification,
     applicationActionError,
+    appStatusSuccess,
     fosterFilterStatus,
     setFosterFilterStatus,
     filteredFosterList,
@@ -1202,6 +1299,14 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+        {appStatusSuccess && (
+          <div className="mb-6 p-4 rounded-xl bg-emerald-600 text-white flex items-center justify-between shadow-sm animate-in fade-in">
+            <div className="flex items-center gap-2.5 text-sm font-medium">
+              <CheckCircle2 className="size-5" />
+              {appStatusSuccess}
+            </div>
+          </div>
+        )}
 
         {/* OVERVIEW TAB */}
         <DashboardOverviewTab />
@@ -1234,6 +1339,32 @@ export default function DashboardPage() {
         onClose={handleCloseThankModal}
       />
       {deletePetTarget && <DeleteConfirmDialog petName={deletePetTarget.name} onCancel={() => setDeletePetTarget(null)} onConfirm={handleConfirmDeletePet} />}
+      {deleteFosterTarget && <DeleteConfirmDialog petName={deleteFosterTarget.name} title={`¿Eliminar casa puente ${deleteFosterTarget.name}?`} description={`Se eliminará el registro de ${deleteFosterTarget.name} de la red de casas puente.`} onCancel={() => setDeleteFosterTarget(null)} onConfirm={handleConfirmDeleteFoster} />}
+      {deleteThankTarget && <DeleteConfirmDialog petName={deleteThankTarget.name} title={`¿Eliminar agradecimiento a ${deleteThankTarget.name}?`} description={`Se eliminará el agradecimiento a ${deleteThankTarget.name}.`} onCancel={() => setDeleteThankTarget(null)} onConfirm={handleConfirmDeleteThank} />}
+      {deleteFollowUpTarget && <DeleteConfirmDialog petName={deleteFollowUpTarget.petName} title={`¿Eliminar seguimiento de ${deleteFollowUpTarget.petName}?`} description={`Se eliminará el seguimiento de ${deleteFollowUpTarget.petName} (adoptante: ${deleteFollowUpTarget.adopterName}).`} onCancel={() => setDeleteFollowUpTarget(null)} onConfirm={handleConfirmDeleteFollowUp} />}
+      {deleteEventTarget && <DeleteConfirmDialog petName={deleteEventTarget.title} title={`¿Eliminar evento ${deleteEventTarget.title}?`} description={`Se eliminará el evento &quot;${deleteEventTarget.title}&quot;. Esta acción no se puede deshacer.`} onCancel={() => setDeleteEventTarget(null)} onConfirm={handleConfirmDeleteEvent} />}
+      {pendingAppStatusTarget && (
+        <DeleteConfirmDialog
+          variant={pendingAppStatusTarget.status === 'Rechazada' ? 'danger' : 'info'}
+          title={pendingAppStatusTarget.status === 'Rechazada' ? `¿Rechazar solicitud de ${pendingAppStatusTarget.applicantName}?` : `¿Marcar en revisión a ${pendingAppStatusTarget.applicantName}?`}
+          description={pendingAppStatusTarget.status === 'Rechazada' ? `Se marcará como Rechazada la solicitud de ${pendingAppStatusTarget.applicantName} para ${pendingAppStatusTarget.petName}.` : `Se cambiará el estado de la solicitud de ${pendingAppStatusTarget.applicantName} para ${pendingAppStatusTarget.petName} a “En revisión”.`}
+          cancelLabel="Cancelar"
+          confirmLabel={pendingAppStatusTarget.status === 'Rechazada' ? 'Rechazar solicitud' : 'Marcar en revisión'}
+          onCancel={() => setPendingAppStatusTarget(null)}
+          onConfirm={handleConfirmAppStatusChange}
+        />
+      )}
+      {pendingApproveTarget && (
+        <DeleteConfirmDialog
+          variant="success"
+          title={`¿Aprobar solicitud de ${pendingApproveTarget.applicantName}?`}
+          description={`Se aprobará la adopción de ${pendingApproveTarget.petName} para ${pendingApproveTarget.applicantName}. Se creará el seguimiento y la mascota pasará a “En Proceso”.`}
+          cancelLabel="Cancelar"
+          confirmLabel="Aprobar adopción"
+          onCancel={() => setPendingApproveTarget(null)}
+          onConfirm={handleConfirmApproveApplication}
+        />
+      )}
       </div>
     </DashboardProvider>
   )

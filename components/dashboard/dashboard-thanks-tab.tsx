@@ -76,7 +76,7 @@ export function DashboardThanksTab() {
               </label>
 
               <button
-                onClick={() => handleDeleteThank(thank.id)}
+                onClick={() => handleDeleteThank(thank.id, thank.name)}
                 className="grid size-9 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"
                 title="Eliminar"
               >

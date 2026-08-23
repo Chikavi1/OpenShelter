@@ -1,3 +1,4 @@
+try { process.loadEnvFile() } catch {}
 import { migrateDatabase, setupDatabase } from '../lib/db/setup'
 import { seedDashboardState } from '../lib/dashboard-store'
 

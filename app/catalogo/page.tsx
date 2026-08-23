@@ -46,7 +46,7 @@ export default function CatalogoPage() {
             <div className="rounded-[2rem] border border-dashed border-foreground/15 bg-card p-10 text-center text-muted-foreground">
               <p className="text-xs font-semibold uppercase tracking-[0.2em]">Sin mascotas publicadas</p>
               <h3 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-foreground">Hoy no hay adopciones activas</h3>
-              <p className="mt-4 text-sm leading-7">Aun así, el refugio sigue necesitando apoyo para alimento, veterinaria y rescates.</p>
+              <p className="mt-4 text-sm leading-7">Aún así, el refugio sigue necesitando apoyo para alimento, veterinaria y rescates.</p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <a href="/donar" className="rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">Donar</a>
                 <a href="/contacto" className="rounded-full border border-foreground/15 px-5 py-3 text-sm font-medium">Contactar</a>
