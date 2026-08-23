@@ -9,6 +9,7 @@ import { PublicPageShell } from '@/components/public/public-page-shell'
 export default function CatalogoPage() {
   const site = usePublicSite()
   const [filter, setFilter] = useState('Todos')
+  const [statusFilter, setStatusFilter] = useState<'Todos' | 'En adopción' | 'Adoptados'>('Todos')
   const catalogPets = site.pets.map((pet) => ({
     id: pet.id,
     name: pet.name,
@@ -19,10 +20,18 @@ export default function CatalogoPage() {
     location: pet.location,
     image: pet.image,
     featured: pet.featured,
+    status: pet.status,
     tone: pet.species === 'Perro' ? 'bg-[#dceebf]' : 'bg-[#e9dfd1]',
   }))
   const displayPets = catalogPets
-  const filteredPets = useMemo(() => filter === 'Todos' ? displayPets : displayPets.filter((pet) => pet.type === filter), [filter, displayPets])
+  const filteredPets = useMemo(() => {
+    let list = filter === 'Todos' ? displayPets : displayPets.filter((pet) => pet.type === filter)
+    if (statusFilter === 'En adopción') list = list.filter((pet) => pet.status === 'Disponible')
+    if (statusFilter === 'Adoptados') list = list.filter((pet) => pet.status === 'Adoptado')
+    // prioridad: disponibles primero
+    const order: Record<string, number> = { Disponible: 0, 'En Proceso': 1, Adoptado: 2 }
+    return [...list].sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9))
+  }, [filter, statusFilter, displayPets])
 
   const appName = site.settings.name || process.env.NEXT_PUBLIC_APP_NAME || ''
   const logoUrl = site.settings.logoUrl || process.env.NEXT_PUBLIC_LOGO_URL
@@ -39,9 +48,10 @@ export default function CatalogoPage() {
             </div>
             <div className="flex items-center gap-2 self-start rounded-full border border-foreground/10 bg-card p-1 text-sm sm:self-auto"><Search className="ml-3 size-4 text-muted-foreground" />{['Todos', 'Perro', 'Gato'].map((item) => <button key={item} onClick={() => setFilter(item)} className={`rounded-full px-4 py-2 transition ${filter === item ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>{item}</button>)}</div>
           </div>
+          <div className="mb-8 flex flex-wrap gap-2">{(['Todos', 'En adopción', 'Adoptados'] as const).map((item) => <button key={item} onClick={() => setStatusFilter(item)} className={`rounded-full border px-4 py-2 text-sm font-medium transition ${statusFilter === item ? 'border-primary bg-primary text-primary-foreground' : 'border-foreground/15 bg-card text-muted-foreground hover:text-foreground'}`}>{item}</button>)}</div>
 
           {filteredPets.length > 0 ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{filteredPets.map((pet) => <a key={pet.id} href={`/adopta/${pet.slug}`} className="group block"><div className={`relative overflow-hidden rounded-3xl ${pet.tone}`}><img src={pet.image} alt={`${pet.name}, ${pet.breed} en adopción`} className="aspect-[0.86] w-full object-cover transition duration-500 group-hover:scale-105" /><span className="absolute bottom-4 left-4 rounded-full bg-background/90 px-3 py-1 text-xs font-medium">Disponible</span></div><div className="flex items-start justify-between gap-3 px-1 pt-4"><div><h2 className="text-xl font-semibold transition group-hover:text-primary">{pet.name}</h2><p className="mt-1 text-sm text-muted-foreground">{pet.breed} · {pet.age}</p></div><p className="pt-1 text-xs text-muted-foreground">{pet.location}</p></div></a>)}</div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{filteredPets.map((pet) => <a key={pet.id} href={`/adopta/${pet.slug}`} className="group block"><div className={`relative overflow-hidden rounded-3xl ${pet.tone}`}><img src={pet.image} alt={`${pet.name}, ${pet.breed}`} className={`aspect-[0.86] w-full object-cover transition duration-500 group-hover:scale-105 ${pet.status === 'Adoptado' ? 'grayscale-[0.2] opacity-90' : ''}`} /><span className={`absolute bottom-4 left-4 rounded-full px-3 py-1 text-xs font-medium ${pet.status === 'Adoptado' ? 'bg-zinc-900 text-white' : pet.status === 'En Proceso' ? 'bg-amber-400 text-black' : 'bg-background/90 text-foreground'}`}>{pet.status === 'Adoptado' ? 'Adoptado' : pet.status === 'En Proceso' ? 'En proceso' : 'Disponible'}</span></div><div className="flex items-start justify-between gap-3 px-1 pt-4"><div><h2 className="text-xl font-semibold transition group-hover:text-primary">{pet.name}</h2><p className="mt-1 text-sm text-muted-foreground">{pet.breed} · {pet.age}</p></div><p className="pt-1 text-xs text-muted-foreground">{pet.location}</p></div></a>)}</div>
           ) : (
             <div className="rounded-[2rem] border border-dashed border-foreground/15 bg-card p-10 text-center text-muted-foreground">
               <p className="text-xs font-semibold uppercase tracking-[0.2em]">Sin mascotas publicadas</p>

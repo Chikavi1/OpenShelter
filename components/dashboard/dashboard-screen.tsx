@@ -273,8 +273,8 @@ const createEmptyPetForm = (settings?: ShelterSettings) => ({
   image: '',
   images: [] as string[],
   story: '',
-  healthInput: 'Vacunas al día, Esterilizado',
-  personalityInput: 'Amigable, Cariñoso',
+  healthInput: '',
+  personalityInput: '',
 })
 
 const createEmptyFosterForm = () => ({

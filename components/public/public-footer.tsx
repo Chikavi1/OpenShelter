@@ -1,6 +1,9 @@
 'use client'
 
-import type { ReactElement, SVGProps } from 'react'
+import type { ReactElement } from 'react'
+import { Heart, Mail, MapPin, PawPrint, Phone } from 'lucide-react'
+import { FaFacebookF, FaInstagram } from 'react-icons/fa6'
+import { usePublicSite } from '@/lib/use-public-site'
 
 interface PublicFooterProps {
   appName: string
@@ -12,55 +15,82 @@ interface PublicFooterProps {
 }
 
 export function PublicFooter({ appName, socialLinks }: PublicFooterProps) {
+  const site = usePublicSite()
+  const year = new Date().getFullYear()
+  const resolvedName = site.settings.name || appName || 'key rescata'
+  const description = site.settings.description || 'Rescatamos, rehabilitamos y conectamos mascotas increíbles con hogares para siempre.'
+  const address = site.settings.address || 'Calle del Amor 123'
+  const city = site.settings.city ? `${site.settings.city}${site.settings.state ? ', ' + site.settings.state : ''}` : ''
+  const phone = site.settings.phone
+  const email = site.settings.email
+  const logoUrl = site.settings.logoUrl
+
   const socials = [
-    socialLinks.instagram ? { href: socialLinks.instagram, label: 'Instagram', icon: InstagramIcon } : null,
-    socialLinks.facebook ? { href: socialLinks.facebook, label: 'Facebook', icon: FacebookIcon } : null,
-  ].filter(Boolean) as Array<{ href: string; label: string; icon: (props: SVGProps<SVGSVGElement>) => ReactElement }>
+    socialLinks.instagram || site.settings.socialLinks.instagram ? { href: socialLinks.instagram || site.settings.socialLinks.instagram, label: 'Instagram', icon: FaInstagram } : null,
+    socialLinks.facebook || site.settings.socialLinks.facebook ? { href: socialLinks.facebook || site.settings.socialLinks.facebook, label: 'Facebook', icon: FaFacebookF } : null,
+  ].filter(Boolean) as Array<{ href: string; label: string; icon: (props: { className?: string }) => ReactElement }>
 
   return (
-    <footer className="border-t border-foreground/10 py-10 text-sm text-muted-foreground">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="font-semibold text-foreground">{appName.toLowerCase()}.</p>
-        <p>Hecho con amor para quienes no tienen voz.</p>
-        <div className="flex items-center gap-4">
-          {socials.map(({ href, label, icon: Icon }) => (
-            <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="grid size-9 place-items-center rounded-full border border-foreground/10 bg-background transition hover:scale-105 hover:shadow-sm">
-              <Icon className="size-4" />
-            </a>
-          ))}
-          <a href="/contacto" className="hover:text-foreground">Contacto</a>
-          <a href="/privacidad" className="hover:text-foreground">Privacidad</a>
-          <a href="/terminos" className="hover:text-foreground">Términos</a>
+    <footer className="mt-10">
+      <div className="rounded-t-[2rem] bg-primary text-primary-foreground sm:rounded-t-[2.5rem]">
+        <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 lg:px-10 lg:py-14">
+          <div className="grid gap-10 lg:grid-cols-[1.5fr_0.9fr_0.9fr_1.2fr]">
+            <div>
+              <a href="/" className="flex items-center gap-3">
+                {logoUrl ? <img src={logoUrl} alt={resolvedName} className="size-10 rounded-full object-cover ring-1 ring-white/15" /> : <span className="grid size-10 place-items-center rounded-full bg-white/10 ring-1 ring-white/10"><PawPrint className="size-5" /></span>}
+                <span className="text-lg font-semibold tracking-tight">{resolvedName.toLowerCase()}.</span>
+              </a>
+              <p className="mt-4 max-w-sm text-sm leading-6 text-primary-foreground/70">{description}</p>
+              <div className="mt-6 flex items-center gap-2.5">
+                {socials.length > 0 ? socials.map(({ href, label, icon: Icon }) => (
+                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="grid size-9 place-items-center rounded-full bg-white/10 ring-1 ring-white/10 transition hover:bg-white hover:text-primary">
+                    <Icon className="size-4" />
+                  </a>
+                )) : <span className="text-xs text-primary-foreground/50">Síguenos</span>}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/60">Navegación</p>
+              <ul className="mt-4 grid gap-2.5 text-sm text-primary-foreground/80">
+                <li><a href="/nosotros" className="hover:text-white">Nosotros</a></li>
+                <li><a href="/catalogo" className="hover:text-white">Catálogo</a></li>
+                <li><a href="/reconocimiento" className="hover:text-white">Agradecimientos</a></li>
+                <li><a href="/eventos" className="hover:text-white">Eventos</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/60">Ayuda</p>
+              <ul className="mt-4 grid gap-2.5 text-sm text-primary-foreground/80">
+                <li><a href="/donar" className="hover:text-white">Donativos</a></li>
+                <li><a href="/contacto" className="hover:text-white">Contacto</a></li>
+                <li><a href="/privacidad" className="hover:text-white">Privacidad</a></li>
+                <li><a href="/terminos" className="hover:text-white">Términos</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/60">Contacto</p>
+              <ul className="mt-4 grid gap-3 text-sm text-primary-foreground/80">
+                <li className="flex items-start gap-2.5"><MapPin className="mt-0.5 size-4 shrink-0 text-accent" /><span>{address}{city ? ` — ${city}` : ''}</span></li>
+                {phone && <li className="flex items-center gap-2.5"><Phone className="size-4 shrink-0 text-accent" /><a href={`tel:${phone}`} className="hover:text-white">{phone}</a></li>}
+                {email && <li className="flex items-center gap-2.5"><Mail className="size-4 shrink-0 text-accent" /><a href={`mailto:${email}`} className="hover:text-white">{email}</a></li>}
+              </ul>
+              <a href="/#formulario" className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground transition hover:opacity-90">
+                Quiero adoptar <Heart className="size-4" />
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-primary-foreground/60 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {year} {resolvedName}. Hecho con amor para quienes no tienen voz.</p>
+            <p className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-accent" /> Rescate y adopción responsable</p>
+          </div>
         </div>
       </div>
     </footer>
   )
 }
 
-function FacebookIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-      <circle cx="12" cy="12" r="11" fill="#1877F2" />
-      <path fill="#FFFFFF" d="M13.5 9H16V6h-2.5C11.57 6 10 7.57 10 9.5V12H8v3h2v7h3v-7h2.5l.5-3H13v-2.1c0-.61.4-.9.95-.9Z" />
-    </svg>
-  )
-}
 
-function InstagramIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-      <defs>
-        <linearGradient id="instagram-gradient" x1="4" y1="20" x2="20" y2="4" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#F58529" />
-          <stop offset="35%" stopColor="#DD2A7B" />
-          <stop offset="70%" stopColor="#8134AF" />
-          <stop offset="100%" stopColor="#515BD4" />
-        </linearGradient>
-      </defs>
-      <rect x="3" y="3" width="18" height="18" rx="5" fill="url(#instagram-gradient)" />
-      <rect x="6" y="6" width="12" height="12" rx="4" fill="none" stroke="white" strokeWidth="1.7" />
-      <circle cx="12" cy="12" r="3.4" fill="none" stroke="white" strokeWidth="1.7" />
-      <circle cx="16.5" cy="7.5" r="1.1" fill="white" />
-    </svg>
-  )
-}

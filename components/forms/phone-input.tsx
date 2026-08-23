@@ -43,9 +43,9 @@ export function PhoneInput({ label, name, placeholder = 'Número de teléfono', 
   }
 
   return (
-    <label className="grid gap-2 text-sm font-medium">
+    <label className="grid min-w-0 gap-2 text-sm font-medium">
       {label}
-      <span className="flex min-h-12 overflow-hidden rounded-xl border border-foreground/15 bg-background transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+      <span className="flex min-h-12 min-w-0 overflow-hidden rounded-xl border border-foreground/15 bg-background transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
         <select
           aria-label="País"
           value={selectedCountry.code}

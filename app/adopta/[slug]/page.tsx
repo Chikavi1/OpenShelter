@@ -1,36 +1,42 @@
-'use client'
-
-import { ArrowLeft, PawPrint } from 'lucide-react'
-import { use } from 'react'
-import { PetProfileSections } from '@/components/adoption/pet-profile-sections'
-import { usePublicSite } from '@/lib/use-public-site'
+import type { Metadata } from 'next'
+import { PetProfileClient } from '@/components/adoption/pet-profile-client'
+import { loadDashboardState } from '@/lib/dashboard-store'
 import { slugify } from '@/lib/slug'
-import { PublicPageShell } from '@/components/public/public-page-shell'
-import { PublicPageLoader } from '@/components/public/public-page-loader'
 
-export default function PetProfilePage({ params }: { params: Promise<{ slug: string }> }) {
-  const site = usePublicSite()
-  const { slug: rawSlug } = use(params)
-  if (site.loading) return <PublicPageLoader label="Cargando perfil" />
-  const slug = rawSlug.toLowerCase()
-  const pet = site.pets.find((item) => slugify(item.name) === slug)
-  const appName = site.settings.name || process.env.NEXT_PUBLIC_APP_NAME || ''
-  const logoUrl = site.settings.logoUrl || process.env.NEXT_PUBLIC_LOGO_URL
-
-  if (!pet) {
-    return (
-      <main className="min-h-screen bg-background px-4 py-20 text-center text-foreground">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Mascota no disponible</p>
-        <h1 className="mt-4 text-4xl font-semibold sm:text-6xl">No hay datos cargados todavía</h1>
-        <a href="/catalogo" className="mt-8 inline-flex rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">Ver catálogo</a>
-      </main>
-    )
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug: raw } = await params
+  const slug = raw.toLowerCase()
+  try {
+    const state = await loadDashboardState()
+    const pet = state.pets.find((p) => slugify(p.name) === slug)
+    if (!pet) return {}
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const title = `${pet.name} — ${pet.breed} en adopción | ${state.settings.name || 'Refugio Huellas'}`
+    const description = pet.story?.slice(0, 155) || `Conoce a ${pet.name}, ${pet.age} ${pet.breed} busca hogar. ${pet.personality.slice(0, 3).join(', ')}`
+    const image = pet.image || pet.images?.[0] || '/events.png'
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: [{ url: image, width: 1200, height: 630, alt: `${pet.name} en adopción` }],
+        type: 'profile',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [image],
+      },
+      alternates: { canonical: `${siteUrl}/adopta/${raw}` },
+    }
+  } catch {
+    return {}
   }
+}
 
-  return (
-    <PublicPageShell appName={appName} logoUrl={logoUrl} contentClassName="mx-auto max-w-[1440px] space-y-6 px-4 sm:px-6 lg:px-10">
-      <PetProfileSections pet={pet} appName={appName} />
-
-    </PublicPageShell>
-  )
+export default async function PetProfilePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  return <PetProfileClient slug={slug} />
 }

@@ -46,7 +46,9 @@ export default function Page() {
     img: thank.avatarUrl,
   }))
   const featuredPet = catalogPets.find((pet) => pet.featured)
-  const filteredPets = filter === 'Todos' ? catalogPets : catalogPets.filter((pet) => pet.type === filter)
+  const adoptablePets = catalogPets.filter((pet) => pet.status === 'Disponible')
+  const speciesFiltered = filter === 'Todos' ? adoptablePets : adoptablePets.filter((pet) => pet.type === filter)
+  const filteredPets = speciesFiltered.slice(0, 4)
   const donationMethods = getDonationMethods(site.settings)
   const hasDonationMethods = donationMethods.length > 0
 
@@ -58,10 +60,11 @@ export default function Page() {
 
         <section id="inicio" className="grid gap-10 py-14 md:py-20 lg:grid-cols-[1fr_0.9fr] lg:items-end lg:gap-20">
           <div className="max-w-3xl"><p className="mb-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"><span className="size-2 rounded-full bg-accent" /> Rescate y adopción responsable</p><h1 className="text-balance text-5xl font-semibold leading-[0.95] tracking-[-0.065em] sm:text-7xl lg:text-[6.7rem]">Una segunda oportunidad <span className="text-muted-foreground">cambia dos vidas.</span></h1><p className="mt-8 max-w-xl text-lg leading-7 text-muted-foreground">Rescatamos, rehabilitamos y conectamos mascotas increíbles con personas listas para quererlas para siempre.</p><div className="mt-9 flex flex-wrap gap-3"><a href="/donar" className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition hover:scale-[1.02]">Apoyar <ArrowRight className="ml-2 inline size-4" /></a><a href="/nosotros" className="rounded-full border border-foreground/15 px-6 py-3 text-sm font-medium transition hover:bg-muted">Conoce nuestra historia</a></div></div>
-          <div className="relative"><div className="overflow-hidden rounded-[2rem] bg-secondary"><img src={site.settings.heroBannerUrl || HERO_IMAGE} alt={`${appName} en acción`} className="h-[390px] w-full object-cover object-bottom mix-blend-multiply sm:h-[500px]" /></div><div className="absolute -bottom-5 -left-3 rounded-2xl bg-accent p-4 shadow-xl sm:-left-6"><p className="text-3xl font-semibold tracking-tight">{site.pets.length}</p><p className="text-xs font-medium uppercase tracking-wider">vidas en seguimiento</p></div></div>
+          <div className="relative"><div className="overflow-hidden rounded-[2rem] bg-secondary"><img src={site.settings.heroBannerUrl || HERO_IMAGE} alt={`${appName} en acción`} className="h-[390px] w-full object-cover object-bottom mix-blend-multiply sm:h-[500px]" /></div>
+           </div>
         </section>
 
-        <section id="adopta" className="scroll-mt-10 py-20"><div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Encuentra a tu match</p><h2 className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">Conoce a nuestros rescatados</h2></div><div className="flex items-center gap-2 rounded-full border border-foreground/10 bg-card p-1 text-sm"><Search className="ml-3 size-4 text-muted-foreground" />{['Todos', 'Perro', 'Gato'].map((item) => <button key={item} onClick={() => setFilter(item)} className={`rounded-full px-4 py-2 transition ${filter === item ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>{item}</button>)}</div></div>{filteredPets.length > 0 ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{filteredPets.map((pet) => <a key={pet.id} href={`/adopta/${pet.slug}`} className="group block"><div className={`relative overflow-hidden rounded-3xl ${pet.tone}`}><img src={pet.image} alt={`${pet.name}, ${pet.breed} en adopción`} className="aspect-[0.86] w-full object-cover transition duration-500 group-hover:scale-105" /><span className="absolute bottom-4 left-4 rounded-full bg-background/90 px-3 py-1 text-xs font-medium">Disponible</span></div><div className="flex items-start justify-between gap-3 px-1 pt-4"><div><h3 className="text-xl font-semibold transition group-hover:text-primary">{pet.name}</h3><p className="mt-1 text-sm text-muted-foreground">{pet.breed} · {pet.age}</p></div><p className="pt-1 text-xs text-muted-foreground">{pet.location}</p></div></a>)}</div> : <div className="rounded-3xl border border-foreground/10 bg-card p-12 text-center text-muted-foreground"><p>Por el momento no hay mascotas en adopción. Vuelve pronto, llegan nuevos rescatados constantemente.</p></div>}</section>
+        <section id="adopta" className="scroll-mt-10 py-20"><div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Encuentra a tu match</p><h2 className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">Conoce a nuestros rescatados</h2></div><div className="flex items-center gap-2 rounded-full border border-foreground/10 bg-card p-1 text-sm"><Search className="ml-3 size-4 text-muted-foreground" />{['Todos', 'Perro', 'Gato'].map((item) => <button key={item} onClick={() => setFilter(item)} className={`rounded-full px-4 py-2 transition ${filter === item ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>{item}</button>)}</div></div>{filteredPets.length > 0 ? <><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{filteredPets.map((pet) => <a key={pet.id} href={`/adopta/${pet.slug}`} className="group block"><div className={`relative overflow-hidden rounded-3xl ${pet.tone}`}><img src={pet.image} alt={`${pet.name}, ${pet.breed} en adopción`} className="aspect-[0.86] w-full object-cover transition duration-500 group-hover:scale-105" /><span className="absolute bottom-4 left-4 rounded-full bg-background/90 px-3 py-1 text-xs font-medium">Disponible</span></div><div className="flex items-start justify-between gap-3 px-1 pt-4"><div><h3 className="text-xl font-semibold transition group-hover:text-primary">{pet.name}</h3><p className="mt-1 text-sm text-muted-foreground">{pet.breed} · {pet.age}</p></div><p className="pt-1 text-xs text-muted-foreground">{pet.location}</p></div></a>)}</div><div className="mt-10 flex justify-center"><a href="/catalogo" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition hover:opacity-90">Ver catálogo completo <ArrowRight className="size-4" /></a></div></> : <div className="rounded-3xl border border-foreground/10 bg-card p-12 text-center text-muted-foreground"><p>Por el momento no hay mascotas en adopción. Vuelve pronto, llegan nuevos rescatados constantemente.</p></div>}</section>
 
         {featuredPet && <section className="grid gap-8 rounded-[2rem] bg-primary p-6 text-primary-foreground sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14"><div className="flex flex-col justify-between"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/60">Perfil destacado</p><h2 className="max-w-md text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">{featuredPet ? featuredPet.name : 'No hay mascotas publicadas todavía'} está listo para conocerte.</h2><p className="mt-6 max-w-sm leading-7 text-primary-foreground/70">{featuredPet ? `${featuredPet.breed}, cariñoso y listo para encontrar un hogar.` : 'El refugio sigue activo y necesita apoyo para rescates, alimento y veterinaria.'}</p></div><a href={featuredPet ? `/adopta/${featuredPet.slug}` : '/donar'} className="mt-10 w-fit rounded-full bg-accent px-5 py-3 text-sm font-medium text-accent-foreground">{featuredPet ? `Quiero conocer a ${featuredPet.name}` : 'Apoyar al refugio'} <ArrowDownRight className="ml-2 inline size-4" /></a></div><div className="grid gap-4 sm:grid-cols-[1.1fr_0.9fr]"><img src={featuredPet?.image || 'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=1000&q=85'} alt={`${featuredPet?.name || 'refugio'}, mascota rescatada`} className="h-full min-h-72 w-full rounded-3xl object-cover" /><div className="flex flex-col justify-between rounded-3xl bg-primary-foreground/10 p-6"><div className="flex flex-wrap gap-2 text-xs"><span className="rounded-full border border-primary-foreground/20 px-3 py-1">{featuredPet?.age || '—'}</span><span className="rounded-full border border-primary-foreground/20 px-3 py-1">{featuredPet?.size || '—'}</span><span className="rounded-full border border-primary-foreground/20 px-3 py-1">{featuredPet?.gender || '—'}</span></div><div><p className="mb-2 text-xs uppercase tracking-wider text-primary-foreground/50">Personalidad</p><p className="text-2xl font-medium">{featuredPet?.personality?.slice(0, 3).join(' · ') || 'Sin datos'}</p></div><div className="border-t border-primary-foreground/15 pt-4 text-sm text-primary-foreground/65">{featuredPet?.story || 'Milo convive con otros perros y disfruta los paseos largos.'}</div></div></div></section>}
 
@@ -69,38 +72,57 @@ export default function Page() {
 
         <section id="impacto" className="scroll-mt-10 rounded-[2rem] bg-accent p-7 sm:p-12"><div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-accent-foreground/60">Nuestro impacto</p><h2 className="max-w-xl text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">Cada gesto se convierte en una historia feliz.</h2></div><p className="max-w-xs text-sm leading-6 text-accent-foreground/70">Con tu ayuda podemos seguir atendiendo rescates urgentes y encontrar hogares para más animales.</p></div><div className="mt-14 grid gap-8 border-t border-accent-foreground/20 pt-8 sm:grid-cols-3"><div><p className="text-5xl font-semibold tracking-[-0.06em]">{site.pets.filter((pet) => pet.status === 'Adoptado').length}</p><p className="mt-2 text-sm text-accent-foreground/65">adopciones felices</p></div><div><p className="text-5xl font-semibold tracking-[-0.06em]">{site.pets.filter((pet) => pet.status !== 'Adoptado').length}</p><p className="mt-2 text-sm text-accent-foreground/65">rescatados activos</p></div><div><p className="text-5xl font-semibold tracking-[-0.06em]">{Math.max(80, Math.round((site.thanksList.filter((thank) => thank.isPublic).length / Math.max(site.thanksList.length, 1)) * 100))}%</p><p className="mt-2 text-sm text-accent-foreground/65">de historias compartidas</p></div></div></section>
 
-        <section id="agradecimientos" className="scroll-mt-10 py-24">
-          <div className="mx-auto mb-12 max-w-2xl text-center">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Muro de Reconocimiento</p>
-            <h2 className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">Gracias por hacer esto posible</h2>
-            <p className="mt-4 leading-relaxed text-muted-foreground">Nuestra labor existe gracias a la generosidad de donantes, padrinos, empresas aliadas y voluntarios dedicados.</p>
+        <section id="agradecimientos" className="scroll-mt-10 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-[#FDF6EE] px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+          <div className="mx-auto mb-10 max-w-3xl text-center">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-600 shadow-sm"><span className="size-2 rounded-full bg-amber-400" /> Muro de Reconocimiento</p>
+            <h2 className="text-3xl font-semibold tracking-[-0.05em] text-zinc-900 sm:text-4xl">Gracias por hacer esto posible</h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-500">Un espacio reservado para quienes eligieron estar del lado correcto. Cada nombre aquí representa alimento, rescate y una vida que hoy tiene hogar.</p>
           </div>
           {publicThanks.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {publicThanks.map((t, idx) => (
-                <div key={t.id || idx} className="flex flex-col justify-between space-y-4 rounded-3xl border border-foreground/10 bg-card p-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <img src={t.img} alt={t.name} className="size-12 rounded-full border border-foreground/10 object-cover" />
-                      <div>
-                        <h3 className="text-base font-semibold">{t.name}</h3>
-                        <span className="text-xs font-medium text-primary">{t.role}</span>
+            <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2">
+              {publicThanks.slice(0, 2).map((t, idx) => {
+                const isVoluntario = t.role.toLowerCase().includes('volunt')
+                const isEmpresa = t.role.toLowerCase().includes('empresa')
+                const tagLabel = isVoluntario ? 'VOLUNTARIO' : isEmpresa ? 'EMPRESA ALIADA' : t.role.toUpperCase()
+                const tagClass = isVoluntario ? 'bg-amber-100 text-amber-900 border-amber-200' : isEmpresa ? 'bg-emerald-100 text-emerald-900 border-emerald-200' : 'bg-zinc-100 text-zinc-700 border-zinc-200'
+                const tags = isVoluntario ? ['Salud Animal', 'Atención', 'Esterilización'] : isEmpresa ? ['Alimentación', 'Sostenibilidad', 'Apoyo'] : ['Apoyo', 'Solidaridad', 'Comunidad']
+                return (
+                  <article key={t.id || idx} className="flex flex-col rounded-[1.6rem] border border-zinc-200 bg-white p-5 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.12)] sm:p-6">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <img src={t.img} alt={t.name} className="size-10 shrink-0 rounded-full object-cover ring-1 ring-black/5" />
+                        <div className="min-w-0">
+                          <h3 className="truncate text-sm font-semibold leading-none tracking-tight">{t.name}</h3>
+                          <p className="mt-1 text-xs text-zinc-500">Miembro de honor</p>
+                        </div>
                       </div>
+                      <span className="shrink-0 text-[11px] font-medium text-zinc-400">Hoy</span>
                     </div>
-                    <div className="rounded-xl bg-secondary p-3 text-xs">
-                      <span className="block text-[10px] font-bold uppercase text-muted-foreground">Aportación:</span>
-                      <p className="font-medium text-foreground">{t.contribution}</p>
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${tagClass}`}>{tagLabel}</span>
+                      <span className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-900">RECONOCIMIENTO</span>
                     </div>
-                    <p className="text-sm italic leading-relaxed text-muted-foreground">&quot;{t.msg}&quot;</p>
-                  </div>
-                </div>
-              ))}
+                    <div className="mt-3 rounded-2xl bg-zinc-100 px-4 py-3.5">
+                      <p className="flex items-center gap-1.5 text-xs text-zinc-600"><span className="text-zinc-400"><Globe className="size-3.5" /></span> Refugio Principal</p>
+                      <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-zinc-700"><span className="text-zinc-400">♡</span> {t.contribution}</p>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {tags.map((p) => (
+                        <span key={p} className="rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-xs text-zinc-600">{p}</span>
+                      ))}
+                      <span className="rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-xs text-zinc-500">+1</span>
+                    </div>
+                    <p className="mt-4 text-xs italic leading-6 text-zinc-500">“{t.msg || 'Gracias por su apoyo'}”</p>
+                  </article>
+                )
+              })}
             </div>
           ) : (
-            <div className="rounded-3xl border border-foreground/10 bg-card p-12 text-center text-muted-foreground">
+            <div className="rounded-[1.6rem] border border-dashed border-zinc-300 bg-white p-10 text-center text-sm text-zinc-500">
               <p>Pronto compartiremos más reconocimientos de quienes hacen posible nuestra labor.</p>
             </div>
           )}
+          {publicThanks.length > 0 && <div className="mt-8 flex justify-center"><a href="/reconocimiento" className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-black">Ver muro completo <ArrowRight className="size-4" /></a></div>}
         </section>
 
         {hasDonationMethods && <section id="donativos" className="scroll-mt-10 flex flex-col justify-between gap-8 py-24 lg:flex-row lg:items-center"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Donativos</p><h2 className="max-w-2xl text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">Tu ayuda puede llenar un plato, cubrir una cirugía o cambiar un destino.</h2></div><div className="max-w-sm rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm leading-6 text-muted-foreground">Aporta desde $100 MXN y acompáñanos a construir más finales felices.</p><a href="/donar" className="mt-6 flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">Quiero donar <ArrowRight className="ml-2 inline size-4" /></a></div></section>}

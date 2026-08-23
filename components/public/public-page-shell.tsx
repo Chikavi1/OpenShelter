@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { usePublicSite } from '@/lib/use-public-site'
 import { PublicFooter } from '@/components/public/public-footer'
 import { PublicHeader } from '@/components/public/public-header'
+import { WhatsAppFab } from '@/components/public/whatsapp-fab'
 
 interface PublicPageShellProps {
   appName: string
@@ -25,9 +26,8 @@ export function PublicPageShell({ appName, logoUrl, children, contentClassName =
         </div>
       </header>
       <div className={contentClassName}>{children}</div>
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10">
-        <PublicFooter appName={resolvedAppName} socialLinks={site.settings.socialLinks} />
-      </div>
+      <PublicFooter appName={resolvedAppName} socialLinks={site.settings.socialLinks} />
+      <WhatsAppFab />
     </main>
   )
 }
