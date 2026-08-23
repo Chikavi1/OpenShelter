@@ -4,8 +4,18 @@ import { useEffect, useState } from 'react'
 import { DEFAULT_DASHBOARD_STATE, type DashboardState } from './dashboard-defaults'
 import { applySitePalette } from './theme'
 
+const EMPTY_PUBLIC_STATE: DashboardState = {
+  ...DEFAULT_DASHBOARD_STATE,
+  pets: [],
+  applications: [],
+  fosterHomes: [],
+  thanksList: [],
+  followUps: [],
+  events: [],
+}
+
 export function usePublicSite() {
-  const [state, setState] = useState<DashboardState>(DEFAULT_DASHBOARD_STATE)
+  const [state, setState] = useState<DashboardState>(EMPTY_PUBLIC_STATE)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
