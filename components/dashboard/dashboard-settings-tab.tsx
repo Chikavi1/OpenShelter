@@ -19,11 +19,11 @@ export function DashboardSettingsTab() {
   {/* SHELTER SETTINGS TAB */}
   {activeTab === 'settings' && (
     <div className="space-y-6">
-      {/* Sub-tab Navigation */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-foreground/10 pb-3">
+      {/* Sub-tab Navigation — móvil lineal con scroll horizontal */}
+      <div className="flex flex-nowrap items-center gap-2 overflow-x-auto border-b border-foreground/10 pb-3 -mx-6 px-6 sm:mx-0 sm:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
         <button
           onClick={() => setSettingsSection('general')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+          className={`flex shrink-0 snap-start whitespace-nowrap items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
             settingsSection === 'general'
               ? 'bg-primary text-primary-foreground'
               : 'bg-card text-muted-foreground hover:text-foreground'
@@ -34,7 +34,7 @@ export function DashboardSettingsTab() {
 
         <button
           onClick={() => setSettingsSection('forms')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+          className={`flex shrink-0 snap-start whitespace-nowrap items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
             settingsSection === 'forms'
               ? 'bg-primary text-primary-foreground'
               : 'bg-card text-muted-foreground hover:text-foreground'
@@ -45,7 +45,7 @@ export function DashboardSettingsTab() {
 
         <button
           onClick={() => setSettingsSection('appearance')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+          className={`flex shrink-0 snap-start whitespace-nowrap items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
             settingsSection === 'appearance'
               ? 'bg-primary text-primary-foreground'
               : 'bg-card text-muted-foreground hover:text-foreground'
@@ -56,7 +56,7 @@ export function DashboardSettingsTab() {
 
         <button
           onClick={() => setSettingsSection('support')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+          className={`flex shrink-0 snap-start whitespace-nowrap items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
             settingsSection === 'support'
               ? 'bg-primary text-primary-foreground'
               : 'bg-card text-muted-foreground hover:text-foreground'
@@ -67,7 +67,7 @@ export function DashboardSettingsTab() {
 
         <button
           onClick={() => setSettingsSection('location')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+          className={`flex shrink-0 snap-start whitespace-nowrap items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
             settingsSection === 'location'
               ? 'bg-primary text-primary-foreground'
               : 'bg-card text-muted-foreground hover:text-foreground'
@@ -78,7 +78,7 @@ export function DashboardSettingsTab() {
 
         <button
           onClick={() => setSettingsSection('legal')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+          className={`flex shrink-0 snap-start whitespace-nowrap items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
             settingsSection === 'legal'
               ? 'bg-primary text-primary-foreground'
               : 'bg-card text-muted-foreground hover:text-foreground'
