@@ -32,6 +32,7 @@ export function PublicHeader({ appName, logoUrl, loading = false }: PublicHeader
           <span className="transition-opacity duration-500">{appName.toLowerCase()}</span>
         </a>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
+          <a href="/nosotros" className="transition-colors hover:text-foreground">Nosotros</a>
           <a href="/catalogo" className="transition-colors hover:text-foreground">Catálogo</a>
           <a href="/reconocimiento" className="transition-colors hover:text-foreground">Agradecimientos</a>
           <a href="/donar" className="transition-colors hover:text-foreground">Donativos</a>
@@ -40,7 +41,7 @@ export function PublicHeader({ appName, logoUrl, loading = false }: PublicHeader
         <a href="/#formulario" className="hidden rounded-full border border-foreground/20 px-5 py-2 text-sm font-medium transition hover:bg-accent hover:text-accent-foreground sm:block">Quiero adoptar</a>
         <button type="button" aria-label="Abrir menú" className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
       </div>
-      {menuOpen && <nav className="flex flex-col gap-4 pt-5 text-sm md:hidden"><a href="/catalogo" onClick={closeMenu}>Catálogo</a><a href="/reconocimiento" onClick={closeMenu}>Gracias</a><a href="/#donativos" onClick={closeMenu}>Donativos</a><a href="/eventos" onClick={closeMenu}>Eventos</a><a href="/#formulario" onClick={closeMenu}>Quiero adoptar</a></nav>}
+      {menuOpen && <nav className="flex flex-col gap-4 pt-5 text-sm md:hidden"><a href="/nosotros" onClick={closeMenu}>Nosotros</a><a href="/catalogo" onClick={closeMenu}>Catálogo</a><a href="/reconocimiento" onClick={closeMenu}>Gracias</a><a href="/#donativos" onClick={closeMenu}>Donativos</a><a href="/eventos" onClick={closeMenu}>Eventos</a><a href="/#formulario" onClick={closeMenu}>Quiero adoptar</a></nav>}
     </header>
   )
 }
