@@ -21,9 +21,9 @@ export default function EventsPage() {
 
               return (
                 <article key={event.id} className="overflow-hidden rounded-[28px] border border-foreground/10 bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                  <div className="relative h-56 overflow-hidden">
+                  <div className="relative h-56 overflow-hidden sm:h-56">
                     <img src={cover} alt={event.title} className="h-full w-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 hidden bg-gradient-to-t from-black/60 via-black/20 to-transparent sm:block" aria-hidden="true" />
 
                     <a
                       href={`/eventos/${event.id}`}
@@ -35,7 +35,7 @@ export default function EventsPage() {
                       <ArrowRight className="size-4" />
                     </a>
 
-                    <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 text-white">
+                    <div className="absolute inset-x-4 bottom-4 hidden items-end justify-between gap-4 text-white sm:flex">
                       <div className="max-w-[70%]">
                         <p className="flex items-center gap-2 text-xs font-medium text-white/80">
                           <CalendarDays className="size-4" />
@@ -50,7 +50,11 @@ export default function EventsPage() {
                   </div>
 
                   <div className="p-6">
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-wrap gap-2 sm:hidden">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium"><CalendarDays className="size-3.5" /> {event.eventDate}{event.eventTime ? ` · ${event.eventTime}` : ''}</span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium"><MapPin className="size-3.5" /> {event.location}</span>
+                    </div>
+                    <div className="mt-3 flex items-start justify-between gap-4 sm:mt-0">
                       <div>
                         <h2 className="text-2xl font-semibold tracking-[-0.04em]"><a href={`/eventos/${event.id}`} target="_blank" rel="noreferrer" className="transition hover:text-primary">{event.title}</a></h2>
                         <p className="mt-3 max-w-xl leading-7 text-muted-foreground">

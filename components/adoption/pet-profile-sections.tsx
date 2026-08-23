@@ -5,6 +5,7 @@ import { ArrowRight, Check, ChevronLeft, ChevronRight, ShieldCheck } from 'lucid
 import type { DashboardPet } from '@/lib/dashboard-defaults'
 import { VaccinationHistory } from '@/components/vaccination-history'
 import { PhoneInput } from '@/components/forms/phone-input'
+import { ShareButtons } from '@/components/public/share-buttons'
 
 interface PetProfileSectionsProps {
   pet: DashboardPet
@@ -43,12 +44,19 @@ export function PetProfileSections({ pet, appName }: PetProfileSectionsProps) {
     if (response.ok) setSent(true)
   }
 
+  const isAdopted = pet.status === 'Adoptado'
+
   return (
     <>
+      {isAdopted && (
+        <div className="mt-6 rounded-2xl bg-green-800 px-4 py-4 text-center text-sm font-semibold text-white shadow-sm sm:mt-8 sm:px-6">
+          🎉 ¡Esta mascota ya fue adoptada! Gracias por ayudar a cambiar su vida. Conoce a otros rescatados que aún buscan hogar.
+        </div>
+      )}
       <section className="grid gap-8 py-10 lg:grid-cols-[1.4fr_0.85fr] lg:items-start lg:gap-10 lg:py-16">
         <div className="lg:sticky lg:top-6">
           <div className="relative overflow-hidden rounded-[2rem] bg-zinc-900">
-            <img src={photos[activePhoto] || pet.image} alt={petName + ' en adopción'} className="h-auto max-h-[78vh] min-h-[460px] w-full object-contain object-center lg:min-h-[620px]" />
+            <img src={photos[activePhoto] || pet.image} alt={petName + (isAdopted ? ' - ya adoptado' : ' en adopción')} className={`h-auto max-h-[78vh] min-h-[460px] w-full object-contain object-center lg:min-h-[620px] ${isAdopted ? 'opacity-90' : ''}`} />
             {photos.length > 1 && (
               <>
                 <button
@@ -69,7 +77,7 @@ export function PetProfileSections({ pet, appName }: PetProfileSectionsProps) {
                 </button>
               </>
             )}
-            <span className="absolute bottom-5 left-5 rounded-full bg-accent px-4 py-2 text-xs font-semibold uppercase tracking-wider text-accent-foreground">Disponible para adopción</span>
+            <span className={`absolute bottom-5 left-5 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider ${isAdopted ? 'bg-zinc-900 text-white' : 'bg-accent text-accent-foreground'}`}>{isAdopted ? 'Adoptado · no disponible' : 'Disponible para adopción'}</span>
           </div>
         </div>
 
@@ -83,6 +91,9 @@ export function PetProfileSections({ pet, appName }: PetProfileSectionsProps) {
           <div className="mt-9 flex flex-wrap gap-2">{pet.personality.slice(0, 4).map((tag) => <span key={tag} className="rounded-full border border-foreground/15 px-4 py-2 text-sm">{tag}</span>)}</div>
           <div className="mt-10 border-t border-foreground/10 pt-8"><h2 className="text-2xl font-semibold">Su historia</h2><p className="mt-3 leading-7 text-muted-foreground">{pet.story}</p></div>
           <div className="mt-8 flex items-center gap-3 text-sm text-muted-foreground"><ShieldCheck className="size-5 text-accent-foreground" /> {pet.health.join(' · ')}</div>
+          <div className="mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
+            <ShareButtons title={isAdopted ? `${petName} ya fue adoptado en ${appName}` : `${petName} en adopción en ${appName}`} text={isAdopted ? `¡${petName} ya encontró hogar en ${appName}! Conoce su historia.` : `¡Conoce a ${petName}! ${pet.breed} en adopción en ${appName}. ¡Ayúdame a encontrarle hogar!`} />
+          </div>
         </div>
       </section>
 
@@ -98,33 +109,45 @@ export function PetProfileSections({ pet, appName }: PetProfileSectionsProps) {
         </ul>
       </section>
 
-      <section id="formulario" className="grid gap-10 rounded-[2rem] bg-primary p-6 text-primary-foreground sm:p-10 lg:grid-cols-[0.72fr_1.28fr] lg:p-14">
-        <div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/60">Formulario de adopción</p><h2 className="max-w-md text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">¿{petName} es tu match?</h2><p className="mt-6 max-w-sm leading-7 text-primary-foreground/70">Cuéntanos sobre ti y tu hogar. El proceso es sencillo, humano y pensado para cuidar a ambas partes.</p></div>
-        {sent ? <div className="flex min-h-96 flex-col justify-center rounded-3xl bg-white p-8 text-black shadow-sm"><span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground"><Check /></span><h3 className="mt-5 text-3xl font-semibold text-black">Solicitud recibida.</h3><p className="mt-3 max-w-sm leading-7 text-black/70">Gracias por abrirle la puerta a una nueva historia. Nuestro equipo se pondrá en contacto contigo muy pronto.</p></div> : <AdoptionForm appName={appName} onSubmit={submitApplication} />}
-      </section>
+      {isAdopted ? (
+        <section className="grid gap-6 rounded-[2rem] bg-primary p-6 text-primary-foreground sm:gap-10 sm:p-10 lg:grid-cols-[0.72fr_1.28fr] lg:p-14">
+          <div><p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/60 sm:mb-4">Final feliz</p><h2 className="max-w-md text-3xl font-semibold tracking-[-0.05em] sm:text-5xl">{petName} ya fue adoptado</h2><p className="mt-4 max-w-sm text-sm leading-6 text-primary-foreground/70 sm:mt-6 sm:text-base sm:leading-7">Esta historia tuvo un final feliz. {petName} ya encontró a su familia para siempre, pero hay muchos rescatados esperando una oportunidad como la suya.</p></div>
+          <div className="flex min-h-64 flex-col justify-center rounded-3xl bg-white p-6 text-black shadow-sm sm:min-h-72 sm:p-8">
+            <span className="grid size-12 place-items-center rounded-full bg-amber-400 text-black">✓</span>
+            <h3 className="mt-5 text-2xl font-semibold text-black sm:text-3xl">¡Adoptado!</h3>
+            <p className="mt-3 max-w-sm text-sm leading-7 text-black/70 sm:text-base">No disponible para adopción. Te invitamos a conocer a otros amigos que aún buscan hogar.</p>
+            <a href="/catalogo" className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:opacity-90">Ver catálogo <ArrowRight className="size-4" /></a>
+          </div>
+        </section>
+      ) : (
+        <section id="formulario" className="grid gap-6 rounded-[2rem] bg-primary p-4 text-primary-foreground sm:gap-10 sm:p-10 lg:grid-cols-[0.72fr_1.28fr] lg:p-14">
+          <div><p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/60 sm:mb-4">Formulario de adopción</p><h2 className="max-w-md text-3xl font-semibold tracking-[-0.05em] sm:text-6xl">¿{petName} es tu match?</h2><p className="mt-4 max-w-sm text-sm leading-6 text-primary-foreground/70 sm:mt-6 sm:text-base sm:leading-7">Cuéntanos sobre ti y tu hogar. El proceso es sencillo, humano y pensado para cuidar a ambas partes.</p></div>
+          {sent ? <div className="flex min-h-64 flex-col justify-center rounded-3xl bg-white p-6 text-black shadow-sm sm:min-h-96 sm:p-8"><span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground"><Check /></span><h3 className="mt-5 text-2xl font-semibold text-black sm:text-3xl">Solicitud recibida.</h3><p className="mt-3 max-w-sm text-sm leading-7 text-black/70 sm:text-base">Gracias por abrirle la puerta a una nueva historia. Nuestro equipo se pondrá en contacto contigo muy pronto.</p></div> : <AdoptionForm appName={appName} onSubmit={submitApplication} />}
+        </section>
+      )}
     </>
   )
 }
 
 function AdoptionForm({ appName, onSubmit }: { appName: string; onSubmit: (event: React.FormEvent<HTMLFormElement>) => void }) {
-  return <form className="grid gap-5 rounded-3xl bg-white p-6 text-black shadow-sm sm:p-8" onSubmit={onSubmit}>
-    <div className="grid gap-5 sm:grid-cols-2"><Field label="Nombre completo" name="name" placeholder="Tu nombre" required /><Field label="Correo electrónico" name="email" placeholder="tu@correo.com" type="email" required /></div>
-    <div className="grid gap-5 sm:grid-cols-2"><PhoneInput label="Teléfono / WhatsApp" name="phone" placeholder="Número de teléfono" required /><Field label="Ciudad" name="city" placeholder="Tu ciudad" required /></div>
+  return <form className="grid gap-4 rounded-3xl bg-white p-4 text-black shadow-sm sm:gap-5 sm:p-8" onSubmit={onSubmit}>
+    <div className="grid gap-4 sm:grid-cols-2 sm:gap-5"><Field label="Nombre completo" name="name" placeholder="Tu nombre" required /><Field label="Correo electrónico" name="email" placeholder="tu@correo.com" type="email" required /></div>
+    <div className="grid gap-4 sm:grid-cols-2 sm:gap-5"><PhoneInput label="Teléfono / WhatsApp" name="phone" placeholder="Número de teléfono" required /><Field label="Ciudad" name="city" placeholder="Tu ciudad" required /></div>
     <Field label="Domicilio completo" name="address" placeholder="Calle, número, colonia" required />
     <Field label="Ocupación" name="job" placeholder="A qué te dedicas" />
     <Field label="Tipo de vivienda y tu hogar" name="home" placeholder="Cuéntanos sobre tu espacio y rutina" required />
-    <label className="grid gap-2 text-sm font-medium text-black">¿Por qué quieres adoptar?<textarea required name="why" rows={4} placeholder="Comparte tu motivación" className="rounded-xl border border-black/15 bg-white px-4 py-3 font-normal text-black outline-none placeholder:text-black/40 focus:border-black" /></label>
-    <div className="grid gap-5 border-t border-black/10 pt-5 sm:grid-cols-2">
+    <label className="grid gap-2 text-sm font-medium text-black">¿Por qué quieres adoptar?<textarea required name="why" rows={4} placeholder="Comparte tu motivación" className="min-h-28 rounded-xl border border-black/15 bg-white px-4 py-3 font-normal text-black outline-none placeholder:text-black/40 focus:border-black" /></label>
+    <div className="grid gap-4 border-t border-black/10 pt-5 sm:grid-cols-2 sm:gap-5">
       <FileField label="Identificación oficial vigente" name="identityDocument" />
       <FileField label="Comprobante de domicilio" name="addressDocument" />
     </div>
-    <label className="flex items-start gap-3 text-sm text-black/70"><input required type="checkbox" className="mt-1 size-4 accent-primary" /> Acepto que {appName} me contacte.</label>
-    <button type="submit" className="flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-medium text-primary-foreground transition hover:opacity-90">Enviar solicitud <ArrowRight className="size-4" /></button>
+    <label className="flex items-start gap-3 text-sm leading-5 text-black/70"><input required type="checkbox" className="mt-0.5 size-4 shrink-0 accent-primary" /> <span>Acepto que {appName} me contacte.</span></label>
+    <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 sm:py-3">Enviar solicitud <ArrowRight className="size-4" /></button>
   </form>
 }
 
 function FileField({ label, name }: { label: string; name: string }) {
-  return <label className="grid gap-2 text-sm font-medium text-black">{label}<input required type="file" name={name} accept="application/pdf,image/jpeg,image/png" className="rounded-xl border border-black/15 bg-white px-3 py-2 text-sm font-normal text-black file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:font-medium file:text-primary-foreground" /><span className="text-xs font-normal text-black/60">PDF, JPG o PNG · máximo 5 MB</span></label>
+  return <label className="grid min-w-0 gap-2 text-sm font-medium text-black">{label}<input required type="file" name={name} accept="application/pdf,image/jpeg,image/png" className="w-full min-w-0 rounded-xl border border-black/15 bg-white px-3 py-2 text-sm font-normal text-black file:mr-2 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:font-medium file:text-primary-foreground file:whitespace-nowrap sm:file:mr-3" /><span className="text-xs font-normal leading-4 text-black/60">PDF, JPG o PNG · máximo 5 MB</span></label>
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -133,14 +156,14 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 function Field({ label, name, placeholder, type = 'text', required = false }: { label: string; name: string; placeholder: string; type?: string; required?: boolean }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-black">
+    <label className="grid min-w-0 gap-2 text-sm font-medium text-black">
       {label}
       <input
         required={required}
         type={type}
         name={name}
         placeholder={placeholder}
-        className="rounded-xl border border-black/15 bg-white px-4 py-3 font-normal text-black placeholder:text-black/40 outline-none focus:border-black"
+        className="w-full min-w-0 rounded-xl border border-black/15 bg-white px-4 py-3 font-normal text-black placeholder:text-black/40 outline-none focus:border-black"
       />
     </label>
   )

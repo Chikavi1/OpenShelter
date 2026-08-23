@@ -8,6 +8,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   applicationName: 'Refugio Huellas',
   keywords: ['adopción responsable', 'mascotas en adopción', 'refugio de animales', 'rescate animal'],
+  icons: {
+    icon: [{ url: '/favicon.ico' }, { url: '/icon', type: 'image/png' }],
+    apple: [{ url: '/apple-icon', type: 'image/png' }],
+  },
   openGraph: {
     type: 'website',
     locale: 'es_MX',

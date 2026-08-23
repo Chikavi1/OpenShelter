@@ -35,7 +35,8 @@ export function DashboardAdoptionFollowUpsTab() {
           <p className="text-sm text-muted-foreground">Fecha, dirección y responsable de cada adopción cerrada.</p>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Desktop table */}
+        <div className="hidden overflow-x-auto lg:block">
           <table className="min-w-full divide-y divide-foreground/10">
             <thead className="bg-secondary/40">
               <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -104,13 +105,54 @@ export function DashboardAdoptionFollowUpsTab() {
 
               {!followUps.length && (
                 <tr>
-                  <td colSpan={9} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                  <td colSpan={10} className="px-6 py-12 text-center text-sm text-muted-foreground">
                     Todavía no hay adopciones registradas.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+        {/* Mobile cards */}
+        <div className="grid gap-4 p-4 lg:hidden">
+          {!followUps.length ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">Todavía no hay adopciones registradas.</p>
+          ) : (
+            visibleFollowUps.map((followUp: AdoptionFollowUp) => (
+              <div key={followUp.id} className="rounded-2xl border border-foreground/10 bg-background p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold">{followUp.petName}</p>
+                    <p className="text-xs text-muted-foreground">{followUp.adopterEmail || 'Sin correo'}</p>
+                  </div>
+                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ${followUp.verificationStatus === 'En cumplimiento' ? 'bg-emerald-100 text-emerald-800' : followUp.verificationStatus === 'Requiere atención' ? 'bg-amber-100 text-amber-800' : 'bg-secondary text-foreground'}`}>{followUp.verificationStatus}</span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div><p className="text-xs text-muted-foreground">Responsable</p><p className="font-medium">{followUp.adopterName}</p><p className="text-xs text-muted-foreground">{followUp.adopterPhone || 'Sin teléfono'}</p></div>
+                  <div><p className="text-xs text-muted-foreground">Ciudad</p><p>{followUp.adopterCity || 'No registrada'}</p></div>
+                  <div><p className="text-xs text-muted-foreground">Adopción</p><p>{followUp.adoptionDate || 'Sin fecha'}</p></div>
+                  <div><p className="text-xs text-muted-foreground">Próx. seguimiento</p><p>{followUp.nextFollowUpDate || 'Sin fecha'}</p></div>
+                </div>
+                <div className="mt-3">
+                  <p className="text-xs font-medium text-muted-foreground">Etapa</p>
+                  <select value={followUp.processStage} onChange={(event) => handleUpdateFollowUpStage(followUp.id, event.target.value as FollowUpFormState['processStage'])} className={inputClass + ' mt-1 w-full'}>
+                    {stages.map((stage) => <option key={stage}>{stage}</option>)}
+                  </select>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                  {(([['contacted', 'Contacto'], ['petSafe', 'Mascota segura'], ['healthUpToDate', 'Salud al día'], ['conditionsMet', 'Condiciones']] as const).map(([key, label]) => <label key={key} className="flex items-center gap-2 rounded-lg border border-foreground/10 px-2 py-2"><input type="checkbox" checked={followUp.followUpChecks[key]} onChange={(event) => handleUpdateFollowUpChecks(followUp.id, key, event.target.checked)} className="size-3.5 accent-primary" />{label}</label>))}
+                </div>
+                <div className="mt-3 grid gap-2">
+                  <input type="date" value={followUp.lastContactDate ?? ''} onChange={(event) => handleUpdateFollowUpDetails(followUp.id, { lastContactDate: event.target.value })} className={inputClass + ' w-full text-xs'} aria-label="Último contacto" />
+                  <input type="text" value={followUp.incidents} onChange={(event) => handleUpdateFollowUpDetails(followUp.id, { incidents: event.target.value })} placeholder="Incidencias o alertas" className={inputClass + ' w-full text-xs'} />
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <Link href={`/contrato/${followUp.id}`} className="text-sm font-medium text-primary hover:underline">Ver contrato</Link>
+                  <button onClick={() => handleDeleteFollowUp(followUp.id, followUp.petName, followUp.adopterName)} className="rounded-full bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600">Eliminar</button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
       <Pagination page={page} totalItems={followUps.length} pageSize={pageSize} onPageChange={setPage} />
