@@ -1,6 +1,17 @@
 # OpenShelter
 
-OpenShelter is a self-hostable, vendor-independent animal rescue platform built with Next.js, PostgreSQL, and Drizzle ORM.
+OpenShelter is a single-organization animal rescue and adoption platform built with Next.js, PostgreSQL, and Drizzle ORM.
+
+## What It Includes
+
+- Public website for the rescue
+- Pet catalog and adoption detail pages
+- Adoption application flow
+- Donation page
+- Recognition page for supporters
+- Events page and event detail view
+- Adoption follow-up and contract tracking in the admin dashboard
+- Dashboard for pets, applications, foster homes, thanks, events, and settings
 
 ## Tech Stack
 
@@ -10,20 +21,28 @@ OpenShelter is a self-hostable, vendor-independent animal rescue platform built 
 - Drizzle ORM
 - Tailwind CSS v4
 
-## Quick Deploy
+## Requirements
 
-For cloud providers that run Node.js apps:
+- Node.js 20+
+- PostgreSQL 15+
+- npm
 
-1. Create a PostgreSQL database.
-2. Copy `.env.example` to `.env` and fill in the production values.
-3. Set `DATABASE_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`.
-4. Run `npm install`.
-5. Run `npm run build`.
-6. Start with `npm run start`.
+## Installation
 
-The app works on any Node-hosting platform that supports Next.js, including Vercel, Render, Railway, Fly, and similar providers.
+### Local
 
-## Self-hosted
+```bash
+git clone <your-repo-url>
+cd adopt-me
+cp .env.example .env
+npm install
+npm run db:setup
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+### Docker
 
 ```bash
 git clone <your-repo-url>
@@ -32,24 +51,18 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Open `http://localhost:3000` once the containers are healthy.
+Then open `http://localhost:3000`.
 
-The stack includes:
+## Environment Variables
 
-- PostgreSQL with a persistent volume
-- Automatic migrations and seed data on startup
-- Local storage at `/app/public/uploads` for persisted files
-
-## Environment
-
-Required variables:
+Required:
 
 - `DATABASE_URL`
 - `AUTH_SECRET`
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 
-Optional variables:
+Optional:
 
 - `STORAGE_DRIVER`
 - `STORAGE_LOCAL_DIR`
@@ -62,6 +75,38 @@ Optional variables:
 - `S3_FORCE_PATH_STYLE`
 - `S3_PUBLIC_URL`
 
+## Usage
+
+### Public Site
+
+- Home page: landing and featured pets
+- Catalog: browse all pets
+- Adopt: view pet profiles and submit adoption applications
+- Donate: see configured donation methods
+- Recognition: view public supporter acknowledgements
+- Events: browse upcoming rescue events
+- Contact: rescue contact information
+
+### Admin Dashboard
+
+The dashboard includes:
+
+- Overview
+- Pets
+- Adoption applications
+- Foster homes
+- Acknowledgements
+- Adoption follow-ups
+- Contracts
+- Events
+- Settings
+
+### Contracts
+
+- Open an adoption follow-up from the dashboard
+- Use the contract preview page to review the document
+- Download or print the contract PDF
+
 ## Scripts
 
 ```bash
@@ -73,8 +118,21 @@ npm run typecheck
 npm run db:setup
 ```
 
+## Project Structure
+
+- `app/` - Next.js routes and API endpoints
+- `components/` - shared UI and dashboard modules
+- `lib/` - auth, storage, database, and shared helpers
+- `migrations/` - SQL migrations
+- `public/` - static assets
+
 ## Notes
 
-- Dashboard data is stored in PostgreSQL.
-- Admin auth uses a signed HttpOnly cookie.
-- Local file uploads are stored under the configured storage directory instead of the ephemeral filesystem.
+- Admin authentication uses a signed HttpOnly cookie.
+- Dashboard data is persisted in PostgreSQL.
+- Uploaded files use local storage by default or an S3-compatible provider.
+- The app is designed for one organization, not multi-tenant use.
+
+## License
+
+Add your preferred license before publishing.

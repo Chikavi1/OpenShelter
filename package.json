@@ -9,6 +9,7 @@
     "start:docker": "npm run db:setup && node .next/standalone/server.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "check:app-lines": "node scripts/check-app-line-limit.mjs",
     "db:migrate": "tsx scripts/db-setup.ts migrate",
     "db:seed": "tsx scripts/db-setup.ts seed",
     "db:setup": "tsx scripts/db-setup.ts setup"
@@ -21,6 +22,7 @@
     "drizzle-orm": "^0.44.7",
     "lucide-react": "^1.16.0",
     "next": "16.3.0",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.23.0",
     "react": "^19",
     "react-dom": "^19",
@@ -40,10 +42,5 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.12",
     "typescript": "5.7.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "hono": "4.12.25"
-    }
   }
 }

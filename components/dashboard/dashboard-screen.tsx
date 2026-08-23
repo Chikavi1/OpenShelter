@@ -64,20 +64,23 @@ import { applySitePalette } from '@/lib/theme'
 import { ThankModal } from '@/components/dashboard/thank-modal'
 import { PetCard } from '@/components/dashboard/pet-card'
 import { PetForm } from '@/components/dashboard/pet-form'
-import { type AdoptionFollowUp, type ShelterEvent } from '@/lib/dashboard-defaults'
+import { type AdoptionApplication, type AdoptionFollowUp, type ShelterEvent } from '@/lib/dashboard-defaults'
 import { DashboardOverviewTab } from '@/components/dashboard/dashboard-overview-tab'
 import { DashboardApplicationsTab } from '@/components/dashboard/dashboard-applications-tab'
 import { DashboardFosterHomesTab } from '@/components/dashboard/dashboard-foster-homes-tab'
 import { DashboardThanksTab } from '@/components/dashboard/dashboard-thanks-tab'
 import { DashboardAdoptionFollowUpsTab } from '@/components/dashboard/dashboard-adoption-followups-tab'
+import { DashboardContractsTab } from '@/components/dashboard/dashboard-contracts-tab'
 import { DashboardEventsTab } from '@/components/dashboard/dashboard-events-tab'
+import { DashboardEventCreateScreen } from '@/components/dashboard/dashboard-event-create-screen'
 import { DashboardSettingsTab } from '@/components/dashboard/dashboard-settings-tab'
 import { DashboardFosterModal } from '@/components/dashboard/dashboard-foster-modal'
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar'
 import { DashboardProvider } from '@/components/dashboard/dashboard-context'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 
 // Types
-type TabType = 'overview' | 'pets' | 'register-pet' | 'applications' | 'foster-homes' | 'thanks' | 'adoption-followups' | 'events' | 'settings'
+type TabType = 'overview' | 'pets' | 'register-pet' | 'applications' | 'foster-homes' | 'thanks' | 'adoption-followups' | 'contracts' | 'events' | 'register-event' | 'settings'
 
 const DEFAULT_IMAGE_URL = 'https://i.ibb.co/tFjxBQK/default-image-icon-4595376-512.png'
 
@@ -120,23 +123,6 @@ interface Pet {
   applicationsCount: number
 }
 
-interface AdoptionApplication {
-  id: string
-  applicantName: string
-  applicantEmail: string
-  applicantPhone: string
-  petName: string
-  petId: string
-  petImage: string
-  homeType: 'Casa' | 'Departamento' | 'Otro'
-  hasOtherPets: boolean
-  yard: boolean
-  status: 'Pendiente' | 'En revisión' | 'Aprobada' | 'Rechazada'
-  dateSubmitted: string
-  experience: string
-  customResponses?: Record<string, string | boolean>
-}
-
 interface FosterHome {
   id: string
   name: string
@@ -174,6 +160,8 @@ interface ShelterSettings {
   phone: string
   email: string
   address: string
+  latitude: number
+  longitude: number
   city: string
   state: string
   country: string
@@ -226,6 +214,8 @@ const INITIAL_SETTINGS: ShelterSettings = {
   phone: '',
   email: '',
   address: '',
+  latitude: 19.4326,
+  longitude: -99.1332,
   city: '',
   state: '',
   country: '',
@@ -314,15 +304,23 @@ const createEmptyFollowUpForm = (): Omit<AdoptionFollowUp, 'id'> => ({
   processStage: 'Pendiente' as AdoptionFollowUp['processStage'],
   notes: '',
   carePlan: '',
+  applicationId: undefined,
+  lastContactDate: '',
+  verificationStatus: 'Pendiente',
+  followUpChecks: { contacted: false, petSafe: false, healthUpToDate: false, conditionsMet: false },
+  incidents: '',
 })
 
 const createEmptyEventForm = (): Omit<ShelterEvent, 'id'> => ({
   title: '',
+  image: '/events.png',
   category: 'Adopción' as ShelterEvent['category'],
   status: 'Programado' as ShelterEvent['status'],
   eventDate: '',
   eventTime: '',
   location: '',
+  latitude: 19.4326,
+  longitude: -99.1332,
   attendeesTarget: 0,
   contactName: '',
   contactPhone: '',
@@ -439,7 +437,9 @@ export default function DashboardPage() {
   }, [hydrated, pets, applications, fosterHomes, thanksList, followUps, events, settings, persistDashboardState])
 
   // Filters
-  const [searchTerm, setSearchTerm] = useState('')
+  const [petSearchTerm, setPetSearchTerm] = useState('')
+  const [appSearchTerm, setAppSearchTerm] = useState('')
+  const [fosterSearchTerm, setFosterSearchTerm] = useState('')
   const [filterSpecies, setFilterSpecies] = useState<string>('Todos')
   const [filterStatus, setFilterStatus] = useState<string>('Todos')
   const [appFilterStatus, setAppFilterStatus] = useState<string>('Todos')
@@ -447,10 +447,12 @@ export default function DashboardPage() {
 
   // Registration & Editing state for Pet
   const [editingPet, setEditingPet] = useState<Pet | null>(null)
+  const [deletePetTarget, setDeletePetTarget] = useState<{ id: string; name: string } | null>(null)
   const [petFormActionSuccess, setPetFormActionSuccess] = useState<string | null>(null)
   const [newPet, setNewPet] = useState(createEmptyPetForm())
   const [registerSuccess, setRegisterSuccess] = useState(false)
   const [settingsSuccess, setSettingsSuccess] = useState(false)
+  const [applicationActionError, setApplicationActionError] = useState<string | null>(null)
 
   // New Foster Home Modal State
   const [showAddFosterModal, setShowAddFosterModal] = useState(false)
@@ -462,10 +464,10 @@ export default function DashboardPage() {
   const [uploadingThankImage, setUploadingThankImage] = useState(false)
 
   // Adoption Follow-up State
-  const [newFollowUp, setNewFollowUp] = useState(createEmptyFollowUpForm())
-
   // Events State
   const [newEvent, setNewEvent] = useState(createEmptyEventForm())
+  const [editingEvent, setEditingEvent] = useState<ShelterEvent | null>(null)
+  const [uploadingEventImage, setUploadingEventImage] = useState(false)
 
   // Settings Sub-tab state
   const [settingsSection, setSettingsSection] = useState<'general' | 'forms' | 'appearance' | 'support' | 'location' | 'legal'>('general')
@@ -483,6 +485,47 @@ export default function DashboardPage() {
     setApplications(prev => prev.map(app => app.id === appId ? { ...app, status: newStatus } : app))
   }
 
+  const handleUpdateAppVerification = (appId: string, key: keyof AdoptionApplication['verification'], value: boolean) => {
+    setApplications(prev => prev.map(app => app.id === appId
+      ? { ...app, verification: { ...app.verification, [key]: value } }
+      : app))
+  }
+
+  const handleApproveApplication = (app: AdoptionApplication) => {
+    const checksComplete = Object.values(app.verification).every(Boolean)
+    const requiredDocuments = ['Identificación oficial', 'Comprobante de domicilio']
+    const documentsComplete = requiredDocuments.every((type) => app.documents.some((document) => document.type === type && document.url))
+
+    if (!checksComplete || !documentsComplete) {
+      setApplicationActionError(`No se puede aprobar ${app.applicantName}: completa todos los puntos de verificación y carga identificación y comprobante de domicilio.`)
+      return
+    }
+
+    setApplicationActionError(null)
+    setApplications(prev => prev.map(current => current.id === app.id
+      ? { ...current, status: 'Aprobada', reviewedAt: new Date().toISOString() }
+      : current))
+    setPets(prev => prev.map(pet => pet.id === app.petId ? { ...pet, status: 'En Proceso' } : pet))
+
+    setFollowUps(prev => {
+      if (prev.some(followUp => followUp.applicationId === app.id)) return prev
+      return [{
+        ...createEmptyFollowUpForm(),
+        id: `fu-${Date.now()}`,
+        applicationId: app.id,
+        petId: app.petId || undefined,
+        petName: app.petName,
+        adopterName: app.applicantName,
+        adopterEmail: app.applicantEmail,
+        adopterPhone: app.applicantPhone,
+        adopterAddress: app.applicantAddress,
+        adopterCity: app.applicantCity,
+        processStage: 'Pendiente',
+        nextFollowUpDate: '',
+      }, ...prev]
+    })
+  }
+
   // Handlers for Pet Status changes
   const handleUpdatePetStatus = (petId: string, newStatus: Pet['status']) => {
     setPets(prev => prev.map(pet => pet.id === petId ? { ...pet, status: newStatus } : pet))
@@ -494,11 +537,15 @@ export default function DashboardPage() {
 
   // Delete Pet Handler
   const handleDeletePet = (petId: string, petName: string) => {
-    if (confirm(`¿Estás seguro de que deseas eliminar el perfil de ${petName}? Esta acción no se puede deshacer.`)) {
-      setPets(prev => prev.filter(p => p.id !== petId))
-      setPetFormActionSuccess(`El perfil de ${petName} ha sido eliminado.`)
-      setTimeout(() => setPetFormActionSuccess(null), 3000)
-    }
+    setDeletePetTarget({ id: petId, name: petName })
+  }
+
+  const handleConfirmDeletePet = () => {
+    if (!deletePetTarget) return
+    setPets(prev => prev.filter(p => p.id !== deletePetTarget.id))
+    setPetFormActionSuccess(`El perfil de ${deletePetTarget.name} ha sido eliminado.`)
+    setDeletePetTarget(null)
+    setTimeout(() => setPetFormActionSuccess(null), 3000)
   }
 
   // Open Edit Form Handler
@@ -648,34 +695,31 @@ export default function DashboardPage() {
     }
   }
 
-  // Follow-up / Adoption tracking handlers
-  const handleCreateFollowUp = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!newFollowUp.petName.trim() || !newFollowUp.adopterName.trim()) return
-
-    const followUpToAdd: AdoptionFollowUp = {
-      id: `fu-${Date.now()}`,
-      petId: newFollowUp.petId?.trim() || undefined,
-      petName: newFollowUp.petName.trim(),
-      adopterName: newFollowUp.adopterName.trim(),
-      adopterEmail: newFollowUp.adopterEmail.trim(),
-      adopterPhone: newFollowUp.adopterPhone.trim(),
-      adopterAddress: newFollowUp.adopterAddress.trim(),
-      adopterCity: newFollowUp.adopterCity.trim(),
-      adoptionDate: newFollowUp.adoptionDate.trim(),
-      nextFollowUpDate: newFollowUp.nextFollowUpDate.trim(),
-      processStage: newFollowUp.processStage,
-      notes: newFollowUp.notes.trim(),
-      carePlan: newFollowUp.carePlan.trim(),
-    }
-
-    setFollowUps(prev => [followUpToAdd, ...prev])
-    setNewFollowUp(createEmptyFollowUpForm())
-  }
-
   const handleUpdateFollowUpStage = (followUpId: string, processStage: AdoptionFollowUp['processStage']) => {
     setFollowUps(prev => prev.map(followUp => followUp.id === followUpId ? { ...followUp, processStage } : followUp))
+    if (processStage === 'Entregado') {
+      setPets(prev => prev.map(pet => {
+        const followUp = followUps.find(item => item.id === followUpId)
+        return followUp?.petId && pet.id === followUp.petId ? { ...pet, status: 'Adoptado' } : pet
+      }))
+    }
+  }
+
+  const handleUpdateFollowUpChecks = (followUpId: string, key: keyof AdoptionFollowUp['followUpChecks'], value: boolean) => {
+    setFollowUps(prev => prev.map(followUp => {
+      if (followUp.id !== followUpId) return followUp
+      const followUpChecks = { ...followUp.followUpChecks, [key]: value }
+      const verificationStatus = Object.values(followUpChecks).every(Boolean)
+        ? 'En cumplimiento'
+        : Object.values(followUpChecks).some(Boolean)
+          ? 'Requiere atención'
+          : 'Pendiente'
+      return { ...followUp, followUpChecks, verificationStatus }
+    }))
+  }
+
+  const handleUpdateFollowUpDetails = (followUpId: string, changes: Partial<Pick<AdoptionFollowUp, 'lastContactDate' | 'nextFollowUpDate' | 'incidents'>>) => {
+    setFollowUps(prev => prev.map(followUp => followUp.id === followUpId ? { ...followUp, ...changes } : followUp))
   }
 
   const handleDeleteFollowUp = (followUpId: string, petName: string, adopterName: string) => {
@@ -684,32 +728,24 @@ export default function DashboardPage() {
     }
   }
 
-  const handleStartFollowUpFromApplication = (app: AdoptionApplication) => {
-    setActiveTab('adoption-followups')
-    setNewFollowUp({
-      ...createEmptyFollowUpForm(),
-      petId: app.petId || '',
-      petName: app.petName,
-      adopterName: app.applicantName,
-      adopterEmail: app.applicantEmail,
-      adopterPhone: app.applicantPhone,
-      processStage: 'Pendiente',
-    })
-  }
+  const handleStartFollowUpFromApplication = () => setActiveTab('adoption-followups')
 
   const handleCreateEvent = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!newEvent.title.trim() || !newEvent.eventDate.trim() || !newEvent.location.trim()) return
 
-    const eventToAdd: ShelterEvent = {
-      id: `evt-${Date.now()}`,
+    const eventToSave: ShelterEvent = {
+      id: editingEvent?.id || `evt-${Date.now()}`,
       title: newEvent.title.trim(),
+      image: newEvent.image || '/events.png',
       category: newEvent.category,
       status: newEvent.status,
       eventDate: newEvent.eventDate.trim(),
       eventTime: newEvent.eventTime.trim(),
       location: newEvent.location.trim(),
+      latitude: Number.isFinite(newEvent.latitude) ? newEvent.latitude : 19.4326,
+      longitude: Number.isFinite(newEvent.longitude) ? newEvent.longitude : -99.1332,
       attendeesTarget: Number.isFinite(newEvent.attendeesTarget) ? newEvent.attendeesTarget : 0,
       contactName: newEvent.contactName.trim(),
       contactPhone: newEvent.contactPhone.trim(),
@@ -718,8 +754,37 @@ export default function DashboardPage() {
       notes: newEvent.notes.trim(),
     }
 
-    setEvents(prev => [eventToAdd, ...prev])
+    setEvents(prev => editingEvent ? prev.map((event) => event.id === editingEvent.id ? eventToSave : event) : [eventToSave, ...prev])
     setNewEvent(createEmptyEventForm())
+    setEditingEvent(null)
+    setActiveTab('events')
+  }
+
+  const handleStartCreateEvent = () => {
+    setEditingEvent(null)
+    setNewEvent(createEmptyEventForm())
+    setActiveTab('register-event')
+  }
+
+  const handleStartEditEvent = (event: ShelterEvent) => {
+    setEditingEvent(event)
+    setNewEvent({ ...event, latitude: event.latitude || 19.4326, longitude: event.longitude || -99.1332 })
+    setActiveTab('register-event')
+  }
+
+  const handleEventImageUpload = async (file?: File) => {
+    if (!file) return
+    setUploadingEventImage(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const response = await fetch('/api/admin/uploads', { method: 'POST', body: formData })
+      if (!response.ok) return
+      const asset = await response.json() as { url?: string }
+      if (asset.url) setNewEvent((current) => ({ ...current, image: asset.url || '/events.png' }))
+    } finally {
+      setUploadingEventImage(false)
+    }
   }
 
   const handleUpdateEventStatus = (eventId: string, status: ShelterEvent['status']) => {
@@ -896,23 +961,23 @@ export default function DashboardPage() {
 
   // Filtered lists
   const filteredPetsList = pets.filter(pet => {
-    const matchesSearch = pet.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          pet.breed.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = pet.name.toLowerCase().includes(petSearchTerm.toLowerCase()) || 
+                          pet.breed.toLowerCase().includes(petSearchTerm.toLowerCase())
     const matchesSpecies = filterSpecies === 'Todos' || pet.species === filterSpecies
     const matchesStatus = filterStatus === 'Todos' || pet.status === filterStatus
     return matchesSearch && matchesSpecies && matchesStatus
   })
 
   const filteredAppsList = applications.filter(app => {
-    const matchesSearch = app.applicantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          app.petName.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = app.applicantName.toLowerCase().includes(appSearchTerm.toLowerCase()) ||
+                          app.petName.toLowerCase().includes(appSearchTerm.toLowerCase())
     const matchesStatus = appFilterStatus === 'Todos' || app.status === appFilterStatus
     return matchesSearch && matchesStatus
   })
 
   const filteredFosterList = fosterHomes.filter(foster => {
-    const matchesSearch = foster.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          foster.city.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = foster.name.toLowerCase().includes(fosterSearchTerm.toLowerCase()) ||
+                          foster.city.toLowerCase().includes(fosterSearchTerm.toLowerCase())
     const matchesStatus = fosterFilterStatus === 'Todos' || foster.status === fosterFilterStatus
     return matchesSearch && matchesStatus
   })
@@ -951,12 +1016,19 @@ export default function DashboardPage() {
     availablePets,
     inProcessPets,
     settings,
-    searchTerm,
-    setSearchTerm,
+    petSearchTerm,
+    setPetSearchTerm,
+    appSearchTerm,
+    setAppSearchTerm,
+    fosterSearchTerm,
+    setFosterSearchTerm,
     appFilterStatus,
     setAppFilterStatus,
     filteredAppsList,
     handleUpdateAppStatus,
+    handleApproveApplication,
+    handleUpdateAppVerification,
+    applicationActionError,
     fosterFilterStatus,
     setFosterFilterStatus,
     filteredFosterList,
@@ -968,16 +1040,20 @@ export default function DashboardPage() {
     handleToggleThankPublic,
     handleDeleteThank,
     followUps,
-    newFollowUp,
-    setNewFollowUp,
-    handleCreateFollowUp,
     handleUpdateFollowUpStage,
+    handleUpdateFollowUpChecks,
+    handleUpdateFollowUpDetails,
     handleDeleteFollowUp,
     handleStartFollowUpFromApplication,
     events,
     newEvent,
     setNewEvent,
+    editingEvent,
     handleCreateEvent,
+    handleStartCreateEvent,
+    handleStartEditEvent,
+    uploadingEventImage,
+    handleEventImageUpload,
     handleUpdateEventStatus,
     handleDeleteEvent,
     settingsSection,
@@ -1051,7 +1127,9 @@ export default function DashboardPage() {
               {activeTab === 'foster-homes' && 'Red de Casas Puente (Hogares Temporales)'}
               {activeTab === 'thanks' && 'Módulo de Agradecimientos & Donantes'}
               {activeTab === 'adoption-followups' && 'Seguimiento de Adopciones'}
+              {activeTab === 'contracts' && 'Contratos de Adopción'}
               {activeTab === 'events' && 'Eventos del Refugio'}
+              {activeTab === 'register-event' && 'Crear Evento'}
               {activeTab === 'settings' && 'Configuración General del Refugio'}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
@@ -1062,7 +1140,9 @@ export default function DashboardPage() {
               {activeTab === 'foster-homes' && 'Directorio de voluntarios registrados para dar alojamiento temporal a rescatados.'}
               {activeTab === 'thanks' && 'Reconoce públicamente a donantes, empresas y voluntarios que sostienen al refugio.'}
               {activeTab === 'adoption-followups' && 'Registra quién adoptó, en qué etapa va el proceso y qué revisiones siguen para dar seguimiento.'}
+              {activeTab === 'contracts' && 'Accede a cada contrato ya generado y abre su vista pública lista para imprimir o descargar.'}
               {activeTab === 'events' && 'Administra jornadas, campañas y actividades del refugio con fechas, cupos y responsables.'}
+              {activeTab === 'register-event' && 'Crea una actividad con toda la información que verá tu comunidad.'}
               {activeTab === 'settings' && 'Crea inputs web dinámicos (Texto, Email, Fecha, Booleanos), reglas y personalización.'}
             </p>
           </div>
@@ -1088,18 +1168,22 @@ export default function DashboardPage() {
           )}
 
           {activeTab === 'adoption-followups' && (
+            <div className="rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-medium text-primary">Los seguimientos se crean al aprobar una solicitud</div>
+          )}
+
+          {activeTab === 'contracts' && (
             <button
-              onClick={() => setNewFollowUp(createEmptyFollowUpForm())}
+              onClick={() => setActiveTab('adoption-followups')}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:scale-[1.02]"
             >
               <Plus className="size-4" />
-              Nuevo Seguimiento
+              Ir a seguimientos
             </button>
           )}
 
           {activeTab === 'events' && (
             <button
-              onClick={() => setNewEvent(createEmptyEventForm())}
+              onClick={handleStartCreateEvent}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:scale-[1.02]"
             >
               <Plus className="size-4" />
@@ -1129,7 +1213,10 @@ export default function DashboardPage() {
 
         <DashboardAdoptionFollowUpsTab />
 
+        <DashboardContractsTab />
+
         <DashboardEventsTab />
+        <DashboardEventCreateScreen />
 
         <DashboardSettingsTab />
 
@@ -1146,6 +1233,7 @@ export default function DashboardPage() {
         onSubmit={handleCreateThank}
         onClose={handleCloseThankModal}
       />
+      {deletePetTarget && <DeleteConfirmDialog petName={deletePetTarget.name} onCancel={() => setDeletePetTarget(null)} onConfirm={handleConfirmDeletePet} />}
       </div>
     </DashboardProvider>
   )

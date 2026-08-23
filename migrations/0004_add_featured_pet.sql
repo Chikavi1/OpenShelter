@@ -1,0 +1,12 @@
+ALTER TABLE pets
+  ADD COLUMN IF NOT EXISTS featured BOOLEAN NOT NULL DEFAULT FALSE;
+
+UPDATE pets
+SET featured = TRUE
+WHERE id = (
+  SELECT id
+  FROM pets
+  ORDER BY CASE WHEN LOWER(name) = 'milo' THEN 0 ELSE 1 END, created_at
+  LIMIT 1
+)
+AND NOT EXISTS (SELECT 1 FROM pets WHERE featured = TRUE);

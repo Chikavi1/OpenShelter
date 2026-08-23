@@ -6,13 +6,12 @@ import {
   ArrowRight,
   Check,
   Globe,
-  Menu,
-  PawPrint,
   Search,
-  X,
 } from 'lucide-react'
 import { usePublicSite } from '@/lib/use-public-site'
 import { slugify } from '@/lib/slug'
+import { PublicPageShell } from '@/components/public/public-page-shell'
+import { getDonationMethods } from '@/lib/donation-methods'
 
 const HERO_IMAGE = 'https://images.unsplash.com/photo-1660535254205-b9f03a7b84dc?q=80&w=857&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
 const RESCUE_IMAGE = 'https://images.unsplash.com/photo-1636604244109-7b26dd38dd91?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
@@ -20,7 +19,6 @@ const RESCUE_IMAGE = 'https://images.unsplash.com/photo-1636604244109-7b26dd38dd
 export default function Page() {
   const site = usePublicSite()
   const [filter, setFilter] = useState('Todos')
-  const [menuOpen, setMenuOpen] = useState(false)
   const [sent, setSent] = useState(false)
   const catalogPets = site.pets.map((pet) => ({
     id: pet.id,
@@ -31,6 +29,7 @@ export default function Page() {
     breed: pet.breed,
     location: pet.location,
     image: pet.image,
+    featured: pet.featured,
     size: pet.size,
     gender: pet.gender,
     personality: pet.personality,
@@ -46,27 +45,19 @@ export default function Page() {
     msg: thank.message,
     img: thank.avatarUrl,
   }))
-  const featuredPet = catalogPets[0]
+  const featuredPet = catalogPets.find((pet) => pet.featured) ?? catalogPets[0]
   const filteredPets = filter === 'Todos' ? catalogPets : catalogPets.filter((pet) => pet.type === filter)
+  const donationMethods = getDonationMethods(site.settings)
+  const hasDonationMethods = donationMethods.length > 0
 
   const appName = site.settings.name || process.env.NEXT_PUBLIC_APP_NAME || ''
   const logoUrl = site.settings.logoUrl || process.env.NEXT_PUBLIC_LOGO_URL
 
   return (
-    <main className="min-h-screen overflow-hidden bg-background text-foreground">
-      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
-        <header className="flex items-center justify-between border-b border-foreground/10 py-5">
-          <a href="#inicio" className="flex items-center gap-2 font-semibold tracking-tight">{logoUrl ? <img src={logoUrl} alt={appName} className="size-8 rounded-full object-cover" /> : <span className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground"><PawPrint className="size-4" /></span>} {appName.toLowerCase()}</a>
-          <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-            <a href="#adopta" className="transition-colors hover:text-foreground">Adopta</a><a href="#nosotros" className="transition-colors hover:text-foreground">Nosotros</a><a href="#impacto" className="transition-colors hover:text-foreground">Impacto</a><a href="/catalogo" className="transition-colors hover:text-foreground">Catálogo</a><a href="/reconocimiento" className="transition-colors hover:text-foreground">Gracias</a><a href="#donativos" className="transition-colors hover:text-foreground">Donativos</a><a href="/dashboard" className="rounded-full border border-foreground/10 px-3 py-1 text-xs font-medium text-muted-foreground/70 transition hover:border-foreground/15 hover:text-foreground">Panel Refugio</a>
-          </nav>
-          <a href="#formulario" className="hidden rounded-full border border-foreground/20 px-5 py-2 text-sm font-medium transition hover:bg-primary hover:text-primary-foreground sm:block">Quiero adoptar <ArrowRight className="ml-2 inline size-4" /></a>
-          <button aria-label="Abrir menú" className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
-        </header>
-        {menuOpen && <nav className="flex flex-col gap-4 border-b border-foreground/10 py-5 text-sm md:hidden"><a href="#adopta" onClick={() => setMenuOpen(false)}>Adopta</a><a href="#nosotros" onClick={() => setMenuOpen(false)}>Nosotros</a><a href="#impacto" onClick={() => setMenuOpen(false)}>Impacto</a><a href="/reconocimiento" onClick={() => setMenuOpen(false)}>Gracias</a><a href="/dashboard" onClick={() => setMenuOpen(false)} className="text-muted-foreground/70">Panel Refugio</a><a href="#formulario" onClick={() => setMenuOpen(false)}>Quiero adoptar</a></nav>}
+    <PublicPageShell appName={appName} logoUrl={logoUrl} contentClassName="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
 
         <section id="inicio" className="grid gap-10 py-14 md:py-20 lg:grid-cols-[1fr_0.9fr] lg:items-end lg:gap-20">
-          <div className="max-w-3xl"><p className="mb-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"><span className="size-2 rounded-full bg-accent" /> Rescate y adopción responsable</p><h1 className="text-balance text-5xl font-semibold leading-[0.95] tracking-[-0.065em] sm:text-7xl lg:text-[6.7rem]">Una segunda oportunidad <span className="text-muted-foreground">cambia dos vidas.</span></h1><p className="mt-8 max-w-xl text-lg leading-7 text-muted-foreground">Rescatamos, rehabilitamos y conectamos mascotas increíbles con personas listas para quererlas para siempre.</p><div className="mt-9 flex flex-wrap gap-3"><a href="#adopta" className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition hover:scale-[1.02]">Conoce a los rescatados <ArrowRight className="ml-2 inline size-4" /></a><a href="#nosotros" className="rounded-full border border-foreground/15 px-6 py-3 text-sm font-medium transition hover:bg-muted">Conoce nuestra historia</a></div></div>
+          <div className="max-w-3xl"><p className="mb-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"><span className="size-2 rounded-full bg-accent" /> Rescate y adopción responsable</p><h1 className="text-balance text-5xl font-semibold leading-[0.95] tracking-[-0.065em] sm:text-7xl lg:text-[6.7rem]">Una segunda oportunidad <span className="text-muted-foreground">cambia dos vidas.</span></h1><p className="mt-8 max-w-xl text-lg leading-7 text-muted-foreground">Rescatamos, rehabilitamos y conectamos mascotas increíbles con personas listas para quererlas para siempre.</p><div className="mt-9 flex flex-wrap gap-3"><a href="/donar" className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition hover:scale-[1.02]">Apoyar <ArrowRight className="ml-2 inline size-4" /></a><a href="#nosotros" className="rounded-full border border-foreground/15 px-6 py-3 text-sm font-medium transition hover:bg-muted">Conoce nuestra historia</a></div></div>
           <div className="relative"><div className="overflow-hidden rounded-[2rem] bg-secondary"><img src={site.settings.heroBannerUrl || HERO_IMAGE} alt={`${appName} en acción`} className="h-[390px] w-full object-cover object-bottom mix-blend-multiply sm:h-[500px]" /></div><div className="absolute -bottom-5 -left-3 rounded-2xl bg-accent p-4 shadow-xl sm:-left-6"><p className="text-3xl font-semibold tracking-tight">{site.pets.length}</p><p className="text-xs font-medium uppercase tracking-wider">vidas en seguimiento</p></div></div>
         </section>
 
@@ -112,12 +103,10 @@ export default function Page() {
           )}
         </section>
 
-        <section id="donativos" className="scroll-mt-10 flex flex-col justify-between gap-8 py-24 lg:flex-row lg:items-center"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Donativos</p><h2 className="max-w-2xl text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">Tu ayuda puede llenar un plato, cubrir una cirugía o cambiar un destino.</h2></div><div className="max-w-sm rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm leading-6 text-muted-foreground">Aporta desde $100 MXN y acompáñanos a construir más finales felices.</p><a href="/donar" className="mt-6 flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">Quiero donar <ArrowRight className="ml-2 inline size-4" /></a></div></section>
+        {hasDonationMethods && <section id="donativos" className="scroll-mt-10 flex flex-col justify-between gap-8 py-24 lg:flex-row lg:items-center"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Donativos</p><h2 className="max-w-2xl text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">Tu ayuda puede llenar un plato, cubrir una cirugía o cambiar un destino.</h2></div><div className="max-w-sm rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm leading-6 text-muted-foreground">Aporta desde $100 MXN y acompáñanos a construir más finales felices.</p><a href="/donar" className="mt-6 flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">Quiero donar <ArrowRight className="ml-2 inline size-4" /></a></div></section>}
 
-        <section id="formulario" className="scroll-mt-10 grid gap-10 rounded-[2rem] border border-foreground/10 bg-card p-6 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Da el siguiente paso</p><h2 className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">¿Listo para adoptar?</h2><p className="mt-5 max-w-sm leading-7 text-muted-foreground">Cuéntanos un poco sobre ti. Nuestro equipo te contactará para conocerte y encontrar tu match ideal.</p></div>{sent ? <div className="flex min-h-72 flex-col items-start justify-center rounded-3xl bg-accent p-8"><span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground"><Check /></span><h3 className="mt-5 text-2xl font-semibold">¡Recibimos tu solicitud!</h3><p className="mt-2 text-muted-foreground">Te escribiremos muy pronto para continuar.</p></div> : <form className="grid gap-5" onSubmit={(event) => { event.preventDefault(); setSent(true) }}><div className="grid gap-5 sm:grid-cols-2"><label className="grid gap-2 text-sm font-medium">Nombre completo<input required name="name" placeholder="Tu nombre" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal outline-none transition focus:border-foreground" /></label><label className="grid gap-2 text-sm font-medium">Correo electrónico<input required type="email" name="email" placeholder="tu@correo.com" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal outline-none transition focus:border-foreground" /></label></div><div className="grid gap-5 sm:grid-cols-2"><label className="grid gap-2 text-sm font-medium">Tipo de vivienda<select name="home" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal outline-none"><option>Casa</option><option>Departamento</option><option>Otro</option></select></label><label className="grid gap-2 text-sm font-medium">¿Qué mascota te interesa?<select name="pet" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal outline-none"><option>Milo</option><option>Luna</option><option>Bruno</option><option>Nube</option></select></label></div><label className="grid gap-2 text-sm font-medium">Cuéntanos sobre ti<textarea required name="message" rows={4} placeholder="¿Por por qué quieres adoptar?" className="resize-none rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal outline-none transition focus:border-foreground" /></label><button type="submit" className="w-fit rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground">Enviar solicitud <ArrowRight className="ml-2 inline size-4" /></button></form>}</section>
+        <section id="formulario" className="scroll-mt-10 grid gap-10 rounded-[2rem] border border-foreground/10 bg-card p-6 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Da el siguiente paso</p><h2 className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">¿Listo para adoptar?</h2><p className="mt-5 max-w-sm leading-7 text-muted-foreground">Cuéntanos un poco sobre ti. Nuestro equipo te contactará para conocerte y encontrar tu match ideal.</p></div>{sent ? <div className="flex min-h-72 flex-col items-start justify-center rounded-3xl bg-white p-8 text-foreground shadow-sm"><span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground"><Check /></span><h3 className="mt-5 text-2xl font-semibold">¡Recibimos tu solicitud!</h3><p className="mt-2 text-muted-foreground">Te escribiremos muy pronto para continuar.</p></div> : <form className="grid gap-5 rounded-3xl bg-white p-6 text-foreground shadow-sm sm:p-8" onSubmit={(event) => { event.preventDefault(); setSent(true) }}><div className="grid gap-5 sm:grid-cols-2"><label className="grid gap-2 text-sm font-medium text-foreground">Nombre completo<input required name="name" placeholder="Tu nombre" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal text-foreground outline-none transition focus:border-foreground" /></label><label className="grid gap-2 text-sm font-medium text-foreground">Correo electrónico<input required type="email" name="email" placeholder="tu@correo.com" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal text-foreground outline-none transition focus:border-foreground" /></label></div><div className="grid gap-5 sm:grid-cols-2"><label className="grid gap-2 text-sm font-medium text-foreground">Tipo de vivienda<select name="home" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal text-foreground outline-none"><option>Casa</option><option>Departamento</option><option>Otro</option></select></label><label className="grid gap-2 text-sm font-medium text-foreground">¿Qué mascota te interesa?<select name="pet" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal text-foreground outline-none"><option>Milo</option><option>Luna</option><option>Bruno</option><option>Nube</option></select></label></div><label className="grid gap-2 text-sm font-medium text-foreground">Cuéntanos sobre ti<textarea required name="message" rows={4} placeholder="¿Por por qué quieres adoptar?" className="resize-none rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal text-foreground outline-none transition focus:border-foreground" /></label><button type="submit" className="w-fit rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground">Enviar solicitud <ArrowRight className="ml-2 inline size-4" /></button></form>}</section>
 
-        <footer className="flex flex-col justify-between gap-6 border-t border-foreground/10 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center"><p className="font-semibold text-foreground">{appName.toLowerCase()}.</p><p>Hecho con amor para quienes no tienen voz.</p><div className="flex items-center gap-4"><a href="#inicio" aria-label="Instagram"><Globe className="size-4" /></a><a href="/contacto" className="hover:text-foreground">Contacto</a><a href="/privacidad" className="hover:text-foreground">Privacidad</a><a href="/terminos" className="hover:text-foreground">Términos</a></div></footer>
-      </div>
-    </main>
+    </PublicPageShell>
   )
 }

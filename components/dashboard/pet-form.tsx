@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, PawPrint } from 'lucide-react'
+import { Check, PawPrint, Trash2 } from 'lucide-react'
 
 export interface PetFormValue {
   name: string
@@ -60,7 +60,7 @@ export function PetForm({ value, editingName, success, onChange, onSubmit, onCan
     <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider">Fotografías de la mascota
       <input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => onUploadImages(event.target.files)} className={inputClass + ' file:mr-3 file:rounded-lg file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-xs file:font-semibold'} />
       <span className="normal-case tracking-normal text-muted-foreground">Puedes seleccionar varias. La primera será la imagen principal.</span>
-      {value.images.length > 0 && <div className="grid grid-cols-4 gap-2">{value.images.map((image, index) => <img key={index} src={image} alt="Foto de la mascota" className="aspect-square w-full rounded-lg object-cover" />)}</div>}
+      {value.images.length > 0 && <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{value.images.map((image, index) => <div key={`${image}-${index}`} className="group relative overflow-hidden rounded-xl"><img src={image} alt={`Foto ${index + 1} de la mascota`} className="aspect-square w-full object-cover" /><button type="button" onClick={() => { const images = value.images.filter((_, imageIndex) => imageIndex !== index); update({ images, image: value.image === image ? images[0] || '' : value.image }) }} className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-rose-600 text-white opacity-100 shadow-sm transition hover:bg-rose-700 sm:opacity-0 sm:group-hover:opacity-100" title="Eliminar foto"><Trash2 className="size-3.5" /></button></div>)}</div>}
     </label>
     <div className="grid gap-5 sm:grid-cols-2">
       <Field label="Salud (separado por comas)" value={value.healthInput} onChange={(healthInput) => update({ healthInput })} placeholder="Vacunas al día, Esterilizado" />
