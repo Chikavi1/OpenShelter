@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ArrowLeft, Check, Clock, Mail, MapPin, PawPrint, Phone, Send } from 'lucide-react'
 import { usePublicSite } from '@/lib/use-public-site'
+import { PublicPageShell } from '@/components/public/public-page-shell'
 
 export default function ContactoPage() {
   const site = usePublicSite()
@@ -23,12 +24,7 @@ export default function ContactoPage() {
   ]
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
-        <header className="flex items-center justify-between border-b border-foreground/10 py-5">
-          <a href="/" className="flex items-center gap-2 font-semibold tracking-tight">{logoUrl ? <img src={logoUrl} alt={appName} className="size-8 rounded-full object-cover" /> : <span className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground"><PawPrint className="size-4" /></span>} {appName.toLowerCase()}</a>
-          <a href="/" className="flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"><ArrowLeft className="size-4" /> Volver al inicio</a>
-        </header>
+    <PublicPageShell appName={appName} logoUrl={logoUrl} contentClassName="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
 
         <section className="grid gap-10 py-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 lg:py-20">
           <div>
@@ -40,8 +36,6 @@ export default function ContactoPage() {
           {sent ? <div className="flex min-h-96 flex-col justify-center rounded-[2rem] bg-accent p-8 text-accent-foreground"><span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground"><Check /></span><h2 className="mt-5 text-3xl font-semibold">¡Mensaje enviado!</h2><p className="mt-3 max-w-sm leading-7">Gracias por escribirnos. Nuestro equipo te responderá muy pronto a tu correo.</p><a href="/" className="mt-7 flex w-fit items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">Volver al inicio</a></div> : <form className="grid gap-5 rounded-[2rem] border border-foreground/10 bg-card p-6 sm:p-10" onSubmit={(event) => { event.preventDefault(); setSent(true) }}><div className="grid gap-5 sm:grid-cols-2"><label className="grid gap-2 text-sm font-medium">Nombre completo<input required name="name" placeholder="Tu nombre" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal outline-none transition focus:border-foreground" /></label><label className="grid gap-2 text-sm font-medium">Correo electrónico<input required type="email" name="email" placeholder="tu@correo.com" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal outline-none transition focus:border-foreground" /></label></div><label className="grid gap-2 text-sm font-medium">Asunto<select name="subject" className="rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal outline-none"><option>Adopción</option><option>Donativos</option><option>Voluntariado</option><option>Otro</option></select></label><label className="grid gap-2 text-sm font-medium">Mensaje<textarea required name="message" rows={5} placeholder="Cuéntanos en qué podemos ayudarte" className="resize-none rounded-xl border border-foreground/15 bg-background px-4 py-3 font-normal outline-none transition focus:border-foreground" /></label><button className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-4 text-sm font-medium text-primary-foreground transition hover:scale-[1.01]">Enviar mensaje <Send className="size-4" /></button></form>}
         </section>
 
-        <footer className="flex flex-col justify-between gap-5 border-t border-foreground/10 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center"><p className="font-semibold text-foreground">{appName.toLowerCase()}.</p><p>Hecho con amor para quienes no tienen voz.</p><div className="flex items-center gap-4"><a href="/privacidad" className="hover:text-foreground">Privacidad</a><a href="/terminos" className="hover:text-foreground">Términos</a></div></footer>
-      </div>
-    </main>
+    </PublicPageShell>
   )
 }

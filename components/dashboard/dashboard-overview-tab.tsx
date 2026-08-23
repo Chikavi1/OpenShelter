@@ -11,7 +11,7 @@ export function DashboardOverviewTab() {
   const [petsPage, setPetsPage] = useState(1)
   const {
     activeTab, setActiveTab, applications, totalPets, activeFosters, pendingApps,
-    adoptedPets, availablePets, inProcessPets, settings, searchTerm, setSearchTerm,
+    adoptedPets, availablePets, inProcessPets, settings, petSearchTerm, setPetSearchTerm,
     filterSpecies, setFilterSpecies, filterStatus, setFilterStatus, handleStartCreatePet,
     filteredPetsList = [], handleStartEditPet, handleDeletePet, handleUpdatePetStatus,
     handleSetFeaturedPet, newPet, editingPet, registerSuccess, setNewPet,
@@ -244,8 +244,8 @@ export function DashboardOverviewTab() {
           <input
             type="text"
             placeholder="Buscar por nombre o raza..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={petSearchTerm}
+            onChange={(e) => setPetSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-foreground/15 bg-background outline-none focus:border-foreground"
           />
         </div>

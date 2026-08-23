@@ -1,4 +1,4 @@
-import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import { boolean, index, integer, jsonb, pgEnum, pgTable, real, text, timestamp } from 'drizzle-orm/pg-core'
 
 export const petSpeciesEnum = pgEnum('pet_species', ['Perro', 'Gato', 'Otro'])
 export const petGenderEnum = pgEnum('pet_gender', ['Macho', 'Hembra'])
@@ -45,6 +45,8 @@ export const adoptionApplications = pgTable('adoption_applications', {
   applicantName: text('applicant_name').notNull(),
   applicantEmail: text('applicant_email').notNull(),
   applicantPhone: text('applicant_phone').notNull(),
+  applicantAddress: text('applicant_address').notNull().default(''),
+  applicantCity: text('applicant_city').notNull().default(''),
   petName: text('pet_name').notNull(),
   petId: text('pet_id').references(() => pets.id, { onDelete: 'set null' }),
   petImage: text('pet_image').notNull(),
@@ -55,6 +57,10 @@ export const adoptionApplications = pgTable('adoption_applications', {
   dateSubmitted: text('date_submitted').notNull(),
   experience: text('experience').notNull(),
   customResponses: jsonb('custom_responses').$type<Record<string, string | boolean>>(),
+  documents: jsonb('documents').$type<Array<{ type: string; name: string; url: string; key?: string; uploadedAt: string }>>().notNull().default([]),
+  verification: jsonb('verification').$type<{ identity: boolean; address: boolean; homeConditions: boolean; interview: boolean; references: boolean; eligibility: boolean }>().notNull().default({ identity: false, address: false, homeConditions: false, interview: false, references: false, eligibility: false }),
+  reviewNotes: text('review_notes').notNull().default(''),
+  reviewedAt: text('reviewed_at'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
@@ -115,6 +121,11 @@ export const adoptionFollowUps = pgTable('adoption_followups', {
   processStage: adoptionFollowUpStageEnum('process_stage').notNull(),
   notes: text('notes').notNull(),
   carePlan: text('care_plan').notNull(),
+  applicationId: text('application_id').references(() => adoptionApplications.id, { onDelete: 'set null' }),
+  lastContactDate: text('last_contact_date'),
+  verificationStatus: text('verification_status').notNull().default('Pendiente'),
+  followUpChecks: jsonb('follow_up_checks').$type<{ contacted: boolean; petSafe: boolean; healthUpToDate: boolean; conditionsMet: boolean }>().notNull().default({ contacted: false, petSafe: false, healthUpToDate: false, conditionsMet: false }),
+  incidents: text('incidents').notNull().default(''),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
@@ -125,11 +136,14 @@ export const adoptionFollowUps = pgTable('adoption_followups', {
 export const shelterEvents = pgTable('shelter_events', {
   id: text('id').primaryKey(),
   title: text('title').notNull(),
+  image: text('image').notNull().default('/events.png'),
   category: shelterEventCategoryEnum('category').notNull(),
   status: shelterEventStatusEnum('status').notNull(),
   eventDate: text('event_date').notNull(),
   eventTime: text('event_time').notNull(),
   location: text('location').notNull(),
+  latitude: real('latitude').notNull().default(19.4326),
+  longitude: real('longitude').notNull().default(-99.1332),
   attendeesTarget: integer('attendees_target').notNull().default(0),
   contactName: text('contact_name').notNull(),
   contactPhone: text('contact_phone').notNull(),
@@ -151,6 +165,8 @@ export const shelterSettings = pgTable('shelter_settings', {
   phone: text('phone').notNull(),
   email: text('email').notNull(),
   address: text('address').notNull(),
+  latitude: real('latitude').notNull().default(19.4326),
+  longitude: real('longitude').notNull().default(-99.1332),
   city: text('city').notNull(),
   state: text('state').notNull(),
   country: text('country').notNull(),

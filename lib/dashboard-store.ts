@@ -4,6 +4,7 @@ import { adoptionApplications, adoptionFollowUps, fosterHomes, pets, shelterEven
 import {
   DEFAULT_DASHBOARD_STATE,
   type AdoptionApplication,
+  type AdoptionApplicationDocument,
   type AdoptionFollowUp,
   type CustomFormField,
   type DashboardState,
@@ -50,7 +51,13 @@ function normalizeApplicationRow(application: Omit<typeof adoptionApplications.$
   return {
     ...application,
     petId: application.petId ?? '',
+    applicantAddress: application.applicantAddress ?? '',
+    applicantCity: application.applicantCity ?? '',
     customResponses: application.customResponses ?? undefined,
+    documents: (application.documents ?? []).map((document) => ({ ...document, type: document.type as AdoptionApplicationDocument['type'] })),
+    verification: application.verification ?? { identity: false, address: false, homeConditions: false, interview: false, references: false, eligibility: false },
+    reviewNotes: application.reviewNotes ?? '',
+    reviewedAt: application.reviewedAt ?? undefined,
   }
 }
 
@@ -74,11 +81,16 @@ function normalizeFollowUpRow(followUp: Omit<typeof adoptionFollowUps.$inferSele
   return {
     ...followUp,
     petId: followUp.petId ?? undefined,
+    applicationId: followUp.applicationId ?? undefined,
+    lastContactDate: followUp.lastContactDate ?? undefined,
+    verificationStatus: (followUp.verificationStatus as AdoptionFollowUp['verificationStatus']) ?? 'Pendiente',
+    followUpChecks: followUp.followUpChecks ?? { contacted: false, petSafe: false, healthUpToDate: false, conditionsMet: false },
+    incidents: followUp.incidents ?? '',
   }
 }
 
 function normalizeEventRow(event: Omit<typeof shelterEvents.$inferSelect, 'createdAt' | 'updatedAt'>): ShelterEvent {
-  return event
+  return { ...event, image: event.image || '/events.png', latitude: event.latitude || 19.4326, longitude: event.longitude || -99.1332 }
 }
 
 export async function loadDashboardState() {

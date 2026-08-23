@@ -22,7 +22,7 @@ export function VaccinationHistory({
   nextAppointment,
 }: VaccinationHistoryProps) {
   return (
-    <section className="rounded-[2rem] border border-foreground/10 bg-card p-6 sm:p-10">
+    <section className="rounded-[2rem] border border-foreground/10 bg-card p-6 sm:p-8">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div>
           <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -52,7 +52,18 @@ export function VaccinationHistory({
         </div>
       )}
 
-      <div className="mt-9 overflow-hidden rounded-2xl border border-foreground/10">
+      {records.length === 0 ? (
+        <div className="mt-8 flex items-center gap-4 rounded-2xl border border-dashed border-foreground/15 bg-secondary/35 px-5 py-4">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground">
+            <ShieldCheck className="size-5" />
+          </span>
+          <div>
+            <p className="text-sm font-semibold">Historial disponible al concretar la adopción</p>
+            <p className="mt-1 text-sm text-muted-foreground">El refugio entregará la cartilla y los certificados veterinarios.</p>
+          </div>
+        </div>
+      ) : (
+      <div className="mt-8 overflow-hidden rounded-2xl border border-foreground/10">
         <div className="grid grid-cols-[1fr_auto_1fr] gap-px bg-foreground/10 text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:grid-cols-[1.2fr_auto_1fr_1fr]">
           <p className="bg-card px-5 py-3">Vacuna</p>
           <p className="bg-card px-5 py-3">Fecha</p>
@@ -74,6 +85,7 @@ export function VaccinationHistory({
           </div>
         ))}
       </div>
+      )}
 
       <p className="mt-6 flex items-start gap-2 text-sm leading-6 text-muted-foreground">
         <ShieldCheck className="mt-0.5 size-5 shrink-0 text-accent-foreground" />

@@ -7,7 +7,7 @@ import { useState } from 'react'
 
 export function DashboardFosterHomesTab() {
   const [page, setPage] = useState(1)
-  const { activeTab, searchTerm, setSearchTerm, fosterFilterStatus, setFosterFilterStatus, filteredFosterList, handleUpdateFosterStatus, handleDeleteFoster, setShowAddFosterModal } = useDashboardContext()
+  const { activeTab, fosterSearchTerm, setFosterSearchTerm, fosterFilterStatus, setFosterFilterStatus, filteredFosterList, handleUpdateFosterStatus, handleDeleteFoster, setShowAddFosterModal } = useDashboardContext()
 
   return (<>
   {/* FOSTER HOMES TAB */}
@@ -20,8 +20,8 @@ export function DashboardFosterHomesTab() {
           <input
             type="text"
             placeholder="Buscar casa puente por nombre o ciudad..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={fosterSearchTerm}
+            onChange={(e) => setFosterSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-foreground/15 bg-background outline-none focus:border-foreground"
           />
         </div>

@@ -1,0 +1,2 @@
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS latitude numeric NOT NULL DEFAULT 19.4326;
+ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS longitude numeric NOT NULL DEFAULT -99.1332;

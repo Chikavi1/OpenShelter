@@ -2,6 +2,7 @@
 
 import * as Icons from 'lucide-react'
 import { useDashboardContext } from '@/components/dashboard/dashboard-context'
+import { EventLocationPicker } from '@/components/dashboard/event-location-picker'
 
 type CustomFieldType = string
 
@@ -128,6 +129,14 @@ export function DashboardSettingsTab() {
               </label>
             </div>
 
+            <div className="border-t border-foreground/10 pt-5">
+              <h3 className="flex items-center gap-2 text-sm font-bold"><Icons.Share2 className="size-4 text-primary" /> Redes sociales</h3>
+              <p className="mt-1 text-xs text-muted-foreground">Agrega los enlaces que aparecerán en la web pública.</p>
+              <div className="mt-4 grid gap-5 sm:grid-cols-3">
+                {(['instagram', 'facebook', 'website'] as const).map((network) => <label key={network} className="grid gap-2 text-xs font-semibold uppercase tracking-wider">{network === 'website' ? 'Sitio web' : network}<input type="url" value={settings.socialLinks[network]} onChange={(event) => setSettings({ ...settings, socialLinks: { ...settings.socialLinks, [network]: event.target.value } })} placeholder={network === 'website' ? 'https://tusitio.org' : `https://${network}.com/...`} className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground" /></label>)}
+              </div>
+            </div>
+
             <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider">
               Descripción de la Organización
               <textarea
@@ -137,7 +146,6 @@ export function DashboardSettingsTab() {
                 className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground resize-none"
               />
             </label>
-
             <h3 className="text-sm font-bold pt-2 border-t border-foreground/10 flex items-center gap-2">
               <Icons.Phone className="size-4 text-primary" /> Canales de Contacto Directo
             </h3>
@@ -553,6 +561,10 @@ export function DashboardSettingsTab() {
                 className="rounded-xl border border-foreground/15 bg-background px-4 py-2.5 text-sm font-normal outline-none focus:border-foreground"
               />
             </label>
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider">Ubicación exacta del refugio</p>
+              <EventLocationPicker latitude={settings.latitude} longitude={settings.longitude} onChange={(location) => setSettings({ ...settings, latitude: location.latitude, longitude: location.longitude })} />
+            </div>
           </div>
         )}
 

@@ -16,11 +16,12 @@ export interface UploadInput {
   filename: string
   contentType?: string
   body: Buffer
+  visibility?: 'public' | 'private'
 }
 
 export interface StorageProvider {
   upload(input: UploadInput): Promise<UploadedAsset>
-  read(key: string): Promise<StoredFile>
+  read(key: string, visibility?: 'public' | 'private'): Promise<StoredFile>
   remove(key: string): Promise<void>
 }
 
@@ -58,7 +59,7 @@ class LocalStorageProvider implements StorageProvider {
 
   async upload(input: UploadInput): Promise<UploadedAsset> {
     const key = `${crypto.randomUUID()}${extensionFromFilename(input.filename)}`
-    const absoluteRoot = path.join(process.cwd(), this.rootDir)
+    const absoluteRoot = path.join(process.cwd(), input.visibility === 'private' ? (process.env.STORAGE_PRIVATE_DIR ?? '.storage/private') : this.rootDir)
     const absolutePath = path.join(absoluteRoot, key)
 
     await mkdir(absoluteRoot, { recursive: true })
@@ -66,12 +67,13 @@ class LocalStorageProvider implements StorageProvider {
 
     return {
       key,
-      url: `${normalizePathPrefix(this.publicBase)}/${key}`,
+      url: input.visibility === 'private' ? `/api/admin/documents/${key}` : `${normalizePathPrefix(this.publicBase)}/${key}`,
     }
   }
 
-  async read(key: string): Promise<StoredFile> {
-    const absolutePath = path.join(process.cwd(), this.rootDir, key)
+  async read(key: string, visibility: 'public' | 'private' = 'public'): Promise<StoredFile> {
+    const rootDir = visibility === 'private' ? (process.env.STORAGE_PRIVATE_DIR ?? '.storage/private') : this.rootDir
+    const absolutePath = path.join(process.cwd(), rootDir, key)
     return {
       body: await readFile(absolutePath),
       contentType: contentTypeFromExtension(key),
@@ -130,11 +132,11 @@ class S3CompatibleStorageProvider implements StorageProvider {
 
     return {
       key,
-      url: this.buildUrl(key),
+      url: input.visibility === 'private' ? `/api/admin/documents/${key}` : this.buildUrl(key),
     }
   }
 
-  async read(key: string): Promise<StoredFile> {
+  async read(key: string, visibility: 'public' | 'private' = 'public'): Promise<StoredFile> {
     if (!this.bucket) {
       throw new Error('S3_BUCKET is required when STORAGE_DRIVER=s3')
     }

@@ -6,6 +6,7 @@ import { applySitePalette } from './theme'
 
 export function usePublicSite() {
   const [state, setState] = useState<DashboardState>(DEFAULT_DASHBOARD_STATE)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     applySitePalette(state.settings)
@@ -27,6 +28,8 @@ export function usePublicSite() {
         }
       } catch {
         // Keep the seeded fallback.
+      } finally {
+        if (!cancelled) setLoading(false)
       }
     }
 
@@ -37,5 +40,5 @@ export function usePublicSite() {
     }
   }, [])
 
-  return state
+  return { ...state, loading }
 }

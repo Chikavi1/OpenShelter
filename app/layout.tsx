@@ -5,7 +5,18 @@ import { SiteTheme } from '@/components/site-theme'
 export const metadata: Metadata = {
   title: 'Adopta con amor',
   description: 'Rescatamos, rehabilitamos y conectamos mascotas increíbles con hogares para siempre.',
-  generator: 'v0.app',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  applicationName: 'Refugio Huellas',
+  keywords: ['adopción responsable', 'mascotas en adopción', 'refugio de animales', 'rescate animal'],
+  openGraph: {
+    type: 'website',
+    locale: 'es_MX',
+    title: 'Adopta con amor',
+    description: 'Encuentra una mascota y abre la puerta a una nueva historia.',
+    siteName: 'Refugio Huellas',
+    images: [{ url: '/events.png', width: 1200, height: 630, alt: 'Refugio Huellas' }],
+  },
+  twitter: { card: 'summary_large_image', title: 'Adopta con amor', description: 'Encuentra una mascota y abre la puerta a una nueva historia.', images: ['/events.png'] },
 }
 
 export const viewport: Viewport = {

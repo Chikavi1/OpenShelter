@@ -1,5 +1,6 @@
 export type DashboardPetStatus = 'Disponible' | 'En Proceso' | 'Adoptado'
 export type AdoptionApplicationStatus = 'Pendiente' | 'En revisión' | 'Aprobada' | 'Rechazada'
+export type AdoptionDocumentType = 'Identificación oficial' | 'Comprobante de domicilio'
 export type FosterHomeStatus = 'Activa' | 'En pausa' | 'Disponible'
 export type AdoptionFollowUpStage = 'Pendiente' | 'Contrato firmado' | 'Entregado' | 'Seguimiento 1' | 'Seguimiento 2' | 'Cerrado'
 export type ShelterEventStatus = 'Programado' | 'En preparación' | 'En curso' | 'Finalizado' | 'Cancelado'
@@ -40,6 +41,8 @@ export interface AdoptionApplication {
   applicantName: string
   applicantEmail: string
   applicantPhone: string
+  applicantAddress: string
+  applicantCity: string
   petName: string
   petId: string
   petImage: string
@@ -50,6 +53,27 @@ export interface AdoptionApplication {
   dateSubmitted: string
   experience: string
   customResponses?: Record<string, string | boolean>
+  documents: AdoptionApplicationDocument[]
+  verification: AdoptionApplicationVerification
+  reviewNotes: string
+  reviewedAt?: string
+}
+
+export interface AdoptionApplicationDocument {
+  type: AdoptionDocumentType
+  key?: string
+  name: string
+  url: string
+  uploadedAt: string
+}
+
+export interface AdoptionApplicationVerification {
+  identity: boolean
+  address: boolean
+  homeConditions: boolean
+  interview: boolean
+  references: boolean
+  eligibility: boolean
 }
 
 export interface FosterHome {
@@ -96,16 +120,29 @@ export interface AdoptionFollowUp {
   processStage: AdoptionFollowUpStage
   notes: string
   carePlan: string
+  applicationId?: string
+  lastContactDate?: string
+  verificationStatus: 'Pendiente' | 'En cumplimiento' | 'Requiere atención' | 'Incumplimiento'
+  followUpChecks: {
+    contacted: boolean
+    petSafe: boolean
+    healthUpToDate: boolean
+    conditionsMet: boolean
+  }
+  incidents: string
 }
 
 export interface ShelterEvent {
   id: string
   title: string
+  image: string
   category: ShelterEventCategory
   status: ShelterEventStatus
   eventDate: string
   eventTime: string
   location: string
+  latitude: number
+  longitude: number
   attendeesTarget: number
   contactName: string
   contactPhone: string
@@ -121,6 +158,8 @@ export interface ShelterSettings {
   phone: string
   email: string
   address: string
+  latitude: number
+  longitude: number
   city: string
   state: string
   country: string
@@ -170,7 +209,7 @@ export interface DashboardState {
 
 export const DEFAULT_DASHBOARD_STATE: DashboardState = {
   pets: [
-    {
+      {
       id: 'pet-1',
       name: 'Milo',
       species: 'Perro',
@@ -252,7 +291,9 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       id: 'sol-1',
       applicantName: 'Carlos Gómez',
       applicantEmail: 'carlos@gmail.com',
-      applicantPhone: '5551234567',
+        applicantPhone: '5551234567',
+        applicantAddress: '',
+        applicantCity: 'CDMX',
       petName: 'Milo',
       petId: 'pet-1',
       petImage: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85',
@@ -261,7 +302,10 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       yard: true,
       status: 'En revisión',
       dateSubmitted: 'Ayer',
-      experience: 'He tenido perros durante más de 5 años.',
+        experience: 'He tenido perros durante más de 5 años.',
+        documents: [],
+        verification: { identity: false, address: false, homeConditions: false, interview: false, references: false, eligibility: false },
+        reviewNotes: '',
     },
   ],
   fosterHomes: [
@@ -309,17 +353,25 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       processStage: 'Seguimiento 1',
       notes: 'Familia nueva muy comprometida. Se recomienda verificar adaptación en casa y rutina de paseos.',
       carePlan: 'Revisar alimentación, sueño, paseos y contacto con veterinario en la siguiente visita.',
+      applicationId: 'sol-1',
+      lastContactDate: '12/08/2026',
+      verificationStatus: 'En cumplimiento',
+      followUpChecks: { contacted: true, petSafe: true, healthUpToDate: true, conditionsMet: true },
+      incidents: '',
     },
   ],
   events: [
     {
       id: 'evt-1',
       title: 'Jornada de adopción y bazar solidario',
+      image: '/events.png',
       category: 'Adopción',
       status: 'Programado',
       eventDate: '30/08/2026',
       eventTime: '10:00',
       location: 'Parque Central, CDMX',
+      latitude: 19.4326,
+      longitude: -99.1332,
       attendeesTarget: 80,
       contactName: 'Laura Pérez',
       contactPhone: '5554443322',
@@ -335,6 +387,8 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
     phone: '+52 55 1234 5678',
     email: 'contacto@refugiohuellas.org',
     address: 'Calle del Amor 123',
+    latitude: 19.4326,
+    longitude: -99.1332,
     city: 'Ciudad de México',
     state: 'CDMX',
     country: 'México',

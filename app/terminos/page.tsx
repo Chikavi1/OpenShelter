@@ -50,7 +50,6 @@ export default function TerminosPage() {
           <div className="mt-14 rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm font-medium">Dudas sobre estos términos</p><p className="mt-1 text-sm text-muted-foreground">Usa la sección de contacto del sitio para escribirnos.</p></div>
         </section>
 
-        <footer className="flex flex-col justify-between gap-5 border-t border-foreground/10 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center"><p className="font-semibold text-foreground">{appName.toLowerCase()}.</p><p>Hecho con amor para quienes no tienen voz.</p><a href="/" className="hover:text-foreground">Volver al inicio</a></footer>
       </div>
     </main>
   )

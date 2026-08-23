@@ -14,6 +14,7 @@ export function applySitePalette(settings: ShelterSettings) {
   root.style.setProperty('--secondary', palette.secondary)
   root.style.setProperty('--background', palette.background)
   root.style.setProperty('--accent', palette.cta)
+  root.style.setProperty('--cta', palette.cta)
   root.style.setProperty('--foreground', palette.text)
   root.style.setProperty('--card', palette.surface)
   root.style.setProperty('--card-foreground', palette.text)

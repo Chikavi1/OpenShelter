@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { ArrowLeft, ArrowRight, PawPrint, Search } from 'lucide-react'
 import { usePublicSite } from '@/lib/use-public-site'
 import { slugify } from '@/lib/slug'
+import { PublicPageShell } from '@/components/public/public-page-shell'
 
 export default function CatalogoPage() {
   const site = usePublicSite()
@@ -17,6 +18,7 @@ export default function CatalogoPage() {
     breed: pet.breed,
     location: pet.location,
     image: pet.image,
+    featured: pet.featured,
     tone: pet.species === 'Perro' ? 'bg-[#dceebf]' : 'bg-[#e9dfd1]',
   }))
   const displayPets = catalogPets
@@ -26,12 +28,7 @@ export default function CatalogoPage() {
   const logoUrl = site.settings.logoUrl || process.env.NEXT_PUBLIC_LOGO_URL
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
-        <header className="flex items-center justify-between border-b border-foreground/10 py-5">
-          <a href="/" className="flex items-center gap-2 font-semibold tracking-tight">{logoUrl ? <img src={logoUrl} alt={appName} className="size-8 rounded-full object-cover" /> : <span className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground"><PawPrint className="size-4" /></span>} {appName.toLowerCase()}</a>
-          <a href="/" className="flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"><ArrowLeft className="size-4" /> Volver al inicio</a>
-        </header>
+    <PublicPageShell appName={appName} logoUrl={logoUrl} contentClassName="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
 
         <section className="py-14 lg:py-20">
           <div className="mb-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
@@ -72,8 +69,6 @@ export default function CatalogoPage() {
           </form>
         </section>
 
-        <footer className="flex flex-col justify-between gap-5 border-t border-foreground/10 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center"><p className="font-semibold text-foreground">{appName.toLowerCase()}.</p><p>Hecho con amor para quienes no tienen voz.</p><a href="/" className="hover:text-foreground">Volver al inicio</a></footer>
-      </div>
-    </main>
+    </PublicPageShell>
   )
 }
