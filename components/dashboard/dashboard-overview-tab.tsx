@@ -21,8 +21,8 @@ export function DashboardOverviewTab() {
   return (<React.Fragment>
   {activeTab === 'overview' && (
     <div className="space-y-8">
-      {/* Quick Metrics */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      {/* Quick Metrics — 3 por fila para mejor respiración */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-2xl border border-foreground/10 bg-card p-5 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total Rescatados</span>

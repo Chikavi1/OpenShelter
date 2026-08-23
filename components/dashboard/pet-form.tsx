@@ -1,6 +1,7 @@
 'use client'
 
-import { Check, PawPrint, Trash2 } from 'lucide-react'
+import { useRef } from 'react'
+import { Camera, Check, PawPrint, Plus, Trash2 } from 'lucide-react'
 
 export interface PetFormValue {
   name: string
@@ -39,6 +40,7 @@ export function PetForm({ value, editingName, success, onChange, onSubmit, onCan
   }
 
   const update = (changes: Partial<PetFormValue>) => onChange({ ...value, ...changes })
+  const fileInputRef = useRef<HTMLInputElement>(null)
   return <form onSubmit={onSubmit} className="space-y-6 rounded-2xl border border-foreground/10 bg-card p-6 shadow-xs sm:p-8">
     <div className="flex items-center justify-between border-b border-foreground/10 pb-3">
       <h2 className="flex items-center gap-2 text-lg font-bold"><PawPrint className="size-5 text-primary" />{editingName ? 'Editar Ficha: ' + editingName : 'Datos del Rescatado'}</h2>
@@ -55,13 +57,26 @@ export function PetForm({ value, editingName, success, onChange, onSubmit, onCan
     </div>
     <div className="grid gap-5 sm:grid-cols-2">
       <SelectField label="Tamaño" value={value.size} onChange={(size) => update({ size: size as PetFormValue['size'] })} options={['Pequeño', 'Mediano', 'Grande']} />
-      <Field label="Ubicación / Refugio" value={value.location} onChange={(location) => update({ location })} placeholder="Ej. CDMX Refugio Central" />
+      <Field label="Ubicación / Refugio" value={value.location} onChange={(location) => update({ location })} placeholder="Se autocompleta con la dirección del refugio" />
     </div>
-    <label className="grid gap-2 text-xs font-semibold uppercase tracking-wider">Fotografías de la mascota
-      <input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => onUploadImages(event.target.files)} className={inputClass + ' file:mr-3 file:rounded-lg file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-xs file:font-semibold'} />
-      <span className="normal-case tracking-normal text-muted-foreground">Puedes seleccionar varias. La primera será la imagen principal.</span>
-      {value.images.length > 0 && <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{value.images.map((image, index) => <div key={`${image}-${index}`} className="group relative overflow-hidden rounded-xl"><img src={image} alt={`Foto ${index + 1} de la mascota`} className="aspect-square w-full object-cover" /><button type="button" onClick={() => { const images = value.images.filter((_, imageIndex) => imageIndex !== index); update({ images, image: value.image === image ? images[0] || '' : value.image }) }} className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-rose-600 text-white opacity-100 shadow-sm transition hover:bg-rose-700 sm:opacity-0 sm:group-hover:opacity-100" title="Eliminar foto"><Trash2 className="size-3.5" /></button></div>)}</div>}
-    </label>
+    <div className="grid gap-2 text-xs font-semibold uppercase tracking-wider">
+      <span className="flex items-center justify-between">Fotografías de la mascota <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium normal-case tracking-normal">{value.images.length} foto{value.images.length !== 1 ? 's' : ''}</span></span>
+      <div className="rounded-xl border border-dashed border-foreground/15 bg-muted/30 p-4">
+        <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => { onUploadImages(event.target.files); event.target.value = '' }} className="hidden" />
+        <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-between">
+          <div className="flex items-center gap-3 text-left">
+            <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary"><Camera className="size-5" /></span>
+            <div>
+              <p className="text-sm font-semibold normal-case tracking-normal text-foreground">Agrega fotos de la mascota</p>
+              <p className="text-xs font-normal normal-case tracking-normal text-muted-foreground">Puedes seleccionar varias a la vez. La primera será la portada. Puedes volver a pulsar para agregar más.</p>
+            </div>
+          </div>
+          <button type="button" onClick={() => fileInputRef.current?.click()} className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"><Plus className="size-4" />Agregar fotos</button>
+        </div>
+      </div>
+      <span className="text-[11px] font-normal normal-case tracking-normal text-muted-foreground">Formatos: JPG, PNG, WebP. Puedes agregar en varios pasos, no necesitas elegir todas a la vez.</span>
+      {value.images.length > 0 && <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{value.images.map((image, index) => <div key={`${image}-${index}`} className="group relative overflow-hidden rounded-xl border border-foreground/10"><img src={image} alt={`Foto ${index + 1} de la mascota`} className="aspect-square w-full object-cover" /><span className="absolute left-2 top-2 rounded-full bg-foreground px-2 py-0.5 text-[10px] font-bold text-background">{index === 0 ? 'Portada' : `#${index + 1}`}</span><button type="button" onClick={() => { const images = value.images.filter((_, imageIndex) => imageIndex !== index); update({ images, image: value.image === image ? images[0] || '' : value.image }) }} className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-rose-600 text-white opacity-100 shadow-sm transition hover:bg-rose-700 sm:opacity-0 sm:group-hover:opacity-100" title="Eliminar foto"><Trash2 className="size-3.5" /></button></div>)}</div>}
+    </div>
     <div className="grid gap-5 sm:grid-cols-2">
       <Field label="Salud (separado por comas)" value={value.healthInput} onChange={(healthInput) => update({ healthInput })} placeholder="Vacunas al día, Esterilizado" />
       <Field label="Personalidad (separado por comas)" value={value.personalityInput} onChange={(personalityInput) => update({ personalityInput })} placeholder="Cariñoso, Juguetón, Noble" />

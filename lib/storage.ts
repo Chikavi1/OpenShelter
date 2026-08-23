@@ -105,16 +105,14 @@ class S3CompatibleStorageProvider implements StorageProvider {
   }
 
   private buildUrl(key: string) {
+    // Si hay publicUrl explícito (bucket público + CDN), úsalo
     if (this.publicUrl) {
       return `${normalizePathPrefix(this.publicUrl)}/${key}`
     }
-
-    const endpoint = process.env.S3_ENDPOINT
-    if (!endpoint) {
-      return `https://${this.bucket}.s3.${process.env.S3_REGION ?? 'us-east-1'}.amazonaws.com/${key}`
-    }
-
-    return `${normalizePathPrefix(endpoint)}/${this.bucket}/${key}`
+    // Para buckets privados (Supabase S3 por defecto) el URL directo https://.../s3/bucket/key
+    // da AccessDenied Missing signature. Proxy vía Next.js (/uploads/*) lee con creds server-side
+    // y funciona tanto para local como S3 sin exponer claves. Ver app/uploads/[...key]/route.ts
+    return `/uploads/${key}`
   }
 
   async upload(input: UploadInput): Promise<UploadedAsset> {
@@ -166,7 +164,7 @@ let storageProvider: StorageProvider | null = null
 export function getStorageProvider() {
   if (storageProvider) return storageProvider
 
-  storageProvider = process.env.STORAGE_DRIVER === 's3'
+  storageProvider = process.env.STORAGE_DRIVER?.toLowerCase() === 's3'
     ? new S3CompatibleStorageProvider()
     : new LocalStorageProvider()
 

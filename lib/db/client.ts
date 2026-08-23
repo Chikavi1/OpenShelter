@@ -13,7 +13,12 @@ export function getPool() {
     throw new Error('DATABASE_URL is required')
   }
 
-  const pool = globalThis.__huellasPool ?? new Pool({ connectionString })
+  // Supabase pooler requiere SSL; sin esto da 28P01 aunque el pass sea correcto
+  const needsSSL = connectionString.includes('supabase.co') || connectionString.includes('pooler.supabase')
+  const pool = globalThis.__huellasPool ?? new Pool({ 
+    connectionString,
+    ...(needsSSL ? { ssl: { rejectUnauthorized: false } } : {}),
+  })
 
   if (process.env.NODE_ENV !== 'production') {
     globalThis.__huellasPool = pool

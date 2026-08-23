@@ -8,7 +8,7 @@ import type { AdoptionApplication } from '@/lib/dashboard-defaults'
 
 export function DashboardApplicationsTab() {
   const [page, setPage] = useState(1)
-  const { activeTab, appSearchTerm, setAppSearchTerm, appFilterStatus, setAppFilterStatus, filteredAppsList, handleUpdateAppStatus, handleApproveApplication, handleUpdateAppVerification, handleStartFollowUpFromApplication, applicationActionError, settings } = useDashboardContext()
+  const { activeTab, appSearchTerm, setAppSearchTerm, appFilterStatus, setAppFilterStatus, filteredAppsList, handleRequestAppStatusChange, handleRequestApproveApplication, handleUpdateAppVerification, handleStartFollowUpFromApplication, applicationActionError, settings } = useDashboardContext()
 
   return (<>
   {/* APPLICATIONS TAB */}
@@ -172,14 +172,14 @@ export function DashboardApplicationsTab() {
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => handleUpdateAppStatus(app.id, 'En revisión')}
+                  onClick={() => handleRequestAppStatusChange(app.id, 'En revisión', app.applicantName, app.petName)}
                   className={`text-xs px-3 py-1.5 rounded-xl border border-foreground/15 font-medium hover:bg-secondary transition ${app.status === 'En revisión' ? 'bg-blue-50 text-blue-700 border-blue-300' : ''}`}
                 >
                   Marcar En Revisión
                 </button>
 
                 <button
-                   onClick={() => handleApproveApplication(app)}
+                   onClick={() => handleRequestApproveApplication(app)}
                   className="text-xs px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition flex items-center gap-1"
                 >
                   <Icons.Check className="size-3.5" /> Aprobar
@@ -195,7 +195,7 @@ export function DashboardApplicationsTab() {
                 )}
 
                 <button
-                  onClick={() => handleUpdateAppStatus(app.id, 'Rechazada')}
+                  onClick={() => handleRequestAppStatusChange(app.id, 'Rechazada', app.applicantName, app.petName)}
                   className="text-xs px-3 py-1.5 rounded-xl bg-rose-100 text-rose-700 hover:bg-rose-200 font-medium transition flex items-center gap-1"
                 >
                   <Icons.XCircle className="size-3.5" /> Rechazar

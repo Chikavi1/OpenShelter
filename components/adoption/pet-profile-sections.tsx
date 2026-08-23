@@ -45,10 +45,10 @@ export function PetProfileSections({ pet, appName }: PetProfileSectionsProps) {
 
   return (
     <>
-      <section className="grid gap-8 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-16 lg:py-16">
-        <div>
-          <div className="relative overflow-hidden rounded-[2rem] bg-secondary">
-            <img src={photos[activePhoto] || pet.image} alt={petName + ' en adopción'} className="aspect-[1.05] w-full object-cover sm:aspect-[1.15]" />
+      <section className="grid gap-8 py-10 lg:grid-cols-[1.4fr_0.85fr] lg:items-start lg:gap-10 lg:py-16">
+        <div className="lg:sticky lg:top-6">
+          <div className="relative overflow-hidden rounded-[2rem] bg-zinc-900">
+            <img src={photos[activePhoto] || pet.image} alt={petName + ' en adopción'} className="h-auto max-h-[78vh] min-h-[460px] w-full object-contain object-center lg:min-h-[620px]" />
             {photos.length > 1 && (
               <>
                 <button
