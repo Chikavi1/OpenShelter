@@ -19,10 +19,16 @@ export function PublicFooter({ appName, socialLinks }: PublicFooterProps) {
   const year = new Date().getFullYear()
   const resolvedName = site.settings.name || appName || 'key rescata'
   const description = site.settings.description || 'Rescatamos, rehabilitamos y conectamos mascotas increíbles con hogares para siempre.'
-  const address = site.settings.address?.trim() || ''
-  const city = site.settings.city ? `${site.settings.city}${site.settings.state ? ', ' + site.settings.state : ''}` : ''
-  const phone = site.settings.phone
-  const email = site.settings.email
+  const rawAddress = site.settings.address?.trim() || ''
+  const rawCity = site.settings.city?.trim() || ''
+  const rawState = site.settings.state?.trim() || ''
+  // evitar duplicado "Veracruz, Veracruz" y no inventar fallback
+  const cityPart = rawCity && rawState && rawCity !== rawState ? `${rawCity}, ${rawState}` : rawCity || rawState
+  const address = rawAddress && rawAddress !== cityPart ? rawAddress : ''
+  const city = cityPart
+  const phone = site.settings.phone?.trim() || ''
+  const email = site.settings.email?.trim() || ''
+  const hasContact = !!(address || city || phone || email)
   const logoUrl = site.settings.logoUrl
 
   const socials = [
