@@ -56,7 +56,7 @@ export function PetProfileSections({ pet, appName }: PetProfileSectionsProps) {
       <section className="grid gap-8 py-10 lg:grid-cols-[1.4fr_0.85fr] lg:items-start lg:gap-10 lg:py-16">
         <div className="lg:sticky lg:top-6">
           <div className="relative overflow-hidden rounded-[2rem] bg-zinc-900">
-            <img src={photos[activePhoto] || pet.image} alt={petName + (isAdopted ? ' - ya adoptado' : ' en adopción')} className={`h-auto max-h-[78vh] min-h-[460px] w-full object-contain object-center lg:min-h-[620px] ${isAdopted ? 'opacity-90' : ''}`} />
+            <img src={photos[activePhoto] || pet.image} alt={petName + (isAdopted ? ' - ya adoptado' : ' en adopción')} className={`aspect-[4/5] w-full object-cover object-center sm:aspect-[4/3] lg:aspect-auto lg:h-auto lg:max-h-[78vh] lg:min-h-[620px] lg:object-contain ${isAdopted ? 'opacity-90' : ''}`} />
             {photos.length > 1 && (
               <>
                 <button
@@ -85,10 +85,9 @@ export function PetProfileSections({ pet, appName }: PetProfileSectionsProps) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Conoce a tu nueva mejor {companionWord}</p>
            <h1 className="mt-4 text-6xl font-semibold tracking-[-0.07em] sm:text-8xl">{petName}</h1>
            <div className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/10 sm:grid-cols-4">
-            <Stat label="Edad" value={pet.age} /><Stat label="Tamaño" value={pet.size} /><Stat label="Sexo" value={pet.gender} /><Stat label="Ubicación" value={pet.location} />
-          </div>
-          <div className="mt-9 flex flex-wrap gap-2">{pet.personality.slice(0, 4).map((tag) => <span key={tag} className="rounded-full border border-foreground/15 px-4 py-2 text-sm">{tag}</span>)}</div>
-          <div className="mt-10 border-t border-foreground/10 pt-8"><h2 className="text-2xl font-semibold">Su historia</h2><p className="mt-3 leading-7 text-muted-foreground">{pet.story}</p></div>
+             <Stat label="Edad" value={pet.age} /><Stat label="Tamaño" value={pet.size} /><Stat label="Sexo" value={pet.gender} /><Stat label="Ubicación" value={pet.location} />
+           </div>
+            <div className="mt-14 border-t border-foreground/10 pt-10"><h2 className="text-2xl font-semibold">Su historia</h2><p className="mt-4 leading-7 text-muted-foreground">{pet.story}</p></div>
           <div className="mt-8 flex items-center gap-3 text-sm text-muted-foreground"><ShieldCheck className="size-5 text-accent-foreground" /> {pet.health.join(' · ')}</div>
           <div className="mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
             <ShareButtons title={`${petName} | ${appName}`} text={`¡Conoce a ${petName}! En adopción en ${appName}.`} />
