@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const db = getDb()
     const allPets = await db.select({ name: pets.name, story: pets.story, species: pets.species, breed: pets.breed }).from(pets)
     const pet = allPets.find((p) => slugify(p.name) === raw)
-    const title = pet ? `${pet.name} — ${pet.breed} en adopción | Key Rescata` : 'Adopta — Key Rescata'
+    const title = pet ? `${pet.name} | Key Rescata` : 'Adopta — Key Rescata'
     const description = pet
       ? pet.story?.slice(0, 160) || `Soy ${pet.name}, ${pet.breed} y busco familia. ¡Ayúdame a encontrar hogar!`
       : 'Conoce a nuestros rescatados y encuentra a tu compañero para siempre.'

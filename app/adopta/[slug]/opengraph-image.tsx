@@ -84,7 +84,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             // eslint-disable-next-line @next/next/no-img-element
             <img src={petImage} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }} />
           ) : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '120px' }}>🐾</div>
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '120px' }}></div>
           )}
           <div style={{ position: 'absolute', bottom: '24px', left: '24px', display: 'flex', background: 'rgba(255,255,255,0.95)', borderRadius: '999px', padding: '8px 16px', fontSize: '13px', fontWeight: 800, color: '#3D405B', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             ● Disponible para adopción
@@ -100,9 +100,9 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             </div>
             <div style={{ width: '40px', height: '3px', background: '#E07A5F', borderRadius: '999px', marginTop: '8px' }} />
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '4px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: '#E07A5F', letterSpacing: '0.14em', textTransform: 'uppercase' }}>🐾 Adopta a</span>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#E07A5F', letterSpacing: '0.14em', textTransform: 'uppercase' }}> Adopta a</span>
               <span style={{ fontSize: '84px', fontWeight: 900, lineHeight: '0.88', letterSpacing: '-0.06em', color: '#111827', marginTop: '2px', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '520px' }}>{name}</span>
-              <span style={{ fontSize: '18px', color: '#374151', marginTop: '8px', fontWeight: 700 }}>{species === 'Perro' ? '🐶' : species === 'Gato' ? '🐱' : '🐾'} {breed} · {species}</span>
+              <span style={{ fontSize: '18px', color: '#374151', marginTop: '8px', fontWeight: 700 }}>{species === 'Perro' ? '' : species === 'Gato' ? '' : ''} {breed} · {species}</span>
             </div>
             {/* chips - GRANDES para móvil, con emojis */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '14px' }}>
