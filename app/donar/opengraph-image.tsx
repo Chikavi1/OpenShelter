@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm'
 import { getDb } from '@/lib/db/client'
 import { shelterSettings } from '@/lib/db/schema'
 import { getStorageProvider } from '@/lib/storage'
-export const alt = 'Donativos — Key Rescata'
+export const alt = 'Donativos - Key Rescata'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -22,7 +22,7 @@ async function toDataUri(url: string, siteUrl: string): Promise<string | null> {
   }
   try {
     const full = url.startsWith('http') ? url : `${siteUrl}${url.startsWith('/') ? '' : '/'}${url}`
-    const res = await fetch(full)
+    const res = await fetch(full, { signal: AbortSignal.timeout(2500) } as any)
     if (!res.ok) return null
     const ct = res.headers.get('content-type') || 'image/jpeg'
     const ab = await res.arrayBuffer()
@@ -58,29 +58,29 @@ export default async function Image() {
           )}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(61,64,91,0.72))' }} />
           <div style={{ position: 'absolute', bottom: 28, left: 32, right: 32, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <span style={{ display: 'flex', alignSelf: 'flex-start', background: '#F2CC8F', color: '#3D405B', fontSize: 11, fontWeight: 800, padding: '6px 12px', borderRadius: 999 }}>100% al rescate</span>
-            <p style={{ color: 'white', fontSize: 14, fontWeight: 700, margin: 0 }}>Donativos transparentes - Cada peso cuenta</p>
+            <span style={{ display: 'flex', background: '#F2CC8F', color: '#3D405B', fontSize: 11, fontWeight: 800, padding: '6px 12px', borderRadius: 999 }}>100% al rescate</span>
+            <p style={{ color: 'white', fontSize: 14, fontWeight: 700, marginTop: 0, marginBottom: 0 }}>Donativos transparentes - Cada peso cuenta</p>
           </div>
           {logoData && (
             <div style={{ position: 'absolute', top: 24, left: 24, display: 'flex', alignItems: 'center', gap: 10, background: 'white', padding: '8px 14px', borderRadius: 999 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={logoData} alt="" style={{ width: 36, height: 36, borderRadius: 999, objectFit: 'cover' }} />
+              <img src={logoData} alt="" style={{ width: 36, height: 36, borderRadius: 999 }} />
               <span style={{ fontSize: 14, fontWeight: 800, color: '#3D405B' }}>{appName}</span>
             </div>
           )}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', width: '45%', height: '100%', padding: '36px 32px', background: '#F4F1DE', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#E07A5F' }}>Donativos y apoyo</span>
-            <h1 style={{ fontSize: 40, fontWeight: 900, lineHeight: 0.92, color: '#3D405B', margin: 0 }}>{supportTitle}</h1>
-            <p style={{ fontSize: 14, lineHeight: 1.6, color: '#3D405B', opacity: 0.7, margin: '4px 0 0 0' }}>Elige transferencia, PayPal o lo que prefieras. Transparencia total, directo al rescate.</p>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#E07A5F' }}>Donativos y apoyo</span>
+            <h1 style={{ fontSize: 40, fontWeight: 900, color: '#3D405B', marginTop: 0, marginBottom: 0 }}>{supportTitle}</h1>
+            <p style={{ fontSize: 14, color: '#3D405B', marginTop: 4, marginBottom: 0 }}>Elige transferencia, PayPal o lo que prefieras. Transparencia total, directo al rescate.</p>
             <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
               <span style={{ background: '#E07A5F', color: 'white', fontSize: 12, fontWeight: 700, padding: '8px 14px', borderRadius: 999 }}>Donar ahora</span>
-              <span style={{ background: 'white', border: '1px solid rgba(61,64,91,0.12)', color: '#3D405B', fontSize: 12, fontWeight: 700, padding: '8px 14px', borderRadius: 999 }}>Transferencia - PayPal</span>
+              <span style={{ background: 'white', color: '#3D405B', fontSize: 12, fontWeight: 700, padding: '8px 14px', borderRadius: 999 }}>Transferencia - PayPal</span>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'white', borderRadius: 16, padding: '12px 14px' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#3D405B', opacity: 0.6 }}>keyrescata.netlify.app/donar</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#3D405B' }}>keyrescata.netlify.app/donar</span>
             <span style={{ background: '#3D405B', color: 'white', fontSize: 12, fontWeight: 700, padding: '8px 14px', borderRadius: 999 }}>Yo ayudo</span>
           </div>
         </div>
