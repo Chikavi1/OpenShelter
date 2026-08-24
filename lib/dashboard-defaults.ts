@@ -129,6 +129,7 @@ export interface AdoptionFollowUp {
     healthUpToDate: boolean
     conditionsMet: boolean
   }
+  documents: Array<{ type: AdoptionDocumentType; name: string; url: string; key?: string; uploadedAt: string }>
   incidents: string
 }
 

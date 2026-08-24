@@ -13,9 +13,35 @@ type FollowUpFormState = Omit<AdoptionFollowUp, 'id'>
 
 export function DashboardAdoptionFollowUpsTab() {
   const [page, setPage] = useState(1)
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null)
   const {
     activeTab, followUps, handleUpdateFollowUpStage, handleUpdateFollowUpChecks, handleUpdateFollowUpDetails, handleDeleteFollowUp,
   } = useDashboardContext()
+
+  const uploadDoc = async (followUp: AdoptionFollowUp, type: 'Identificación oficial' | 'Comprobante de domicilio', file: File) => {
+    const key = followUp.id + '-' + type
+    setUploadingDoc(key)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const res = await fetch('/api/admin/uploads', { method: 'POST', body: form })
+      const data = (await res.json()) as { url: string; key: string }
+      if (!res.ok) throw new Error((data as any).error || 'Error al subir')
+      const doc = { type, name: file.name, url: data.url, key: data.key, uploadedAt: new Date().toISOString() }
+      const nextDocs = [...(followUp.documents || []), doc]
+      // reemplaza doc del mismo tipo si ya existía (mantener solo último)
+      const dedup = nextDocs.filter((d, i, a) => a.findLastIndex((x) => x.type === d.type) === i)
+      handleUpdateFollowUpDetails(followUp.id, { documents: dedup as any })
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'No se pudo subir el documento')
+    } finally {
+      setUploadingDoc(null)
+    }
+  }
+  const removeDoc = (followUp: AdoptionFollowUp, idx: number) => {
+    const next = (followUp.documents || []).filter((_, i) => i !== idx)
+    handleUpdateFollowUpDetails(followUp.id, { documents: next as any })
+  }
 
   if (activeTab !== 'adoption-followups') return null
 
@@ -48,6 +74,7 @@ export function DashboardAdoptionFollowUpsTab() {
                 <th className="px-6 py-4">Próx. seguimiento</th>
                 <th className="px-6 py-4">Etapa</th>
                 <th className="px-6 py-4">Cumplimiento</th>
+                <th className="px-6 py-4">Documentos</th>
                 <th className="px-6 py-4">Contrato</th>
                 <th className="px-6 py-4 text-right">Acciones</th>
               </tr>
@@ -87,6 +114,22 @@ export function DashboardAdoptionFollowUpsTab() {
                     <input type="text" value={followUp.incidents} onChange={(event) => handleUpdateFollowUpDetails(followUp.id, { incidents: event.target.value })} placeholder="Incidencias o alertas" className={inputClass + ' mt-2 w-full text-xs'} />
                   </td>
                   <td className="px-6 py-4">
+                    <div className="grid gap-2 min-w-[210px]">
+                      {(followUp.documents || []).length ? (followUp.documents || []).map((doc, idx) => (
+                        <div key={idx} className="flex items-center gap-2 rounded-lg border border-foreground/10 bg-secondary/30 px-2 py-1.5 text-xs">
+                          <a href={doc.url} target="_blank" rel="noreferrer" className="flex-1 truncate font-medium text-primary hover:underline" title={doc.name}>{doc.type}</a>
+                          <button onClick={() => removeDoc(followUp, idx)} className="text-rose-600 hover:text-rose-700" title="Quitar"><Icons.X className="size-3.5" /></button>
+                        </div>
+                      )) : <span className="text-xs text-muted-foreground">Sin documentos</span>}
+                      {(['Identificación oficial', 'Comprobante de domicilio'] as const).map((type) => (
+                        <label key={type} className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-dashed border-foreground/15 px-2 py-1.5 text-[11px] font-medium hover:bg-secondary">
+                          <Icons.Upload className="size-3" />{uploadingDoc === followUp.id + '-' + type ? 'Subiendo…' : type}
+                          <input type="file" accept="image/*,.pdf" className="sr-only" disabled={uploadingDoc !== null} onChange={(e) => { const f = e.target.files?.[0]; if (f) void uploadDoc(followUp, type, f); e.currentTarget.value = '' }} />
+                        </label>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
                     <Link href={`/contrato/${followUp.id}`} className="text-sm font-medium text-primary hover:underline">
                       Ver contrato
                     </Link>
@@ -105,7 +148,7 @@ export function DashboardAdoptionFollowUpsTab() {
 
               {!followUps.length && (
                 <tr>
-                  <td colSpan={10} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                  <td colSpan={11} className="px-6 py-12 text-center text-sm text-muted-foreground">
                     Todavía no hay adopciones registradas.
                   </td>
                 </tr>
@@ -145,6 +188,20 @@ export function DashboardAdoptionFollowUpsTab() {
                 <div className="mt-3 grid gap-2">
                   <input type="date" value={followUp.lastContactDate ?? ''} onChange={(event) => handleUpdateFollowUpDetails(followUp.id, { lastContactDate: event.target.value })} className={inputClass + ' w-full text-xs'} aria-label="Último contacto" />
                   <input type="text" value={followUp.incidents} onChange={(event) => handleUpdateFollowUpDetails(followUp.id, { incidents: event.target.value })} placeholder="Incidencias o alertas" className={inputClass + ' w-full text-xs'} />
+                </div>
+                <div className="mt-3 rounded-xl border border-foreground/10 bg-card p-3">
+                  <p className="text-xs font-semibold">Documentos de seguimiento</p>
+                  <div className="mt-2 grid gap-2">
+                    {(followUp.documents || []).length ? (followUp.documents || []).map((doc, idx) => (
+                      <div key={idx} className="flex items-center gap-2 rounded-lg border border-foreground/10 bg-secondary/30 px-2 py-1.5 text-xs"><a href={doc.url} target="_blank" rel="noreferrer" className="flex-1 truncate font-medium text-primary hover:underline">{doc.type}</a><button onClick={() => removeDoc(followUp, idx)} className="text-rose-600"><Icons.X className="size-3.5" /></button></div>
+                    )) : <span className="text-xs text-muted-foreground">Sin documentos. Súbelos aquí (ya no se piden en el formulario público).</span>}
+                    {(['Identificación oficial', 'Comprobante de domicilio'] as const).map((type) => (
+                      <label key={type} className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-dashed border-foreground/15 px-2 py-2 text-xs font-medium hover:bg-secondary">
+                        <Icons.Upload className="size-3" />{uploadingDoc === followUp.id + '-' + type ? 'Subiendo…' : 'Subir ' + type}
+                        <input type="file" accept="image/*,.pdf" className="sr-only" disabled={uploadingDoc !== null} onChange={(e) => { const f = e.target.files?.[0]; if (f) void uploadDoc(followUp, type, f); e.currentTarget.value = '' }} />
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between">
                   <Link href={`/contrato/${followUp.id}`} className="text-sm font-medium text-primary hover:underline">Ver contrato</Link>

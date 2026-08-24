@@ -5,7 +5,7 @@ import {
   ArrowDownRight,
   ArrowRight,
   Check,
-  Globe,
+  Heart,
   Search,
 } from 'lucide-react'
 import { usePublicSite } from '@/lib/use-public-site'
@@ -85,7 +85,6 @@ export default function Page() {
                 const isEmpresa = t.role.toLowerCase().includes('empresa')
                 const tagLabel = isVoluntario ? 'VOLUNTARIO' : isEmpresa ? 'EMPRESA ALIADA' : t.role.toUpperCase()
                 const tagClass = isVoluntario ? 'bg-amber-100 text-amber-900 border-amber-200' : isEmpresa ? 'bg-emerald-100 text-emerald-900 border-emerald-200' : 'bg-zinc-100 text-zinc-700 border-zinc-200'
-                const tags = isVoluntario ? ['Salud Animal', 'Atención', 'Esterilización'] : isEmpresa ? ['Alimentación', 'Sostenibilidad', 'Apoyo'] : ['Apoyo', 'Solidaridad', 'Comunidad']
                 return (
                   <article key={t.id || idx} className="flex flex-col rounded-[1.6rem] border border-zinc-200 bg-white p-5 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.12)] sm:p-6">
                     <div className="flex items-start justify-between gap-3">
@@ -100,17 +99,9 @@ export default function Page() {
                     </div>
                     <div className="mt-4 flex flex-wrap gap-1.5">
                       <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${tagClass}`}>{tagLabel}</span>
-                      <span className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-900">RECONOCIMIENTO</span>
                     </div>
-                    <div className="mt-3 rounded-2xl bg-zinc-100 px-4 py-3.5">
-                      <p className="flex items-center gap-1.5 text-xs text-zinc-600"><span className="text-zinc-400"><Globe className="size-3.5" /></span> Refugio Principal</p>
-                      <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-zinc-700"><span className="text-zinc-400">♡</span> {t.contribution}</p>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {tags.map((p) => (
-                        <span key={p} className="rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-xs text-zinc-600">{p}</span>
-                      ))}
-                      <span className="rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-xs text-zinc-500">+1</span>
+                    <div className="mt-4 rounded-2xl bg-zinc-50 px-4 py-3.5">
+                      <p className="flex items-center gap-1.5 text-xs font-medium text-zinc-700"><Heart className="size-3.5 text-zinc-400" /> {t.contribution}</p>
                     </div>
                     <p className="mt-4 text-xs italic leading-6 text-zinc-500">“{t.msg || 'Gracias por su apoyo'}”</p>
                   </article>
@@ -122,7 +113,7 @@ export default function Page() {
               <p>Pronto compartiremos más reconocimientos de quienes hacen posible nuestra labor.</p>
             </div>
           )}
-          {publicThanks.length > 0 && <div className="mt-8 flex justify-center"><a href="/reconocimiento" className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-black">Ver muro completo <ArrowRight className="size-4" /></a></div>}
+          {publicThanks.length > 0 && <div className="mt-8 flex justify-center"><a href="/reconocimiento" className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition hover:opacity-90">Ver muro completo <ArrowRight className="size-4" /></a></div>}
         </section>
 
         {hasDonationMethods && <section id="donativos" className="scroll-mt-10 flex flex-col justify-between gap-8 py-24 lg:flex-row lg:items-center"><div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Donativos</p><h2 className="max-w-2xl text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">Tu ayuda puede llenar un plato, cubrir una cirugía o cambiar un destino.</h2></div><div className="max-w-sm rounded-3xl border border-foreground/10 bg-card p-6"><p className="text-sm leading-6 text-muted-foreground">Aporta desde $100 MXN y acompáñanos a construir más finales felices.</p><a href="/donar" className="mt-6 flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">Quiero donar <ArrowRight className="ml-2 inline size-4" /></a></div></section>}

@@ -85,6 +85,7 @@ function normalizeFollowUpRow(followUp: Omit<typeof adoptionFollowUps.$inferSele
     applicationId: followUp.applicationId ?? undefined,
     lastContactDate: followUp.lastContactDate ?? undefined,
     verificationStatus: (followUp.verificationStatus as AdoptionFollowUp['verificationStatus']) ?? 'Pendiente',
+    documents: (followUp as any).documents ?? [],
     followUpChecks: followUp.followUpChecks ?? { contacted: false, petSafe: false, healthUpToDate: false, conditionsMet: false },
     incidents: followUp.incidents ?? '',
   }

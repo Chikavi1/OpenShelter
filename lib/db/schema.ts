@@ -124,6 +124,7 @@ export const adoptionFollowUps = pgTable('adoption_followups', {
   applicationId: text('application_id').references(() => adoptionApplications.id, { onDelete: 'set null' }),
   lastContactDate: text('last_contact_date'),
   verificationStatus: text('verification_status').notNull().default('Pendiente'),
+  documents: jsonb('documents').$type<Array<{ type: string; name: string; url: string; key?: string; uploadedAt: string }>>().notNull().default([]),
   followUpChecks: jsonb('follow_up_checks').$type<{ contacted: boolean; petSafe: boolean; healthUpToDate: boolean; conditionsMet: boolean }>().notNull().default({ contacted: false, petSafe: false, healthUpToDate: false, conditionsMet: false }),
   incidents: text('incidents').notNull().default(''),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

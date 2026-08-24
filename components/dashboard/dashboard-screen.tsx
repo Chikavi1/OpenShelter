@@ -845,7 +845,7 @@ export default function DashboardPage() {
     }))
   }
 
-  const handleUpdateFollowUpDetails = (followUpId: string, changes: Partial<Pick<AdoptionFollowUp, 'lastContactDate' | 'nextFollowUpDate' | 'incidents'>>) => {
+  const handleUpdateFollowUpDetails = (followUpId: string, changes: Partial<Pick<AdoptionFollowUp, 'lastContactDate' | 'nextFollowUpDate' | 'incidents' | 'documents'>>) => {
     setFollowUps(prev => prev.map(followUp => followUp.id === followUpId ? { ...followUp, ...changes } : followUp))
   }
 
