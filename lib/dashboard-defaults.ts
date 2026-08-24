@@ -366,6 +366,7 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       lastContactDate: '12/08/2026',
       verificationStatus: 'En cumplimiento',
       followUpChecks: { contacted: true, petSafe: true, healthUpToDate: true, conditionsMet: true },
+      documents: [],
       incidents: '',
     },
   ],
