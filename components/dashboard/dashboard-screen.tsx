@@ -355,6 +355,7 @@ const createEmptyFollowUpForm = (): Omit<AdoptionFollowUp, 'id'> => ({
   lastContactDate: '',
   verificationStatus: 'Pendiente',
   followUpChecks: { contacted: false, petSafe: false, healthUpToDate: false, conditionsMet: false },
+  documents: [],
   incidents: '',
 })
 
@@ -562,10 +563,8 @@ export default function DashboardPage() {
     if (!pendingApproveTarget) return
     const app = pendingApproveTarget
     const checksComplete = Object.values(app.verification).every(Boolean)
-    const requiredDocuments = ['Identificación oficial', 'Comprobante de domicilio']
-    const documentsComplete = requiredDocuments.every((type) => app.documents.some((document) => document.type === type && document.url))
-    if (!checksComplete || !documentsComplete) {
-      setApplicationActionError(`No se puede aprobar ${app.applicantName}: completa todos los puntos de verificación y carga identificación y comprobante de domicilio.`)
+    if (!checksComplete) {
+      setApplicationActionError(`No se puede aprobar ${app.applicantName}: completa todos los puntos de verificación. Los documentos se solicitan después en Seguimiento.`)
       setPendingApproveTarget(null)
       return
     }
@@ -604,11 +603,9 @@ export default function DashboardPage() {
 
   const handleApproveApplication = (app: AdoptionApplication) => {
     const checksComplete = Object.values(app.verification).every(Boolean)
-    const requiredDocuments = ['Identificación oficial', 'Comprobante de domicilio']
-    const documentsComplete = requiredDocuments.every((type) => app.documents.some((document) => document.type === type && document.url))
 
-    if (!checksComplete || !documentsComplete) {
-      setApplicationActionError(`No se puede aprobar ${app.applicantName}: completa todos los puntos de verificación y carga identificación y comprobante de domicilio.`)
+    if (!checksComplete) {
+      setApplicationActionError(`No se puede aprobar ${app.applicantName}: completa todos los puntos de verificación. Los documentos se solicitan después en Seguimiento.`)
       return
     }
 
