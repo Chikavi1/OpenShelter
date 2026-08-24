@@ -1,16 +1,8 @@
 'use client'
 
-import { ArrowRight, Award, Heart, MapPin, Package, Sparkles, Stethoscope } from 'lucide-react'
+import { ArrowRight, Heart, Sparkles } from 'lucide-react'
 import { usePublicSite } from '@/lib/use-public-site'
 import { PublicPageShell } from '@/components/public/public-page-shell'
-
-function hashStr(s: string) {
-  let h = 0
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
-  return h
-}
-
-const PILL_POOL = ['Salud Animal','Atención','Esterilización','Alimentación','Sostenibilidad','Apoyo','Voluntariado','Rescate','Cuidado','Adopción','Transporte','Difusión']
 
 export default function ReconocimientoPage() {
   const site = usePublicSite()
@@ -39,71 +31,34 @@ export default function ReconocimientoPage() {
           {publicThanks.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2">
               {publicThanks.map((thank) => {
-                const h = hashStr(thank.id)
-                // pills determinísticos 3 visibles + resto
-                const shuffled = [...PILL_POOL].sort((a,b)=> hashStr(a+thank.id)-hashStr(b+thank.id))
-                // sesgo por rol
-                const roleBias = thank.role === 'Voluntario' ? ['Salud Animal','Atención','Esterilización']
-                  : thank.role === 'Empresa Aliada' ? ['Alimentación','Sostenibilidad','Apoyo']
-                  : thank.role === 'Padrino' ? ['Cuidado','Apoyo','Voluntariado']
-                  : ['Rescate','Alimentación','Difusión']
-                const pills = [...roleBias, ...shuffled.filter(p=> !roleBias.includes(p))].slice(0,4)
-                const visible = pills.slice(0,3)
-                const extra = pills.length - visible.length
                 const roleLabel = thank.role.toUpperCase()
-                const isVol = thank.role === 'Voluntario' || thank.role === 'Padrino'
-                const supportText = thank.amountOrContribution || (isVol ? 'Apoyo con esterilizaciones' : 'Aportación solidaria')
-                const dateLabel = thank.date || 'hace poco'
+                const isVoluntario = thank.role.toLowerCase().includes('volunt')
+                const isEmpresa = thank.role.toLowerCase().includes('empresa')
+                const tagLabel = isVoluntario ? 'VOLUNTARIO' : isEmpresa ? 'EMPRESA ALIADA' : thank.role.toUpperCase()
+                const tagClass = isVoluntario ? 'bg-amber-100 text-amber-900 border-amber-200' : isEmpresa ? 'bg-emerald-100 text-emerald-900 border-emerald-200' : 'bg-zinc-100 text-zinc-700 border-zinc-200'
+                const dateLabel = (thank as unknown as { date?: string }).date || 'Hoy'
                 return (
                   <article
                     key={thank.id || thank.name}
-                    className="group flex flex-col rounded-[1.6rem] border border-zinc-100 bg-white p-6 shadow-[0_8px_32px_-16px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_-18px_rgba(0,0,0,0.18)]"
+                    className="flex flex-col rounded-[1.6rem] border border-zinc-200 bg-white p-5 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.12)] sm:p-6"
                   >
-                    {/* header avatar + name + date */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex min-w-0 items-center gap-3">
-                        <img src={thank.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt={thank.name} className="size-10 rounded-full object-cover ring-1 ring-zinc-100" />
+                        <img src={thank.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt={thank.name} className="size-10 shrink-0 rounded-full object-cover ring-1 ring-black/5" />
                         <div className="min-w-0">
-                          <h3 className="truncate text-[15px] font-semibold leading-tight tracking-tight text-zinc-900">{thank.name}</h3>
-                          <p className="text-xs leading-none text-zinc-500">Miembro de honor</p>
+                          <h3 className="truncate text-sm font-semibold leading-none tracking-tight">{thank.name}</h3>
+                          <p className="mt-1 text-xs text-zinc-500">Miembro de honor</p>
                         </div>
                       </div>
-                      <span className="shrink-0 text-xs text-zinc-400">{dateLabel}</span>
+                      <span className="shrink-0 text-[11px] font-medium text-zinc-400">{dateLabel}</span>
                     </div>
-
-                    {/* tags */}
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <span className={`rounded-md px-2.5 py-1 text-[11px] font-semibold tracking-wide ${roleLabel.includes('VOLUNTARIO') ? 'bg-[#FFF1D6] text-[#8A5A00] ring-1 ring-[#FFE9B5]' : roleLabel.includes('EMPRESA') ? 'bg-[#EAF2E8] text-[#3F5A3A] ring-1 ring-[#D6E6D3]' : roleLabel.includes('PADRINO') ? 'bg-[#FFF1D6] text-[#8A5A00] ring-1 ring-[#FFE9B5]' : 'bg-[#EAF2E8] text-[#3F5A3A] ring-1 ring-[#D6E6D3]'}`}>
-                        {roleLabel}
-                      </span>
-                      <span className="rounded-md bg-[#EAF2E8] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-[#3F5A3A] ring-1 ring-[#D6E6D3]">RECONOCIMIENTO</span>
-                    </div>
-
-                    {/* gray box */}
-                    <div className="mt-4 rounded-xl bg-[#F6F6F6] px-4 py-3.5">
-                      <p className="flex items-center gap-2 text-[13px] font-medium leading-5 text-zinc-600">
-                        <MapPin className="size-3.5 shrink-0 text-zinc-500" /> Refugio Principal
-                      </p>
-                      <p className="mt-2 flex items-center gap-2 text-[13px] font-medium leading-5 text-zinc-600">
-                        {isVol ? <Stethoscope className="size-3.5 shrink-0 text-zinc-500" /> : <Package className="size-3.5 shrink-0 text-zinc-500" />}
-                        <span className="truncate">{supportText}</span>
-                      </p>
-                    </div>
-
-                    {/* pills */}
                     <div className="mt-4 flex flex-wrap gap-1.5">
-                      {visible.map((p) => (
-                        <span key={p} className="rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-xs font-medium text-zinc-600">
-                          {p}
-                        </span>
-                      ))}
-                      {extra > 0 && (
-                        <span className="rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-xs font-medium text-zinc-600">+{extra}</span>
-                      )}
+                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${tagClass}`}>{tagLabel}</span>
                     </div>
-
-                    {/* quote */}
-                    <p className="mt-4 text-sm italic leading-5 text-zinc-500">&ldquo;{thank.message || 'Gracias por su apoyo'}&rdquo;</p>
+                    <div className="mt-4 rounded-2xl bg-zinc-50 px-4 py-3.5">
+                      <p className="flex items-center gap-1.5 text-xs font-medium text-zinc-700"><Heart className="size-3.5 text-zinc-400" /> {thank.amountOrContribution || 'Aportación solidaria'}</p>
+                    </div>
+                    <p className="mt-4 text-xs italic leading-6 text-zinc-500">“{thank.message || 'Gracias por su apoyo'}”</p>
                   </article>
                 )
               })}

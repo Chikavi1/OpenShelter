@@ -198,6 +198,13 @@ interface ShelterSettings {
     facebook: string
     website: string
   }
+  aboutContent: {
+    heroKicker: string; heroTitle: string; heroHighlight: string; heroDescription: string
+    storyImageUrl: string; storyKicker: string; storyTitle: string; storyParagraphs: string[]
+    valuesKicker: string; valuesTitle: string; valuesDesc: string; values: Array<{ title: string; desc: string }>
+    stepsKicker: string; stepsTitle: string; stepsDesc: string; steps: Array<{ n: string; title: string; desc: string }>
+    ctaKicker: string; ctaTitle: string; ctaDesc: string
+  }
 }
 
 // Initial empty state
@@ -251,6 +258,37 @@ const INITIAL_SETTINGS: ShelterSettings = {
     facebook: '',
     website: '',
   },
+  aboutContent: {
+    heroKicker: 'Quiénes somos',
+    heroTitle: 'No salvamos mascotas.',
+    heroHighlight: 'Salvamos futuros.',
+    heroDescription: 'Rescatamos, rehabilitamos y conectamos mascotas increíbles con familias amorosas. Nacimos de un grupo de vecinos que decidió no mirar hacia otro lado.',
+    storyImageUrl: 'https://images.unsplash.com/photo-1636604244109-7b26dd38dd91?q=80&w=880&auto=format&fit=crop',
+    storyKicker: 'Nuestra historia',
+    storyTitle: 'De un rescate a una red de apoyo',
+    storyParagraphs: ['Empezamos rescatando a uno. Hoy somos una comunidad de voluntarios, veterinarios, hogares temporales y familias que han decidido que ningún animal se quede atrás. Cada caso nos enseña que con cuidado, paciencia y compromiso, una vida puede cambiar por completo.', 'Colaboramos con hogares temporales y aliados. Todo lo que hacemos se sostiene con donativos y trabajo voluntario.'],
+    valuesKicker: 'Lo que nos mueve',
+    valuesTitle: 'Nuestros valores',
+    valuesDesc: 'No somos un albergue masivo. Somos una red pequeña que hace las cosas con cuidado, para que cada adopción dure para siempre.',
+    values: [
+      { title: 'Rescate con respeto', desc: 'Cada intervención prioriza el bienestar del animal, sin violencia y con acompañamiento veterinario.' },
+      { title: 'Adopción responsable', desc: 'Evaluamos compatibilidad, damos seguimiento y acompañamos a la familia después de la entrega.' },
+      { title: 'Transparencia total', desc: 'Cada donativo se reporta y cada historia se comparte. Nada se esconde.' },
+      { title: 'Comunidad que acompaña', desc: 'Voluntarios, hogares temporales y padrinos hacen posible lo que solos no podríamos.' },
+    ],
+    stepsKicker: 'Cómo trabajamos',
+    stepsTitle: 'Del rescate al hogar',
+    stepsDesc: 'Un proceso claro, humano y con seguimiento. No entregamos mascotas a la ligera.',
+    steps: [
+      { n: '01', title: 'Rescate', desc: 'Rescatamos reportes de abandono, maltrato o extravío y damos atención inmediata.' },
+      { n: '02', title: 'Rehabilitación', desc: 'Atención veterinaria, esterilización, vacunas, desparasitación y terapia conductual si hace falta.' },
+      { n: '03', title: 'Hogar temporal', desc: 'Los rescatados conviven en hogares temporales donde recuperan confianza y rutina.' },
+      { n: '04', title: 'Adopción y seguimiento', desc: 'Conectamos con la familia ideal y damos seguimiento post-adopción con visitas y apoyo.' },
+    ],
+    ctaKicker: 'Súmate',
+    ctaTitle: 'Hay muchas formas de ayudar, incluso si no puedes adoptar ahora.',
+    ctaDesc: 'Dona, ofrece hogar temporal, comparte un perfil o visítanos. Cada gesto cuenta y lo agradecemos de corazón.',
+  },
 }
 
 const getDefaultPetLocation = (s: ShelterSettings) => {
@@ -282,7 +320,7 @@ const createEmptyFosterForm = () => ({
   email: '',
   phone: '',
   address: '',
-  city: 'CDMX',
+  city: '',
   homeType: 'Casa' as 'Casa' | 'Departamento' | 'Finca',
   yard: true,
   preferredSpecies: 'Cualquiera' as 'Perros' | 'Gatos' | 'Cualquiera',
@@ -334,6 +372,7 @@ const createEmptyEventForm = (): Omit<ShelterEvent, 'id'> => ({
   contactName: '',
   contactPhone: '',
   registrationLink: '',
+  ctaLabel: 'Registrarme',
   description: '',
   notes: '',
 })
@@ -359,7 +398,7 @@ export default function DashboardPage() {
   const [settings, setSettings] = useState<ShelterSettings>(INITIAL_SETTINGS)
   const [hydrated, setHydrated] = useState(false)
   const saveTimer = useRef<number | null>(null)
-  const [uploadingImage, setUploadingImage] = useState<'logo' | 'hero' | null>(null)
+  const [uploadingImage, setUploadingImage] = useState<'logo' | 'hero' | 'about' | null>(null)
   const [imageUploadError, setImageUploadError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -486,7 +525,7 @@ export default function DashboardPage() {
   const [uploadingEventImage, setUploadingEventImage] = useState(false)
 
   // Settings Sub-tab state
-  const [settingsSection, setSettingsSection] = useState<'general' | 'forms' | 'appearance' | 'support' | 'location' | 'legal'>('general')
+  const [settingsSection, setSettingsSection] = useState<'general' | 'forms' | 'appearance' | 'support' | 'location' | 'legal' | 'about'>('general')
 
   // Form Field Builder States (Dynamic Web Inputs)
   const [newFieldTarget, setNewFieldTarget] = useState<'adoption' | 'foster'>('adoption')
@@ -658,7 +697,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!hydrated || editingPet || activeTab !== 'register-pet') return
     const expected = getDefaultPetLocation(settings)
-    if (newPet.location === 'Ubicación del refugio' || newPet.location === 'CDMX (Refugio Central)') {
+    if (newPet.location === 'Ubicación del refugio' || newPet.location === 'Refugio Central') {
       setNewPet((prev) => ({ ...prev, location: expected }))
     }
   }, [settings, hydrated, editingPet, activeTab, newPet.location])
@@ -806,7 +845,7 @@ export default function DashboardPage() {
     }))
   }
 
-  const handleUpdateFollowUpDetails = (followUpId: string, changes: Partial<Pick<AdoptionFollowUp, 'lastContactDate' | 'nextFollowUpDate' | 'incidents'>>) => {
+  const handleUpdateFollowUpDetails = (followUpId: string, changes: Partial<Pick<AdoptionFollowUp, 'lastContactDate' | 'nextFollowUpDate' | 'incidents' | 'documents'>>) => {
     setFollowUps(prev => prev.map(followUp => followUp.id === followUpId ? { ...followUp, ...changes } : followUp))
   }
 
@@ -841,6 +880,7 @@ export default function DashboardPage() {
       contactName: newEvent.contactName.trim(),
       contactPhone: newEvent.contactPhone.trim(),
       registrationLink: newEvent.registrationLink.trim(),
+      ctaLabel: (newEvent.ctaLabel || 'Registrarme').trim(),
       description: newEvent.description.trim(),
       notes: newEvent.notes.trim(),
     }
@@ -914,7 +954,7 @@ export default function DashboardPage() {
     setNewThank(createEmptyThankForm())
   }
 
-  const handleImageUpload = async (target: 'logo' | 'hero', file?: File) => {
+  const handleImageUpload = async (target: 'logo' | 'hero' | 'about', file?: File) => {
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
@@ -943,7 +983,9 @@ export default function DashboardPage() {
 
       setSettings(prev => target === 'logo'
         ? { ...prev, logoUrl: asset.url }
-        : { ...prev, heroBannerUrl: asset.url })
+        : target === 'hero'
+          ? { ...prev, heroBannerUrl: asset.url }
+          : { ...prev, aboutContent: { ...prev.aboutContent, storyImageUrl: asset.url } })
     } catch (error) {
       console.error('Error al subir imagen:', error)
       setImageUploadError('No se pudo subir la imagen. Intenta nuevamente.')
@@ -1112,6 +1154,10 @@ export default function DashboardPage() {
     settings,
     petSearchTerm,
     setPetSearchTerm,
+    filterSpecies,
+    setFilterSpecies,
+    filterStatus,
+    setFilterStatus,
     appSearchTerm,
     setAppSearchTerm,
     fosterSearchTerm,

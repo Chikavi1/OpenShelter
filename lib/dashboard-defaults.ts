@@ -129,6 +129,7 @@ export interface AdoptionFollowUp {
     healthUpToDate: boolean
     conditionsMet: boolean
   }
+  documents: Array<{ type: AdoptionDocumentType; name: string; url: string; key?: string; uploadedAt: string }>
   incidents: string
 }
 
@@ -147,6 +148,7 @@ export interface ShelterEvent {
   contactName: string
   contactPhone: string
   registrationLink: string
+  ctaLabel: string
   description: string
   notes: string
 }
@@ -195,6 +197,13 @@ export interface ShelterSettings {
     facebook: string
     website: string
   }
+  aboutContent: {
+    heroKicker: string; heroTitle: string; heroHighlight: string; heroDescription: string
+    storyImageUrl: string; storyKicker: string; storyTitle: string; storyParagraphs: string[]
+    valuesKicker: string; valuesTitle: string; valuesDesc: string; values: Array<{ title: string; desc: string }>
+    stepsKicker: string; stepsTitle: string; stepsDesc: string; steps: Array<{ n: string; title: string; desc: string }>
+    ctaKicker: string; ctaTitle: string; ctaDesc: string
+  }
 }
 
 export interface DashboardState {
@@ -218,7 +227,7 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       gender: 'Macho',
       size: 'Mediano',
       status: 'Disponible',
-      location: 'CDMX (Refugio Central)',
+      location: 'Refugio Central',
       image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85',
       images: ['https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85'],
       featured: true,
@@ -237,7 +246,7 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       gender: 'Hembra',
       size: 'Pequeño',
       status: 'Disponible',
-      location: 'CDMX (Refugio Central)',
+      location: 'Refugio Central',
       image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85',
       images: ['https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=85'],
       featured: false,
@@ -256,7 +265,7 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       gender: 'Macho',
       size: 'Grande',
       status: 'En Proceso',
-      location: 'CDMX (Refugio Central)',
+      location: 'Refugio Central',
       image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85',
       images: ['https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85'],
       featured: false,
@@ -275,7 +284,7 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       gender: 'Hembra',
       size: 'Pequeño',
       status: 'Disponible',
-      location: 'CDMX (Refugio Central)',
+      location: 'Refugio Central',
       image: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85',
       images: ['https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85'],
       featured: false,
@@ -293,7 +302,7 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       applicantEmail: 'carlos@gmail.com',
         applicantPhone: '5551234567',
         applicantAddress: '',
-        applicantCity: 'CDMX',
+        applicantCity: '',
       petName: 'Milo',
       petId: 'pet-1',
       petImage: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85',
@@ -314,8 +323,8 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       name: 'Familia Rodríguez',
       email: 'contacto@rodriguez.org',
       phone: '5559876543',
-      address: 'Av. Insurgentes Sur 1200',
-      city: 'CDMX',
+      address: '',
+      city: '',
       homeType: 'Casa',
       yard: true,
       preferredSpecies: 'Cualquiera',
@@ -347,7 +356,7 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       adopterEmail: 'carlos@gmail.com',
       adopterPhone: '5551234567',
       adopterAddress: 'Av. Siempre Viva 742',
-      adopterCity: 'CDMX',
+      adopterCity: '',
       adoptionDate: '12/08/2026',
       nextFollowUpDate: '26/08/2026',
       processStage: 'Seguimiento 1',
@@ -369,13 +378,14 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       status: 'Programado',
       eventDate: '30/08/2026',
       eventTime: '10:00',
-      location: 'Parque Central, CDMX',
+      location: 'Parque Central',
       latitude: 19.4326,
       longitude: -99.1332,
       attendeesTarget: 80,
       contactName: 'Laura Pérez',
       contactPhone: '5554443322',
       registrationLink: 'https://example.com/eventos/adopcion',
+      ctaLabel: 'Registrarme',
       description: 'Evento para presentar mascotas en adopción, recibir donaciones y sumar voluntarios al refugio.',
       notes: 'Confirmar carpa, mesas y permisos con administración del parque.',
     },
@@ -386,11 +396,11 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
     description: 'Rescatamos, rehabilitamos y conectamos mascotas increíbles con familias amorosas.',
     phone: '+52 55 1234 5678',
     email: 'contacto@refugiohuellas.org',
-    address: 'Calle del Amor 123',
+    address: '',
     latitude: 19.4326,
     longitude: -99.1332,
-    city: 'Ciudad de México',
-    state: 'CDMX',
+    city: '',
+    state: '',
     country: 'México',
     zipCode: '01000',
     primaryColor: '#163b2d',
@@ -423,6 +433,40 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       instagram: 'https://instagram.com/refugiohuellas',
       facebook: 'https://facebook.com/refugiohuellas',
       website: 'https://refugiohuellas.org',
+    },
+    aboutContent: {
+      heroKicker: 'Quiénes somos',
+      heroTitle: 'No salvamos mascotas.',
+      heroHighlight: 'Salvamos futuros.',
+      heroDescription: 'Rescatamos, rehabilitamos y conectamos mascotas increíbles con familias amorosas. Nacimos de un grupo de vecinos que decidió no mirar hacia otro lado.',
+      storyImageUrl: 'https://images.unsplash.com/photo-1636604244109-7b26dd38dd91?q=80&w=880&auto=format&fit=crop',
+      storyKicker: 'Nuestra historia',
+      storyTitle: 'De un rescate a una red de apoyo',
+      storyParagraphs: [
+        'Empezamos rescatando a uno. Hoy somos una comunidad de voluntarios, veterinarios, hogares temporales y familias que han decidido que ningún animal se quede atrás. Cada caso nos enseña que con cuidado, paciencia y compromiso, una vida puede cambiar por completo.',
+        'Colaboramos con hogares temporales y aliados. Todo lo que hacemos se sostiene con donativos y trabajo voluntario.',
+      ],
+      valuesKicker: 'Lo que nos mueve',
+      valuesTitle: 'Nuestros valores',
+      valuesDesc: 'No somos un albergue masivo. Somos una red pequeña que hace las cosas con cuidado, para que cada adopción dure para siempre.',
+      values: [
+        { title: 'Rescate con respeto', desc: 'Cada intervención prioriza el bienestar del animal, sin violencia y con acompañamiento veterinario.' },
+        { title: 'Adopción responsable', desc: 'Evaluamos compatibilidad, damos seguimiento y acompañamos a la familia después de la entrega.' },
+        { title: 'Transparencia total', desc: 'Cada donativo se reporta y cada historia se comparte. Nada se esconde.' },
+        { title: 'Comunidad que acompaña', desc: 'Voluntarios, hogares temporales y padrinos hacen posible lo que solos no podríamos.' },
+      ],
+      stepsKicker: 'Cómo trabajamos',
+      stepsTitle: 'Del rescate al hogar',
+      stepsDesc: 'Un proceso claro, humano y con seguimiento. No entregamos mascotas a la ligera.',
+      steps: [
+        { n: '01', title: 'Rescate', desc: 'Rescatamos reportes de abandono, maltrato o extravío y damos atención inmediata.' },
+        { n: '02', title: 'Rehabilitación', desc: 'Atención veterinaria, esterilización, vacunas, desparasitación y terapia conductual si hace falta.' },
+        { n: '03', title: 'Hogar temporal', desc: 'Los rescatados conviven en hogares temporales donde recuperan confianza y rutina.' },
+        { n: '04', title: 'Adopción y seguimiento', desc: 'Conectamos con la familia ideal y damos seguimiento post-adopción con visitas y apoyo.' },
+      ],
+      ctaKicker: 'Súmate',
+      ctaTitle: 'Hay muchas formas de ayudar, incluso si no puedes adoptar ahora.',
+      ctaDesc: 'Dona, ofrece hogar temporal, comparte un perfil o visítanos. Cada gesto cuenta y lo agradecemos de corazón.',
     },
   },
 }

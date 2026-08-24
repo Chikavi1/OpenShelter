@@ -19,10 +19,16 @@ export function PublicFooter({ appName, socialLinks }: PublicFooterProps) {
   const year = new Date().getFullYear()
   const resolvedName = site.settings.name || appName || 'key rescata'
   const description = site.settings.description || 'Rescatamos, rehabilitamos y conectamos mascotas increíbles con hogares para siempre.'
-  const address = site.settings.address || 'Calle del Amor 123'
-  const city = site.settings.city ? `${site.settings.city}${site.settings.state ? ', ' + site.settings.state : ''}` : ''
-  const phone = site.settings.phone
-  const email = site.settings.email
+  const rawAddress = site.settings.address?.trim() || ''
+  const rawCity = site.settings.city?.trim() || ''
+  const rawState = site.settings.state?.trim() || ''
+  // evitar duplicado "Veracruz, Veracruz" y no inventar fallback
+  const cityPart = rawCity && rawState && rawCity !== rawState ? `${rawCity}, ${rawState}` : rawCity || rawState
+  const address = rawAddress && rawAddress !== cityPart ? rawAddress : ''
+  const city = cityPart
+  const phone = site.settings.phone?.trim() || ''
+  const email = site.settings.email?.trim() || ''
+  const hasContact = !!(address || city || phone || email)
   const logoUrl = site.settings.logoUrl
 
   const socials = [
@@ -73,7 +79,7 @@ export function PublicFooter({ appName, socialLinks }: PublicFooterProps) {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/60">Contacto</p>
               <ul className="mt-4 grid gap-3 text-sm text-primary-foreground/80">
-                <li className="flex items-start gap-2.5"><MapPin className="mt-0.5 size-4 shrink-0 text-accent" /><span>{address}{city ? ` — ${city}` : ''}</span></li>
+                {(address || city) && <li className="flex items-start gap-2.5"><MapPin className="mt-0.5 size-4 shrink-0 text-accent" /><span>{[address, city].filter(Boolean).join(' — ')}</span></li>}
                 {phone && <li className="flex items-center gap-2.5"><Phone className="size-4 shrink-0 text-accent" /><a href={`tel:${phone}`} className="hover:text-white">{phone}</a></li>}
                 {email && <li className="flex items-center gap-2.5"><Mail className="size-4 shrink-0 text-accent" /><a href={`mailto:${email}`} className="hover:text-white">{email}</a></li>}
               </ul>

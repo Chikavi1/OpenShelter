@@ -137,17 +137,9 @@ function AdoptionForm({ appName, onSubmit }: { appName: string; onSubmit: (event
     <Field label="Ocupación" name="job" placeholder="A qué te dedicas" />
     <Field label="Tipo de vivienda y tu hogar" name="home" placeholder="Cuéntanos sobre tu espacio y rutina" required />
     <label className="grid gap-2 text-sm font-medium text-black">¿Por qué quieres adoptar?<textarea required name="why" rows={4} placeholder="Comparte tu motivación" className="min-h-28 rounded-xl border border-black/15 bg-white px-4 py-3 font-normal text-black outline-none placeholder:text-black/40 focus:border-black" /></label>
-    <div className="grid gap-4 border-t border-black/10 pt-5 sm:grid-cols-2 sm:gap-5">
-      <FileField label="Identificación oficial vigente" name="identityDocument" />
-      <FileField label="Comprobante de domicilio" name="addressDocument" />
-    </div>
     <label className="flex items-start gap-3 text-sm leading-5 text-black/70"><input required type="checkbox" className="mt-0.5 size-4 shrink-0 accent-primary" /> <span>Acepto que {appName} me contacte.</span></label>
     <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 sm:py-3">Enviar solicitud <ArrowRight className="size-4" /></button>
   </form>
-}
-
-function FileField({ label, name }: { label: string; name: string }) {
-  return <label className="grid min-w-0 gap-2 text-sm font-medium text-black">{label}<input required type="file" name={name} accept="application/pdf,image/jpeg,image/png" className="w-full min-w-0 rounded-xl border border-black/15 bg-white px-3 py-2 text-sm font-normal text-black file:mr-2 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:font-medium file:text-primary-foreground file:whitespace-nowrap sm:file:mr-3" /><span className="text-xs font-normal leading-4 text-black/60">PDF, JPG o PNG · máximo 5 MB</span></label>
 }
 
 function Stat({ label, value }: { label: string; value: string }) {

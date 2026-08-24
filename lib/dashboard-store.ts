@@ -74,6 +74,7 @@ function normalizeSettingsRow(settings: Omit<typeof shelterSettings.$inferSelect
     ...settings,
     adoptionFormFields: settings.adoptionFormFields as CustomFormField[],
     fosterFormFields: settings.fosterFormFields as CustomFormField[],
+    aboutContent: (settings as any).aboutContent ?? DEFAULT_DASHBOARD_STATE.settings.aboutContent,
   }
 }
 
@@ -84,13 +85,14 @@ function normalizeFollowUpRow(followUp: Omit<typeof adoptionFollowUps.$inferSele
     applicationId: followUp.applicationId ?? undefined,
     lastContactDate: followUp.lastContactDate ?? undefined,
     verificationStatus: (followUp.verificationStatus as AdoptionFollowUp['verificationStatus']) ?? 'Pendiente',
+    documents: (followUp as any).documents ?? [],
     followUpChecks: followUp.followUpChecks ?? { contacted: false, petSafe: false, healthUpToDate: false, conditionsMet: false },
     incidents: followUp.incidents ?? '',
   }
 }
 
 function normalizeEventRow(event: Omit<typeof shelterEvents.$inferSelect, 'createdAt' | 'updatedAt'>): ShelterEvent {
-  return { ...event, image: event.image || '/events.png', latitude: event.latitude || 19.4326, longitude: event.longitude || -99.1332 }
+  return { ...event, image: event.image || '/events.png', latitude: event.latitude || 19.4326, longitude: event.longitude || -99.1332, ctaLabel: (event as any).ctaLabel || 'Registrarme' }
 }
 
 export async function loadDashboardState() {

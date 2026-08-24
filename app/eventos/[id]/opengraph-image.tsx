@@ -8,7 +8,8 @@ export const alt = 'Evento'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-export default async function Image({ params }: { params: { id: string } }) {
+export default async function Image({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://keyrescata.netlify.app').replace(/\/$/, '')
   let event: { title: string; description: string; image: string; location: string } | null = null
   let appName = process.env.NEXT_PUBLIC_APP_NAME || 'Key Rescata'
@@ -16,7 +17,7 @@ export default async function Image({ params }: { params: { id: string } }) {
   try {
     const db = getDb()
     const [rows, settingsRows] = await Promise.all([
-      db.select({ title: shelterEvents.title, description: shelterEvents.description, image: shelterEvents.image, location: shelterEvents.location }).from(shelterEvents).where(eq(shelterEvents.id, params.id)).limit(1),
+      db.select({ title: shelterEvents.title, description: shelterEvents.description, image: shelterEvents.image, location: shelterEvents.location }).from(shelterEvents).where(eq(shelterEvents.id, id)).limit(1),
       db.select({ name: shelterSettings.name, logoUrl: shelterSettings.logoUrl }).from(shelterSettings).where(eq(shelterSettings.id, 1)).limit(1),
     ])
     if (rows[0]) event = rows[0] as any
@@ -53,16 +54,16 @@ export default async function Image({ params }: { params: { id: string } }) {
           {image ? <img src={image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '100px' }}>🎉</div>}
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '40px 44px', justifyContent: 'space-between', background: '#3D405B' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {logo ? <img src={logo} alt={appName} style={{ width: '44px', height: '44px', borderRadius: '999px', objectFit: 'cover', background: 'white' }} /> : null}
-            <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#F2CC8F' }}>{appName} · EVENTO</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            {logo ? <img src={logo} alt={appName} style={{ width: '52px', height: '52px', borderRadius: '999px', objectFit: 'cover', background: 'white', border: '2px solid rgba(255,255,255,0.9)' }} /> : <div style={{ width: '52px', height: '52px', borderRadius: '999px', background: '#F2CC8F', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3D405B', fontWeight: 900, fontSize: '20px' }}>K</div>}
+            <span style={{ fontSize: '15px', fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F2CC8F' }}>{appName} · EVENTO</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <span style={{ fontSize: '52px', fontWeight: 900, lineHeight: '0.95', letterSpacing: '-0.03em' }}>{title}</span>
             <span style={{ fontSize: '16px', color: 'rgba(255,255,255,0.75)', lineHeight: '1.5' }}>{desc}</span>
             {event?.location ? <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#F2CC8F', fontWeight: 700 }}>📍 {event.location}</span> : null}
           </div>
-          <span style={{ background: '#F2CC8F', color: '#3D405B', padding: '10px 18px', borderRadius: '999px', fontSize: '13px', fontWeight: 900, width: 'fit-content' }}>¡Te esperamos! →</span>
+          <span style={{ background: '#F2CC8F', color: '#3D405B', padding: '10px 22px', borderRadius: '999px', fontSize: '14px', fontWeight: 900, alignSelf: 'flex-start' }}>¡Te esperamos! →</span>
         </div>
       </div>
     ),

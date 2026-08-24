@@ -53,21 +53,26 @@ export async function POST(request: Request) {
   const petImage = payload?.petImage?.trim()
   const experience = payload?.experience?.trim()
 
-  if (!applicantName || !applicantEmail || !applicantPhone || !petName || !petImage || !experience || !identityFile || !addressFile) {
+   if (!applicantName || !applicantEmail || !applicantPhone || !petName || !petImage || !experience) {
     return NextResponse.json({ error: 'Payload inválido' }, { status: 400 })
   }
 
-  const validDocument = (file: File) => ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type) && file.size <= 5 * 1024 * 1024
-  if (!validDocument(identityFile) || !validDocument(addressFile)) {
-    return NextResponse.json({ error: 'Los documentos deben ser PDF, JPG o PNG y no superar 5 MB.' }, { status: 400 })
-  }
-
+  // Documentos se suben después desde el dashboard en Seguimiento, no en la solicitud pública
   await setupDatabase()
   const db = getDb()
-  const [identityAsset, addressAsset] = await Promise.all([
-    getStorageProvider().upload({ filename: identityFile.name, contentType: identityFile.type, body: Buffer.from(await identityFile.arrayBuffer()), visibility: 'private' }),
-    getStorageProvider().upload({ filename: addressFile.name, contentType: addressFile.type, body: Buffer.from(await addressFile.arrayBuffer()), visibility: 'private' }),
-  ])
+  const maybeUpload = async (file: File | null) => {
+    if (!file || file.size === 0) return null
+    const ok = ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type) && file.size <= 5 * 1024 * 1024
+    if (!ok) throw new Error('invalid-doc')
+    return getStorageProvider().upload({ filename: file.name, contentType: file.type, body: Buffer.from(await file.arrayBuffer()), visibility: 'private' })
+  }
+  let identityAsset: Awaited<ReturnType<typeof maybeUpload>> = null
+  let addressAsset: Awaited<ReturnType<typeof maybeUpload>> = null
+  try {
+    ;[identityAsset, addressAsset] = await Promise.all([maybeUpload(identityFile), maybeUpload(addressFile)])
+  } catch {
+    return NextResponse.json({ error: 'Los documentos deben ser PDF, JPG o PNG y no superar 5 MB.' }, { status: 400 })
+  }
 
   await db.insert(adoptionApplications).values({
     id: randomUUID(),
@@ -87,8 +92,8 @@ export async function POST(request: Request) {
     experience,
     customResponses: payload?.customResponses,
     documents: [
-      { type: 'Identificación oficial', name: identityFile.name, key: identityAsset.key, url: identityAsset.url, uploadedAt: new Date().toISOString() },
-      { type: 'Comprobante de domicilio', name: addressFile.name, key: addressAsset.key, url: addressAsset.url, uploadedAt: new Date().toISOString() },
+      ...(identityAsset ? [{ type: 'Identificación oficial', name: identityFile!.name, key: identityAsset.key, url: identityAsset.url, uploadedAt: new Date().toISOString() }] : []),
+      ...(addressAsset ? [{ type: 'Comprobante de domicilio', name: addressFile!.name, key: addressAsset.key, url: addressAsset.url, uploadedAt: new Date().toISOString() }] : []),
     ],
   })
 
