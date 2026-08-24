@@ -57,8 +57,8 @@ export default function NosotrosPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="overflow-hidden rounded-[2rem] bg-secondary">
-          <img src={storyImageUrl} alt={storyTitle} className="h-[420px] w-full object-cover sm:h-[480px]" />
+        <div className="overflow-hidden rounded-[2rem] bg-card">
+          <img src={storyImageUrl} alt={storyTitle} className="h-full min-h-[420px] w-full object-cover sm:min-h-[520px]" />
         </div>
         <div className="flex flex-col gap-6">
           <div className="rounded-[2rem] border border-foreground/10 bg-card p-7 sm:p-8">
@@ -67,13 +67,16 @@ export default function NosotrosPage() {
             {storyParagraphs.map((p, i) => (
               <p key={i} className="mt-4 leading-7 text-muted-foreground">{p}</p>
             ))}
-            {(site.settings.address || site.settings.city) && (
-              <p className="mt-6 flex items-center gap-2 text-sm font-medium"><span className="grid size-7 place-items-center rounded-full bg-accent"><Check className="size-4" /></span>{site.settings.address}{site.settings.city ? `, ${site.settings.city}` : ''}</p>
-            )}
+            {(() => {
+              const loc = [site.settings.address, site.settings.city].filter(Boolean).join(', ')
+              if (!loc) return null
+              // no mostrar estado duplicado Ciudad de México si ya está en city
+              return <p className="mt-6 flex items-center gap-2 text-sm font-medium"><span className="grid size-7 place-items-center rounded-full bg-accent"><Check className="size-4" /></span>{loc}</p>
+            })()}
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <div className="rounded-2xl bg-primary p-5 text-primary-foreground"><p className="text-3xl font-semibold tracking-tight">{site.pets.length}</p><p className="mt-1 text-xs leading-4 opacity-70">rescatados registrados</p></div>
-            <div className="rounded-2xl bg-accent p-5 text-accent-foreground"><p className="text-3xl font-semibold tracking-tight">{adopted}</p><p className="mt-1 text-xs leading-4 opacity-70">adopciones felices</p></div>
+            <div className="rounded-2xl border border-foreground/10 bg-card p-5"><p className="text-3xl font-semibold tracking-tight">{site.pets.length}</p><p className="mt-1 text-xs leading-4 text-muted-foreground">rescatados registrados</p></div>
+            <div className="rounded-2xl border border-foreground/10 bg-card p-5"><p className="text-3xl font-semibold tracking-tight">{adopted}</p><p className="mt-1 text-xs leading-4 text-muted-foreground">adopciones felices</p></div>
             <div className="rounded-2xl border border-foreground/10 bg-card p-5"><p className="text-3xl font-semibold tracking-tight">{active}</p><p className="mt-1 text-xs leading-4 text-muted-foreground">en cuidado activo</p></div>
           </div>
         </div>
