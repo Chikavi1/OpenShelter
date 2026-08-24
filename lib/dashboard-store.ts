@@ -74,6 +74,7 @@ function normalizeSettingsRow(settings: Omit<typeof shelterSettings.$inferSelect
     ...settings,
     adoptionFormFields: settings.adoptionFormFields as CustomFormField[],
     fosterFormFields: settings.fosterFormFields as CustomFormField[],
+    aboutContent: (settings as any).aboutContent ?? DEFAULT_DASHBOARD_STATE.settings.aboutContent,
   }
 }
 

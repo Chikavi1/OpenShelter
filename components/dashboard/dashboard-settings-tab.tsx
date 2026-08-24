@@ -86,6 +86,17 @@ export function DashboardSettingsTab() {
         >
           <Icons.Scale className="size-3.5" /> Contrato & Reglamento
         </button>
+
+        <button
+          onClick={() => setSettingsSection('about')}
+          className={`flex shrink-0 snap-start whitespace-nowrap items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition ${
+            settingsSection === 'about'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-card text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Icons.Info className="size-3.5" /> Sobre nosotros
+        </button>
       </div>
 
       {/* Notification Banner */}
@@ -584,6 +595,116 @@ export function DashboardSettingsTab() {
                 className="rounded-xl border border-foreground/15 bg-background p-4 text-xs font-mono leading-relaxed outline-none focus:border-foreground resize-none"
               />
             </label>
+          </div>
+        )}
+
+        {/* 6. Sobre Nosotros - Editable */}
+        {settingsSection === 'about' && (
+          <div className="space-y-6">
+            <div className="bg-card border border-foreground/10 rounded-2xl p-6 sm:p-8 space-y-8 shadow-xs">
+              <div>
+                <h2 className="text-lg font-bold flex items-center gap-2"><Icons.Info className="size-5 text-primary" /> Página &quot;Nosotros&quot;</h2>
+                <p className="text-xs text-muted-foreground mt-1">Edita fácilmente títulos, textos e imagen. Los cambios se reflejan en <a href="/nosotros" target="_blank" className="underline">/nosotros</a> al guardar.</p>
+              </div>
+
+              {/* HERO */}
+              <div className="rounded-2xl border border-foreground/10 bg-background p-5 space-y-4">
+                <h3 className="text-sm font-bold flex items-center gap-2"><span className="size-2 rounded-full bg-accent" /> Hero principal</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Kicker (etiqueta pequeña)<input value={settings.aboutContent.heroKicker} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, heroKicker:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                  <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Título destacado (segundo renglón)<input value={settings.aboutContent.heroHighlight} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, heroHighlight:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                </div>
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Título principal<input value={settings.aboutContent.heroTitle} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, heroTitle:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Descripción<textarea rows={3} value={settings.aboutContent.heroDescription} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, heroDescription:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none resize-none" /></label>
+              </div>
+
+              {/* HISTORIA */}
+              <div className="rounded-2xl border border-foreground/10 bg-background p-5 space-y-4">
+                <h3 className="text-sm font-bold flex items-center gap-2"><Icons.BookOpen className="size-4 text-primary" /> Historia</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Kicker<input value={settings.aboutContent.storyKicker} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, storyKicker:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                  <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Título<input value={settings.aboutContent.storyTitle} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, storyTitle:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider">Párrafos (uno por campo)</p>
+                  {settings.aboutContent.storyParagraphs.map((para: string, idx: number)=> (
+                    <div key={idx} className="flex gap-2">
+                      <textarea rows={2} value={para} onChange={(e)=>{const n=[...settings.aboutContent.storyParagraphs]; n[idx]=e.target.value; setSettings({...settings, aboutContent:{...settings.aboutContent, storyParagraphs:n}})}} className="flex-1 rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal outline-none resize-none" placeholder={`Párrafo ${idx+1}`} />
+                      <button type="button" onClick={()=>{const n=settings.aboutContent.storyParagraphs.filter((_:string,i:number)=>i!==idx); setSettings({...settings, aboutContent:{...settings.aboutContent, storyParagraphs:n}})}} className="self-start p-2 rounded-lg hover:bg-rose-50 text-rose-600"><Icons.Trash2 className="size-4" /></button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={()=>setSettings({...settings, aboutContent:{...settings.aboutContent, storyParagraphs:[...settings.aboutContent.storyParagraphs, '']}})} className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"><Icons.Plus className="size-3.5" /> Añadir párrafo</button>
+                </div>
+                <div className="space-y-2">
+                  <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Imagen historia (URL)<input value={settings.aboutContent.storyImageUrl} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, storyImageUrl:e.target.value}})} placeholder="https://..." className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                  <div className="flex items-center gap-3">
+                    <img src={settings.aboutContent.storyImageUrl} alt="preview" className="h-20 w-32 rounded-xl object-cover border border-foreground/10" />
+                    <label className="flex items-center gap-2 rounded-xl border border-dashed border-foreground/20 px-4 py-2 text-xs font-medium cursor-pointer hover:border-primary/40 hover:text-primary">
+                      <Icons.Upload className="size-3.5" />{uploadingImage==='about'?'Subiendo…':'Subir imagen'}
+                      <input type="file" accept="image/*" className="sr-only" disabled={uploadingImage!==null} onChange={(e)=>{void handleImageUpload('about', e.target.files?.[0]); e.target.value=''}} />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* VALORES */}
+              <div className="rounded-2xl border border-foreground/10 bg-background p-5 space-y-4">
+                <h3 className="text-sm font-bold flex items-center gap-2"><Icons.Heart className="size-4 text-primary" /> Valores</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Kicker<input value={settings.aboutContent.valuesKicker} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, valuesKicker:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                  <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Título<input value={settings.aboutContent.valuesTitle} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, valuesTitle:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                </div>
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Descripción (bajo título) <textarea rows={2} value={settings.aboutContent.valuesDesc} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, valuesDesc:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none resize-none" /></label>
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider">Tarjetas de valores ({settings.aboutContent.values.length})</p>
+                  {settings.aboutContent.values.map((v: {title:string;desc:string}, idx:number)=> (
+                    <div key={idx} className="rounded-xl border border-foreground/10 bg-card p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold">Valor {idx+1}</span>
+                        <button type="button" onClick={()=>{const n=settings.aboutContent.values.filter((_:any,i:number)=>i!==idx); setSettings({...settings, aboutContent:{...settings.aboutContent, values:n}})}} className="p-1.5 rounded-lg hover:bg-rose-50 text-rose-600"><Icons.Trash2 className="size-3.5" /></button>
+                      </div>
+                      <input value={v.title} onChange={(e)=>{const n=[...settings.aboutContent.values]; n[idx]={...n[idx], title:e.target.value}; setSettings({...settings, aboutContent:{...settings.aboutContent, values:n}})}} placeholder="Título" className="w-full rounded-lg border border-foreground/15 bg-background px-3 py-2 text-sm outline-none" />
+                      <textarea rows={2} value={v.desc} onChange={(e)=>{const n=[...settings.aboutContent.values]; n[idx]={...n[idx], desc:e.target.value}; setSettings({...settings, aboutContent:{...settings.aboutContent, values:n}})}} placeholder="Descripción" className="w-full rounded-lg border border-foreground/15 bg-background px-3 py-2 text-sm outline-none resize-none" />
+                    </div>
+                  ))}
+                  <button type="button" onClick={()=>setSettings({...settings, aboutContent:{...settings.aboutContent, values:[...settings.aboutContent.values, {title:'Nuevo valor', desc:'Descripción'}]}})} className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"><Icons.Plus className="size-3.5" /> Añadir valor</button>
+                </div>
+              </div>
+
+              {/* PASOS */}
+              <div className="rounded-2xl border border-foreground/10 bg-background p-5 space-y-4">
+                <h3 className="text-sm font-bold flex items-center gap-2"><Icons.ListOrdered className="size-4 text-primary" /> Cómo trabajamos (pasos)</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Kicker<input value={settings.aboutContent.stepsKicker} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, stepsKicker:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                  <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Título<input value={settings.aboutContent.stepsTitle} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, stepsTitle:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                </div>
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Descripción<textarea rows={2} value={settings.aboutContent.stepsDesc} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, stepsDesc:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none resize-none" /></label>
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider">Pasos ({settings.aboutContent.steps.length})</p>
+                  {settings.aboutContent.steps.map((s:{n:string;title:string;desc:string}, idx:number)=> (
+                    <div key={idx} className="rounded-xl border border-foreground/10 bg-card p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold">Paso {String(idx+1).padStart(2,'0')}</span>
+                        <button type="button" onClick={()=>{const n=settings.aboutContent.steps.filter((_:any,i:number)=>i!==idx).map((x:any,i:number)=>({...x, n:String(i+1).padStart(2,'0')})); setSettings({...settings, aboutContent:{...settings.aboutContent, steps:n}})}} className="p-1.5 rounded-lg hover:bg-rose-50 text-rose-600"><Icons.Trash2 className="size-3.5" /></button>
+                      </div>
+                      <input value={s.title} onChange={(e)=>{const n=[...settings.aboutContent.steps]; n[idx]={...n[idx], title:e.target.value}; setSettings({...settings, aboutContent:{...settings.aboutContent, steps:n}})}} placeholder="Título" className="w-full rounded-lg border border-foreground/15 bg-background px-3 py-2 text-sm outline-none" />
+                      <textarea rows={2} value={s.desc} onChange={(e)=>{const n=[...settings.aboutContent.steps]; n[idx]={...n[idx], desc:e.target.value}; setSettings({...settings, aboutContent:{...settings.aboutContent, steps:n}})}} placeholder="Descripción" className="w-full rounded-lg border border-foreground/15 bg-background px-3 py-2 text-sm outline-none resize-none" />
+                    </div>
+                  ))}
+                  <button type="button" onClick={()=>setSettings({...settings, aboutContent:{...settings.aboutContent, steps:[...settings.aboutContent.steps, {n:String(settings.aboutContent.steps.length+1).padStart(2,'0'), title:'Nuevo paso', desc:'Descripción'}]}})} className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"><Icons.Plus className="size-3.5" /> Añadir paso</button>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="rounded-2xl border border-foreground/10 bg-background p-5 space-y-4">
+                <h3 className="text-sm font-bold flex items-center gap-2"><Icons.Sparkles className="size-4 text-primary" /> Bloque final (CTA)</h3>
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Kicker<input value={settings.aboutContent.ctaKicker} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, ctaKicker:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none" /></label>
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Título<textarea rows={2} value={settings.aboutContent.ctaTitle} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, ctaTitle:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none resize-none" /></label>
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider">Descripción<textarea rows={2} value={settings.aboutContent.ctaDesc} onChange={(e)=>setSettings({...settings, aboutContent:{...settings.aboutContent, ctaDesc:e.target.value}})} className="rounded-xl border border-foreground/15 bg-card px-3 py-2 text-sm font-normal normal-case tracking-normal outline-none resize-none" /></label>
+              </div>
+
+              <p className="text-xs text-muted-foreground">Tip: usa títulos cortos y descripciones de 1–2 líneas. Máximo 4 valores y 4 pasos para que se vea equilibrado. Guarda para ver cambios al instante.</p>
+            </div>
           </div>
         )}
 
