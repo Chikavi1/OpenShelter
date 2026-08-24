@@ -372,6 +372,7 @@ const createEmptyEventForm = (): Omit<ShelterEvent, 'id'> => ({
   contactName: '',
   contactPhone: '',
   registrationLink: '',
+  ctaLabel: 'Registrarme',
   description: '',
   notes: '',
 })
@@ -879,6 +880,7 @@ export default function DashboardPage() {
       contactName: newEvent.contactName.trim(),
       contactPhone: newEvent.contactPhone.trim(),
       registrationLink: newEvent.registrationLink.trim(),
+      ctaLabel: (newEvent.ctaLabel || 'Registrarme').trim(),
       description: newEvent.description.trim(),
       notes: newEvent.notes.trim(),
     }

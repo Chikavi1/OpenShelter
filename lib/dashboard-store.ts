@@ -91,7 +91,7 @@ function normalizeFollowUpRow(followUp: Omit<typeof adoptionFollowUps.$inferSele
 }
 
 function normalizeEventRow(event: Omit<typeof shelterEvents.$inferSelect, 'createdAt' | 'updatedAt'>): ShelterEvent {
-  return { ...event, image: event.image || '/events.png', latitude: event.latitude || 19.4326, longitude: event.longitude || -99.1332 }
+  return { ...event, image: event.image || '/events.png', latitude: event.latitude || 19.4326, longitude: event.longitude || -99.1332, ctaLabel: (event as any).ctaLabel || 'Registrarme' }
 }
 
 export async function loadDashboardState() {

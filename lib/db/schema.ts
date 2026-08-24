@@ -148,6 +148,7 @@ export const shelterEvents = pgTable('shelter_events', {
   contactName: text('contact_name').notNull(),
   contactPhone: text('contact_phone').notNull(),
   registrationLink: text('registration_link').notNull(),
+  ctaLabel: text('cta_label').notNull().default('Registrarme'),
   description: text('description').notNull(),
   notes: text('notes').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

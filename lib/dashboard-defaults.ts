@@ -147,6 +147,7 @@ export interface ShelterEvent {
   contactName: string
   contactPhone: string
   registrationLink: string
+  ctaLabel: string
   description: string
   notes: string
 }
@@ -383,6 +384,7 @@ export const DEFAULT_DASHBOARD_STATE: DashboardState = {
       contactName: 'Laura Pérez',
       contactPhone: '5554443322',
       registrationLink: 'https://example.com/eventos/adopcion',
+      ctaLabel: 'Registrarme',
       description: 'Evento para presentar mascotas en adopción, recibir donaciones y sumar voluntarios al refugio.',
       notes: 'Confirmar carpa, mesas y permisos con administración del parque.',
     },
