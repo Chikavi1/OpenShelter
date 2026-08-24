@@ -56,7 +56,7 @@ async function main() {
   const appName = isYes ? exampleDefaults.NEXT_PUBLIC_APP_NAME || 'Refugio Huellas' : await ask('Nombre del refugio', exampleDefaults.NEXT_PUBLIC_APP_NAME || 'Refugio Huellas', { required: true })
   const contactEmail = isYes ? exampleDefaults.NEXT_PUBLIC_CONTACT_EMAIL || 'contacto@refugiohuellas.org' : await ask('Email público de contacto', exampleDefaults.NEXT_PUBLIC_CONTACT_EMAIL || 'contacto@refugiohuellas.org')
   const contactPhone = isYes ? exampleDefaults.NEXT_PUBLIC_CONTACT_PHONE || '+52 55 1234 5678' : await ask('Teléfono público', exampleDefaults.NEXT_PUBLIC_CONTACT_PHONE || '+52 55 1234 5678')
-  const contactAddress = isYes ? exampleDefaults.NEXT_PUBLIC_CONTACT_ADDRESS || 'Calle del Amor 123, CDMX' : await ask('Dirección pública', exampleDefaults.NEXT_PUBLIC_CONTACT_ADDRESS || 'Calle del Amor 123, CDMX')
+  const contactAddress = isYes ? exampleDefaults.NEXT_PUBLIC_CONTACT_ADDRESS || 'Calle del Amor 123' : await ask('Dirección pública', exampleDefaults.NEXT_PUBLIC_CONTACT_ADDRESS || 'Calle del Amor 123')
   const contactHours = isYes ? exampleDefaults.NEXT_PUBLIC_CONTACT_HOURS || 'Lun-Sáb 10:00-17:00' : await ask('Horario de visitas', exampleDefaults.NEXT_PUBLIC_CONTACT_HOURS || 'Lun-Sáb 10:00-17:00')
 
   // === 2. Base de datos y auth ===

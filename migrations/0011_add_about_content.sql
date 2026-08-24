@@ -8,7 +8,7 @@ ALTER TABLE shelter_settings ADD COLUMN IF NOT EXISTS about_content jsonb NOT NU
   "storyTitle": "De un rescate a una red de apoyo",
   "storyParagraphs": [
     "Empezamos rescatando a uno. Hoy somos una comunidad de voluntarios, veterinarios, hogares temporales y familias que han decidido que ningún animal se quede atrás. Cada caso nos enseña que con cuidado, paciencia y compromiso, una vida puede cambiar por completo.",
-    "Trabajamos en CDMX y colaboramos con hogares temporales en toda la zona metropolitana. Todo lo que hacemos se sostiene con donativos y trabajo voluntario."
+    "Colaboramos con hogares temporales en toda la zona metropolitana. Todo lo que hacemos se sostiene con donativos y trabajo voluntario."
   ],
   "valuesKicker": "Lo que nos mueve",
   "valuesTitle": "Nuestros valores",

@@ -266,7 +266,7 @@ const INITIAL_SETTINGS: ShelterSettings = {
     storyImageUrl: 'https://images.unsplash.com/photo-1636604244109-7b26dd38dd91?q=80&w=880&auto=format&fit=crop',
     storyKicker: 'Nuestra historia',
     storyTitle: 'De un rescate a una red de apoyo',
-    storyParagraphs: ['Empezamos rescatando a uno. Hoy somos una comunidad de voluntarios, veterinarios, hogares temporales y familias que han decidido que ningún animal se quede atrás. Cada caso nos enseña que con cuidado, paciencia y compromiso, una vida puede cambiar por completo.', 'Trabajamos en CDMX y colaboramos con hogares temporales en toda la zona metropolitana. Todo lo que hacemos se sostiene con donativos y trabajo voluntario.'],
+    storyParagraphs: ['Empezamos rescatando a uno. Hoy somos una comunidad de voluntarios, veterinarios, hogares temporales y familias que han decidido que ningún animal se quede atrás. Cada caso nos enseña que con cuidado, paciencia y compromiso, una vida puede cambiar por completo.', 'Colaboramos con hogares temporales y aliados. Todo lo que hacemos se sostiene con donativos y trabajo voluntario.'],
     valuesKicker: 'Lo que nos mueve',
     valuesTitle: 'Nuestros valores',
     valuesDesc: 'No somos un albergue masivo. Somos una red pequeña que hace las cosas con cuidado, para que cada adopción dure para siempre.',
@@ -320,7 +320,7 @@ const createEmptyFosterForm = () => ({
   email: '',
   phone: '',
   address: '',
-  city: 'CDMX',
+  city: '',
   homeType: 'Casa' as 'Casa' | 'Departamento' | 'Finca',
   yard: true,
   preferredSpecies: 'Cualquiera' as 'Perros' | 'Gatos' | 'Cualquiera',
@@ -697,7 +697,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!hydrated || editingPet || activeTab !== 'register-pet') return
     const expected = getDefaultPetLocation(settings)
-    if (newPet.location === 'Ubicación del refugio' || newPet.location === 'CDMX (Refugio Central)') {
+    if (newPet.location === 'Ubicación del refugio' || newPet.location === 'Refugio Central') {
       setNewPet((prev) => ({ ...prev, location: expected }))
     }
   }, [settings, hydrated, editingPet, activeTab, newPet.location])

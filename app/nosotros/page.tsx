@@ -25,7 +25,7 @@ export default function NosotrosPage() {
   const storyTitle = about?.storyTitle ?? 'De un rescate a una red de apoyo'
   const storyParagraphs: string[] = about?.storyParagraphs ?? [
     'Empezamos rescatando a uno. Hoy somos una comunidad de voluntarios, veterinarios, hogares temporales y familias que han decidido que ningún animal se quede atrás.',
-    'Trabajamos en CDMX y colaboramos con hogares temporales en toda la zona metropolitana.',
+    'Colaboramos con hogares temporales y aliados.',
   ]
   const valuesKicker = about?.valuesKicker ?? 'Lo que nos mueve'
   const valuesTitle = about?.valuesTitle ?? 'Nuestros valores'
