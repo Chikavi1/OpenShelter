@@ -1,88 +1,72 @@
-export const dynamic = 'force-dynamic'
 import { ImageResponse } from 'next/og'
-import { eq } from 'drizzle-orm'
-import { getDb } from '@/lib/db/client'
-import { shelterSettings } from '@/lib/db/schema'
-import { getStorageProvider } from '@/lib/storage'
-export const alt = 'Donativos - Key Rescata'
+
+export const alt = 'Donar - Key Rescata'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-async function toDataUri(url: string, siteUrl: string): Promise<string | null> {
-  if (!url) return null
-  if (url.startsWith('data:')) return url
-  if (url.startsWith('/uploads/')) {
-    try {
-      const key = url.replace(/^\/uploads\//, '')
-      const buf = (await getStorageProvider().read(key)) as unknown as Buffer
-      const ext = key.split('.').pop()?.toLowerCase() || 'jpeg'
-      const mime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg'
-      return `data:${mime};base64,${buf.toString('base64')}`
-    } catch { return null }
-  }
-  try {
-    const full = url.startsWith('http') ? url : `${siteUrl}${url.startsWith('/') ? '' : '/'}${url}`
-    const res = await fetch(full, { signal: AbortSignal.timeout(2500) } as any)
-    if (!res.ok) return null
-    const ct = res.headers.get('content-type') || 'image/jpeg'
-    const ab = await res.arrayBuffer()
-    return `data:${ct};base64,${Buffer.from(ab).toString('base64')}`
-  } catch { return null }
-}
-
-export default async function Image() {
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://keyrescata.netlify.app').replace(/\/$/, '')
-  let appName = process.env.NEXT_PUBLIC_APP_NAME || 'Key Rescata'
-  let logoUrl: string | null = process.env.NEXT_PUBLIC_LOGO_URL || null
-  let supportTitle = 'Tu ayuda se convierte en patitas.'
-  try {
-    const db = getDb()
-    const r = await db.select({ name: shelterSettings.name, logoUrl: shelterSettings.logoUrl, supportTitle: shelterSettings.supportTitle }).from(shelterSettings).where(eq(shelterSettings.id, 1)).limit(1)
-    if (r[0]?.name) appName = r[0].name
-    if (r[0]?.logoUrl) logoUrl = r[0].logoUrl
-    if (r[0]?.supportTitle) supportTitle = r[0].supportTitle
-  } catch {}
-  const logoData = logoUrl ? await toDataUri(logoUrl, siteUrl) : null
-  const heroData = await toDataUri('https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1100&q=80', siteUrl)
+export default function Image() {
   return new ImageResponse(
     (
-      <div style={{ display: 'flex', width: '100%', height: '100%', background: '#F4F1DE' }}>
-        <div style={{ display: 'flex', width: '55%', height: '100%', position: 'relative', background: '#3D405B', overflow: 'hidden' }}>
-          {heroData ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={heroData} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <div style={{ display: 'flex', width: '100%', height: '100%', background: '#3D405B', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: 96, height: 96, borderRadius: 999, background: '#E07A5F' }} />
-            </div>
-          )}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(61,64,91,0.72))' }} />
-          <div style={{ position: 'absolute', bottom: 28, left: 32, right: 32, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <span style={{ display: 'flex', background: '#F2CC8F', color: '#3D405B', fontSize: 11, fontWeight: 800, padding: '6px 12px', borderRadius: 999 }}>100% al rescate</span>
-            <p style={{ color: 'white', fontSize: 14, fontWeight: 700, marginTop: 0, marginBottom: 0 }}>Donativos transparentes - Cada peso cuenta</p>
+      <div
+        style={{
+          display: 'flex',
+          width: '100%',
+          height: '100%',
+          background: '#3D405B',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 40,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'white',
+            borderRadius: 32,
+            padding: '48px 64px',
+            gap: 16,
+          }}
+        >
+          {/* Icono simple: circulo con corazon */}
+          <div
+            style={{
+              display: 'flex',
+              width: 96,
+              height: 96,
+              borderRadius: 999,
+              background: '#E07A5F',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{ fontSize: 48, color: 'white', fontWeight: 900, lineHeight: 1 }}>$</span>
           </div>
-          {logoData && (
-            <div style={{ position: 'absolute', top: 24, left: 24, display: 'flex', alignItems: 'center', gap: 10, background: 'white', padding: '8px 14px', borderRadius: 999 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={logoData} alt="" style={{ width: 36, height: 36, borderRadius: 999 }} />
-              <span style={{ fontSize: 14, fontWeight: 800, color: '#3D405B' }}>{appName}</span>
-            </div>
-          )}
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', width: '45%', height: '100%', padding: '36px 32px', background: '#F4F1DE', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#E07A5F' }}>Donativos y apoyo</span>
-            <h1 style={{ fontSize: 40, fontWeight: 900, color: '#3D405B', marginTop: 0, marginBottom: 0 }}>{supportTitle}</h1>
-            <p style={{ fontSize: 14, color: '#3D405B', marginTop: 4, marginBottom: 0 }}>Elige transferencia, PayPal o lo que prefieras. Transparencia total, directo al rescate.</p>
-            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-              <span style={{ background: '#E07A5F', color: 'white', fontSize: 12, fontWeight: 700, padding: '8px 14px', borderRadius: 999 }}>Donar ahora</span>
-              <span style={{ background: 'white', color: '#3D405B', fontSize: 12, fontWeight: 700, padding: '8px 14px', borderRadius: 999 }}>Transferencia - PayPal</span>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'white', borderRadius: 16, padding: '12px 14px' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#3D405B' }}>keyrescata.netlify.app/donar</span>
-            <span style={{ background: '#3D405B', color: 'white', fontSize: 12, fontWeight: 700, padding: '8px 14px', borderRadius: 999 }}>Yo ayudo</span>
-          </div>
+          <span
+            style={{
+              fontSize: 48,
+              fontWeight: 900,
+              color: '#3D405B',
+              lineHeight: 1,
+            }}
+          >
+            Donar
+          </span>
+          <span style={{ fontSize: 18, color: '#6B7280', fontWeight: 600 }}>Key Rescata</span>
+          <span
+            style={{
+              fontSize: 14,
+              color: '#3D405B',
+              background: '#F4F1DE',
+              padding: '8px 16px',
+              borderRadius: 999,
+              fontWeight: 700,
+            }}
+          >
+            keyrescata.netlify.app/donar
+          </span>
         </div>
       </div>
     ),
