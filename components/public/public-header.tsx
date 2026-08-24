@@ -46,7 +46,7 @@ export function PublicHeader({ appName, logoUrl, loading = false }: PublicHeader
           <a href="/donar" className="transition-colors hover:text-foreground">Donativos</a>
           <a href="/eventos" className="transition-colors hover:text-foreground">Eventos</a>
         </nav>
-        <a href="/#formulario" className="hidden rounded-full border border-foreground/20 px-5 py-2 text-sm font-medium transition hover:bg-accent hover:text-accent-foreground sm:block">Quiero adoptar</a>
+        <a href="/catalogo" className="hidden rounded-full bg-accent px-5 py-2 text-sm font-medium text-accent-foreground shadow-sm transition hover:opacity-90 sm:block">Quiero adoptar</a>
         <button type="button" aria-label="Abrir menú" aria-expanded={menuOpen} className="grid size-9 place-items-center rounded-full border border-foreground/10 bg-card text-foreground shadow-sm transition hover:bg-secondary md:hidden" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}</button>
       </div>
 
@@ -79,7 +79,7 @@ export function PublicHeader({ appName, logoUrl, loading = false }: PublicHeader
                 ))}
               </nav>
               <div className="p-3 pt-0">
-                <a href="/#formulario" onClick={closeMenu} className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90">
+                <a href="/catalogo" onClick={closeMenu} className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90">
                   Quiero adoptar <ArrowRight className="size-4" />
                 </a>
                 <p className="mt-3 text-center text-xs text-muted-foreground">Rescate y adopción responsable</p>

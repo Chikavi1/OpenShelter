@@ -83,16 +83,15 @@ export function PetProfileSections({ pet, appName }: PetProfileSectionsProps) {
 
         <div className="lg:pt-3">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Conoce a tu nueva mejor {companionWord}</p>
-          <h1 className="mt-4 text-6xl font-semibold tracking-[-0.07em] sm:text-8xl">{petName}</h1>
-          <p className="mt-5 max-w-lg text-lg leading-8 text-muted-foreground">{pet.breed} noble y cariñoso que está listo para llenar tu casa de juegos, paseos y mucho amor.</p>
-          <div className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/10 sm:grid-cols-4">
+           <h1 className="mt-4 text-6xl font-semibold tracking-[-0.07em] sm:text-8xl">{petName}</h1>
+           <div className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/10 sm:grid-cols-4">
             <Stat label="Edad" value={pet.age} /><Stat label="Tamaño" value={pet.size} /><Stat label="Sexo" value={pet.gender} /><Stat label="Ubicación" value={pet.location} />
           </div>
           <div className="mt-9 flex flex-wrap gap-2">{pet.personality.slice(0, 4).map((tag) => <span key={tag} className="rounded-full border border-foreground/15 px-4 py-2 text-sm">{tag}</span>)}</div>
           <div className="mt-10 border-t border-foreground/10 pt-8"><h2 className="text-2xl font-semibold">Su historia</h2><p className="mt-3 leading-7 text-muted-foreground">{pet.story}</p></div>
           <div className="mt-8 flex items-center gap-3 text-sm text-muted-foreground"><ShieldCheck className="size-5 text-accent-foreground" /> {pet.health.join(' · ')}</div>
           <div className="mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
-            <ShareButtons title={isAdopted ? `${petName} ya fue adoptado en ${appName}` : `${petName} en adopción en ${appName}`} text={isAdopted ? `¡${petName} ya encontró hogar en ${appName}! Conoce su historia.` : `¡Conoce a ${petName}! ${pet.breed} en adopción en ${appName}. ¡Ayúdame a encontrarle hogar!`} />
+            <ShareButtons title={`${petName} | ${appName}`} text={`¡Conoce a ${petName}! En adopción en ${appName}.`} />
           </div>
         </div>
       </section>
