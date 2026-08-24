@@ -20,8 +20,8 @@ export default async function Image(){
     <div style={{display:'flex',width:'100%',height:'100%',background:'#F4F1DE'}}>
       <div style={{display:'flex',width:'54%',height:'100%',position:'relative',background:'#81B29A',overflow:'hidden'}}>
         {heroData?<img src={heroData} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}}/>:<div style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:'100%'}}><span style={{fontSize:80}}>🏠</span></div>}
-        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(61,64,91,0.55) 100%)' as any}}/>
-        {logoData && <div style={{position:'absolute',top:24,left:24,display:'flex',alignItems:'center',gap:10,background:'rgba(255,255,255,0.96)',padding:'8px 14px',borderRadius:999}}><img src={logoData} alt="" style={{width:36,height:36,borderRadius:999,objectFit:'cover',objectPosition:'center 30%' as any}}/><span style={{fontSize:14,fontWeight:800,color:'#3D405B'}}>{appName}</span></div>}
+        <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(61,64,91,0.55) 100%)' as any}}/>
+        {logoData && <div style={{position:'absolute',top:24,left:24,display:'flex',alignItems:'center',gap:10,background:'rgba(255,255,255,0.96)',padding:'8px 14px',borderRadius:999}}><img src={logoData} alt="" style={{width:36,height:36,borderRadius:999,objectFit:'cover'}}/><span style={{fontSize:14,fontWeight:800,color:'#3D405B'}}>{appName}</span></div>}
       </div>
       <div style={{display:'flex',flexDirection:'column',width:'46%',height:'100%',padding:'36px 32px',justifyContent:'space-between'}}>
         <div style={{display:'flex',flexDirection:'column',gap:12}}>

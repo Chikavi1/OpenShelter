@@ -51,7 +51,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     (
       <div style={{ width: '1200px', height: '630px', display: 'flex', background: '#3D405B', color: 'white', fontFamily: 'sans-serif', overflow: 'hidden' }}>
         <div style={{ width: '640px', height: '630px', display: 'flex', background: '#F2CC8F', overflow: 'hidden' }}>
-          {image ? <img src={image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '100px' }}>🎉</div>}
+          {image ? <img src={image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '100px' }}></div>}
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '40px 44px', justifyContent: 'space-between', background: '#3D405B' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>

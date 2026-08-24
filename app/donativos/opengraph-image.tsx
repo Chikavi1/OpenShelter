@@ -24,20 +24,20 @@ export default async function Image() {
   return new ImageResponse((
     <div style={{ display:'flex', width:'100%', height:'100%', background:'#F4F1DE' }}>
       <div style={{ display:'flex', width:'55%', height:'100%', position:'relative', background:'#3D405B', overflow:'hidden' }}>
-        {heroData?<img src={heroData} alt="" style={{width:'100%',height:'100%',objectFit:'cover',opacity:0.95}}/>:<div style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:'100%'}}><span style={{fontSize:96}}>💛</span></div>}
-        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(61,64,91,0.75) 100%)' as any}}/>
+        {heroData?<img src={heroData} alt="" style={{width:'100%',height:'100%',objectFit:'cover',opacity:0.95}}/>:<div style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:'100%'}}><span style={{fontSize:96}}></span></div>}
+        <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(61,64,91,0.75) 100%)' as any}}/>
         <div style={{position:'absolute',bottom:28,left:32,right:32, display:'flex', flexDirection:'column', gap:8}}>
-          <span style={{display:'inline-flex',alignSelf:'flex-start',background:'#F2CC8F',color:'#3D405B',fontSize:11,fontWeight:800,letterSpacing:1,padding:'6px 12px',borderRadius:999}}>💛 100% al rescate</span>
+          <span style={{display:'inline-flex',alignSelf:'flex-start',background:'#F2CC8F',color:'#3D405B',fontSize:11,fontWeight:800,letterSpacing:1,padding:'6px 12px',borderRadius:999}}> 100% al rescate</span>
           <p style={{color:'white',fontSize:14, fontWeight:700, margin:0}}>Donativos transparentes · Cada peso cuenta</p>
         </div>
-        {logoData && <div style={{position:'absolute',top:24,left:24,display:'flex',alignItems:'center',gap:10,background:'rgba(255,255,255,0.96)',padding:'8px 14px',borderRadius:999}}><img src={logoData} alt="" style={{width:36,height:36,borderRadius:999,objectFit:'cover',objectPosition:'center 30%' as any}}/><span style={{fontSize:14,fontWeight:800,color:'#3D405B'}}>{appName}</span></div>}
+        {logoData && <div style={{position:'absolute',top:24,left:24,display:'flex',alignItems:'center',gap:10,background:'rgba(255,255,255,0.96)',padding:'8px 14px',borderRadius:999}}><img src={logoData} alt="" style={{width:36,height:36,borderRadius:999,objectFit:'cover'}}/><span style={{fontSize:14,fontWeight:800,color:'#3D405B'}}>{appName}</span></div>}
       </div>
       <div style={{display:'flex',flexDirection:'column',width:'45%',height:'100%',padding:'36px 32px',background:'#F4F1DE',justifyContent:'space-between'}}>
         <div style={{display:'flex',flexDirection:'column',gap:12}}>
           <span style={{fontSize:11,fontWeight:700,letterSpacing:2,color:'#E07A5F',textTransform:'uppercase' as any}}>Donativos y apoyo</span>
           <h1 style={{fontSize:40,fontWeight:900,lineHeight:0.92,letterSpacing:-1.2,color:'#3D405B',margin:0}}>{supportTitle}</h1>
           <p style={{fontSize:14,lineHeight:1.6,color:'#3D405B',opacity:0.7,margin:'4px 0 0 0'}}>Elige transferencia, PayPal o lo que prefieras. Transparencia total, directo al rescate.</p>
-          <div style={{display:'flex',gap:8,marginTop:8}}><span style={{background:'#E07A5F',color:'white',fontSize:12,fontWeight:700,padding:'8px 14px',borderRadius:999}}>🧡 Donar ahora</span><span style={{background:'white',border:'1px solid rgba(61,64,91,0.12)',color:'#3D405B',fontSize:12,fontWeight:700,padding:'8px 14px',borderRadius:999}}>Transferencia · PayPal</span></div>
+          <div style={{display:'flex',gap:8,marginTop:8}}><span style={{background:'#E07A5F',color:'white',fontSize:12,fontWeight:700,padding:'8px 14px',borderRadius:999}}> Donar ahora</span><span style={{background:'white',border:'1px solid rgba(61,64,91,0.12)',color:'#3D405B',fontSize:12,fontWeight:700,padding:'8px 14px',borderRadius:999}}>Transferencia · PayPal</span></div>
         </div>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',background:'white',borderRadius:16,padding:'12px 14px'}}>
           <span style={{fontSize:11,fontWeight:700,color:'#3D405B',opacity:0.6}}>keyrescata.netlify.app/donar</span>

@@ -43,13 +43,13 @@ export default async function Image() {
     (
       <div style={{ display: 'flex', width: '100%', height: '100%', background: '#F4F1DE', fontFamily: 'Inter, sans-serif' }}>
         <div style={{ display: 'flex', width: '58%', height: '100%', position: 'relative', background: '#111827', overflow: 'hidden' }}>
-          {heroData ? <img src={heroData} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.92 }} /> : <div style={{ display:'flex', alignItems:'center', justifyContent:'center', width:'100%', height:'100%', background:'#111827'}}><span style={{ fontSize:96 }}>🐾</span></div>}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.65) 100%)' }} />
+          {heroData ? <img src={heroData} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.92 }} /> : <div style={{ display:'flex', alignItems:'center', justifyContent:'center', width:'100%', height:'100%', background:'#111827'}}><span style={{ fontSize:96 }}></span></div>}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.65) 100%)' }} />
           <div style={{ position: 'absolute', bottom: 28, left: 32, right: 32, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <span style={{ display:'inline-flex', alignSelf:'flex-start', background:'rgba(255,255,255,0.95)', color:'#111827', fontSize:11, fontWeight:700, letterSpacing:1.2, padding:'6px 12px', borderRadius:999, textTransform:'uppercase' as any }}>{petsCount} patitas · {adoptedCount} adopciones felices</span>
             <p style={{ color:'white', fontSize:13, lineHeight:1.4, opacity:0.92, margin:0 }}>Huellas que se convierten en familia</p>
           </div>
-          {logoData && <div style={{ position:'absolute', top:24, left:24, display:'flex', alignItems:'center', gap:10, background:'rgba(255,255,255,0.96)', padding:'8px 14px', borderRadius:999, boxShadow:'0 4px 12px rgba(0,0,0,0.15)' }}><img src={logoData} alt="" style={{ width:36, height:36, borderRadius:999, objectFit:'cover', objectPosition:'center 30%' as any }} /><span style={{ fontSize:14, fontWeight:800, color:'#111827' }}>{appName}</span></div>}
+          {logoData && <div style={{ position:'absolute', top:24, left:24, display:'flex', alignItems:'center', gap:10, background:'rgba(255,255,255,0.96)', padding:'8px 14px', borderRadius:999, boxShadow:'0 4px 12px rgba(0,0,0,0.15)' }}><img src={logoData} alt="" style={{ width:36, height:36, borderRadius:999, objectFit:'cover',  }} /><span style={{ fontSize:14, fontWeight:800, color:'#111827' }}>{appName}</span></div>}
         </div>
         <div style={{ display:'flex', flexDirection:'column', width:'42%', height:'100%', padding:'36px 32px', background:'#F4F1DE', justifyContent:'space-between' }}>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
@@ -57,7 +57,7 @@ export default async function Image() {
             <h1 style={{ fontSize:44, fontWeight:900, lineHeight:0.95, letterSpacing:-1.5, color:'#3D405B', margin:0 }}>{appName}</h1>
             <p style={{ fontSize:15, lineHeight:1.6, color:'#3D405B', opacity:0.75, margin:'4px 0 0 0' }}>El amor no se compra. Rescata, adopta y dale una segunda oportunidad a una vida.</p>
             <div style={{ display:'flex', gap:8, marginTop:10 }}>
-              <span style={{ background:'#81B29A', color:'white', fontSize:12, fontWeight:700, padding:'8px 14px', borderRadius:999 }}>🐾 Adoptar</span>
+              <span style={{ background:'#81B29A', color:'white', fontSize:12, fontWeight:700, padding:'8px 14px', borderRadius:999 }}> Adoptar</span>
               <span style={{ background:'white', color:'#3D405B', border:'1px solid rgba(61,64,91,0.12)', fontSize:12, fontWeight:700, padding:'8px 14px', borderRadius:999 }}>{petsCount} en adopción</span>
             </div>
           </div>

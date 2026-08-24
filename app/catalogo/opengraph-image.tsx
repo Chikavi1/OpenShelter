@@ -19,9 +19,9 @@ export default async function Image(){
   return new ImageResponse((
     <div style={{display:'flex',width:'100%',height:'100%',background:'#F4F1DE',padding:0}}>
       <div style={{display:'flex',width:'58%',height:'100%',background:'#3D405B',position:'relative',overflow:'hidden', flexWrap:'wrap' as any, gap:0}}>
-        {petDatas.filter(Boolean).length ? petDatas.filter(Boolean).map((d,i)=> <img key={i} src={d!} alt="" style={{width:i===0?'100%':'50%',height:i===0?'60%':'40%',objectFit:'cover'}}/>) : <div style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:'100%'}}><span style={{fontSize:80}}>🐾</span></div>}
-        <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(61,64,91,0.6) 100%)' as any}}/>
-        {logoData && <div style={{position:'absolute',top:24,left:24,display:'flex',alignItems:'center',gap:10,background:'rgba(255,255,255,0.96)',padding:'8px 14px',borderRadius:999}}><img src={logoData} alt="" style={{width:36,height:36,borderRadius:999,objectFit:'cover',objectPosition:'center 30%' as any}}/><span style={{fontSize:14,fontWeight:800,color:'#3D405B'}}>{appName}</span></div>}
+        {petDatas.filter(Boolean).length ? petDatas.filter(Boolean).map((d,i)=> <img key={i} src={d!} alt="" style={{width:i===0?'100%':'50%',height:i===0?'60%':'40%',objectFit:'cover'}}/>) : <div style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:'100%'}}><span style={{fontSize:80}}></span></div>}
+        <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(61,64,91,0.6) 100%)' as any}}/>
+        {logoData && <div style={{position:'absolute',top:24,left:24,display:'flex',alignItems:'center',gap:10,background:'rgba(255,255,255,0.96)',padding:'8px 14px',borderRadius:999}}><img src={logoData} alt="" style={{width:36,height:36,borderRadius:999,objectFit:'cover'}}/><span style={{fontSize:14,fontWeight:800,color:'#3D405B'}}>{appName}</span></div>}
         <div style={{position:'absolute',bottom:24,left:28,right:28,display:'flex',flexDirection:'column',gap:6}}>
           <span style={{display:'inline-flex',alignSelf:'flex-start',background:'white',color:'#3D405B',fontSize:11,fontWeight:800,padding:'6px 12px',borderRadius:999}}>{images.length?`${images.length}+ patitas esperando`:'Adopta, no compres'}</span>
         </div>
@@ -35,7 +35,7 @@ export default async function Image(){
         </div>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',background:'white',borderRadius:16,padding:'12px 14px'}}>
           <span style={{fontSize:11,fontWeight:700,color:'#3D405B',opacity:0.6}}>keyrescata.netlify.app/catalogo</span>
-          <span style={{fontSize:12}}>🐶🐱</span>
+          <span style={{fontSize:12}}></span>
         </div>
       </div>
     </div>
